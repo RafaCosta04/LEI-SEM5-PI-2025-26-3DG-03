@@ -1,0 +1,35 @@
+@startuml 2.2.6
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Port Authority Officer" as portOfficer
+participant "System" as system
+
+title System Sequence Diagram - US2.2.6
+
+== Register a Shipping agent representative ==
+activate portOfficer
+
+portOfficer -> system : Register a shipping agent representative
+activate system
+
+system -> portOfficer : Request shipping agent representative information("Unique Identifier\n, citizen id, name, nationality, email, phone number")
+deactivate system
+portOfficer -> system : Provide shipping agent representative information
+
+activate system
+system -> portOfficer : Request shipping agent organization to be associated
+deactivate system
+portOfficer -> system : Provide the shipping agent organization
+
+activate system
+
+system -> system : Create shipping agent\n representative record
+
+system -> portOfficer : Confirm shipping agent representative registration
+deactivate system
+
+
+
+@enduml
