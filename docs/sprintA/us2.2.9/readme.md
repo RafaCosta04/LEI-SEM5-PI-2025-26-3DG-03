@@ -3,11 +3,11 @@
 ## 1. Context
 
 *A Vessel Visit represents the planned arrival and departure of a vessel at the port, including associated operations such as cargo loading and unloading. The process begins when a shipping agent representative submits a Vessel Visit notification for an authorized vessel, providing key information such as expected arrival (ETA), departure (ETD), cargo type and volume, and any special handling requirements.
-Additionally, a Vessel Visit Notification may also include basic crew information to support regulatory and operational needs. For most visits, this information is limited to the captain’s name and the total number of crew members on board However, when the vessel carries dangerous cargo, the notification must explicitly identify the designated crew safety officers, as their presence is a  prerequisite for port operations involving hazardous materials. .*
+Additionally, a Vessel Visit Notification may also include basic crew information to support regulatory and operational needs. For most visits, this information is limited to the captain’s name and the total number of crew members on board However, when the vessel carries dangerous cargo, the notification must explicitly identify the designated crew safety officers, as their presence is a  prerequisite for port operations involving hazardous materials.*
 
 ## 2. Requirements
 
-**US 2.2.8** As a Shipping Agent Representative, I want to change / complete a Vessel Visit Notification while it is still in progress, so that I can correct errors or withdraw requests if necessary.
+**US 2.2.9** As a Shipping Agent Representative, I want to change / complete a Vessel Visit Notification while it is still in progress, so that I can correct errors or withdraw requests if necessary.
 
 
 **Acceptance Criteria:**
