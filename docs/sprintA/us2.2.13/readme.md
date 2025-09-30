@@ -6,7 +6,7 @@
 
 ## 2. Requirements
 
-**US 2.2.3** As a Logistics Operator, I want to register and manage qualifications (create, update), so that staff members and resources can be consistently associated with the correct skills and certifications required for port operations.
+**US 2.2.13** As a Logistics Operator, I want to register and manage qualifications (create, update), so that staff members and resources can be consistently associated with the correct skills and certifications required for port operations.
 
 **Acceptance Criteria:**
 

@@ -7,7 +7,7 @@ Despite their identification and contact data such as the mecanographic number, 
 
 ## 2. Requirements
 
-**US 2.2.3** As a Logistics Operator, I want to register and manage operating staff members (create, update, deactivate), so that the system can accurately reflect staff availability and ensure that only qualified personnel are assigned to resources during scheduling.
+**US 2.2.11** As a Logistics Operator, I want to register and manage operating staff members (create, update, deactivate), so that the system can accurately reflect staff availability and ensure that only qualified personnel are assigned to resources during scheduling.
 
 **Acceptance Criteria:**
 
