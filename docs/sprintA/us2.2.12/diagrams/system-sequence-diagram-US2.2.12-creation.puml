@@ -1,0 +1,29 @@
+@startuml 2.2.12
+
+skinparam Monochrome true
+skinparam PackageStyle rectangle
+skinparam shadowing false
+
+actor "Logistics Operator" as LO 
+participant "System" as SYS
+
+title System Sequence Diagram - US2.2.12
+
+== Create Physical Resources ==
+activate LO
+
+
+LO -> SYS : Asks to Register a new Physical Resource\n(fixed cranes, mobile cranes and trucks)
+activate SYS
+SYS -> LO : Request which Physical Resource he wants to create
+deactivate SYS
+LO -> SYS : Selects the Physical Resouce he wants to create
+activate SYS
+SYS -> LO : Requests the required data
+deactivate SYS
+LO -> SYS : Inserts the requires data
+activate SYS
+SYS -> LO : Confirms Physical Resource Registration 
+deactivate SYS
+deactivate LO
+@enduml
