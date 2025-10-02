@@ -6,7 +6,10 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: "0 0 * * *" # Todos os dias à meia-noite (UTC)
+    - cron: "0 0 * * *" # todos os dias à meia-noite (UTC)
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -15,11 +18,18 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.414'
+
+      - name: Instalar dotnet-format
+        run: |
+          dotnet tool install -g dotnet-format || dotnet tool update -g dotnet-format
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Restaurar dependências
         run: dotnet restore
@@ -30,6 +40,15 @@ jobs:
       - name: Executar testes
         run: dotnet test --no-build --verbosity normal
 
-      # Opcional: verificar formatação do código
       - name: Verificar formatação do código
-        run: dotnet format --verify-no-changes
+        run: dotnet format --verify-no-changes || true 
+
+      - name: Autoformat e push
+        if: ${{ github.event_name != 'schedule' }}
+        run: |
+          dotnet format
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Apply dotnet format" || echo "No changes to commit"
+          git push
