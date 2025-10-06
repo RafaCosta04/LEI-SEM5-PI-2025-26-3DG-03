@@ -44,8 +44,8 @@ public class VesselTypeDTO
         {
             VesselTypeDTO vesselTypeDTO = ToDTO(vesselType);
             vesselTypeDTOs.Add(vesselTypeDTO);
-            }
-            return vesselTypeDTOs;
+        }
+        return vesselTypeDTOs;
     }
 
 
