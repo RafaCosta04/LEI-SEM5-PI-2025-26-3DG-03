@@ -42,7 +42,7 @@ namespace WebApi.IntegrationTests.Tests
             var getResponse = await _client.GetAsync($"/api/VesselType/ByName/{dto.Name}");
             Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
             var returned = await getResponse.Content.ReadFromJsonAsync<VesselTypeDTO>();
-            Assert.NotNull(returned); 
+            Assert.NotNull(returned);
             Assert.Equal(dto.Name, returned.Name);
         }
 
@@ -66,7 +66,7 @@ namespace WebApi.IntegrationTests.Tests
 
             var getResponse = await _client.GetAsync($"/api/VesselType/ByName/{dto.Name}");
             var returned = await getResponse.Content.ReadFromJsonAsync<VesselTypeDTO>();
-            Assert.NotNull(returned); 
+            Assert.NotNull(returned);
             Assert.Equal("UpdatedDesc", returned.Description);
         }
 

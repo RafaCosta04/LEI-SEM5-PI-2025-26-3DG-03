@@ -49,14 +49,14 @@ public class IntegrationTestsWebApplicationFactory<Program>
                 d => d.ServiceType ==
                     typeof(DbContextOptions<DataModel.Repository.ShippingManagementContext>));
 
-            if(dbContextDescriptor != null)
+            if (dbContextDescriptor != null)
                 services.Remove(dbContextDescriptor);
 
             var dbConnectionDescriptor = services.SingleOrDefault(
                 d => d.ServiceType ==
                     typeof(DbConnection));
 
-            if(dbConnectionDescriptor != null)
+            if (dbConnectionDescriptor != null)
                 services.Remove(dbConnectionDescriptor);
 
             // Create open SqliteConnection so EF won't automatically close it.
