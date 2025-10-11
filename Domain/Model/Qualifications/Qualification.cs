@@ -23,12 +23,6 @@ namespace ShippingManagement.Domain.Qualifications
             Description = description.Trim();
         }
 
-        public void ChangeCode(string code)
-        {
-            ValidateCode(code);
-            Code = code.Trim();
-        }
-
         public void ChangeName(string name)
         {
             ValidateName(name);
@@ -65,7 +59,8 @@ namespace ShippingManagement.Domain.Qualifications
 
         private static void ValidateDescription(string description)
         {
-            if (string.IsNullOrWhiteSpace(description)) return;
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Qualification description cannot be null, empty, or whitespace.", nameof(description));
 
             var trimmed = description.Trim();
             if (trimmed.Length > 150)

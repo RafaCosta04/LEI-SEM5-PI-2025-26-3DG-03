@@ -52,14 +52,16 @@ public class QualificationController : ControllerBase
     }
 
     [HttpPut("Update/{id}")]
-    public async Task<IActionResult> Update(long id, QualificationUpdateDTO dto)
+    public async Task<IActionResult> Update(long id, QualificationDTO dto)
     {
         if (dto == null)
         {
             return BadRequest("Invalid qualification data.");
         }
 
-        var ok = await _qualificationService.UpdateQualificationNameAndDescription(id, dto, _errorMessages);
+        dto.Id = id;
+
+        var ok = await _qualificationService.UpdateQualification(dto, _errorMessages);
         if (!ok && _errorMessages.Any()) return BadRequest(_errorMessages);
         if (!ok) return NotFound("Qualification not found or not updated.");
 
