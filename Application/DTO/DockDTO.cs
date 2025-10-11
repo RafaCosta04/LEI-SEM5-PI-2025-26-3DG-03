@@ -17,7 +17,7 @@ public class DockDTO
     public List<VesselType>? VesselTypesAllowed { get; private set; }
 
     public DateTime LastModifiedAt { get; set; }
-    
+
 
     public DockDTO() { }
 
@@ -37,7 +37,8 @@ public class DockDTO
         {
             DockDTO dockDTO = new DockDTO(dock.Name!, dock.Location!, dock.Length, dock.Depth, dock.MaxDraft, dock.VesselTypesAllowed!);
             return dockDTO;
-        }catch(ArgumentOutOfRangeException ex)
+        }
+        catch (ArgumentOutOfRangeException ex)
         {
             throw new ArgumentException($"Error converting to DockDTO: {ex.Message}");
         }

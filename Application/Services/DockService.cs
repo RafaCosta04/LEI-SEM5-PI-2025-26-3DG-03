@@ -105,16 +105,17 @@ public class DockService
                 errorMessages.Add("Dock not found");
                 return false;
             }
-            
-        }catch (Exception ex)
+
+        }
+        catch (Exception ex)
         {
             errorMessages.Add("Error in converting DTO to Domain: " + ex.Message);
             return false;
         }
-        
+
     }
 
-       
-    
+
+
 
 }

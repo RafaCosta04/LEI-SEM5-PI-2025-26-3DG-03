@@ -49,8 +49,8 @@ public class DockMapper
         dockDM.MaxDraft = dock.MaxDraft;
         dockDM.VesselTypesAllowed = dock.VesselTypesAllowed!.Select(vt => new VesselTypeMapper(new Domain.Factory.VesselTypeFactory()).ToDataModel(vt)).ToList();
     }
-    
-        
-    
+
+
+
 
 }

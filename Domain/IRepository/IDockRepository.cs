@@ -17,7 +17,7 @@ public interface IDockRepository : IGenericRepository<Dock>
     Task<Dock> AddDock(Dock dock);
 
     Task<Dock?> UpdateDock(Dock dock, List<string> errorMessages);
- 
+
     Task<bool> DockExists(long id);
-    
+
 }

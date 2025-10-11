@@ -8,7 +8,7 @@ public class Dock
 {
     public long Id { get; set; }
 
-    
+
     public string? Name { get; private set; }
 
     public string? Location { get; private set; }
@@ -21,7 +21,7 @@ public class Dock
 
     public List<VesselType>? VesselTypesAllowed { get; private set; }
 
-    
+
     public DateTime LastModifiedAt { get; set; }
 
     private Dock() { }
