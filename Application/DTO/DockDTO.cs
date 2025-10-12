@@ -8,13 +8,13 @@ public class DockDTO
     public string? Name { get; set; }
     public string? Location { get; set; }
 
-    public int Length { get; private set; }
+    public int Length { get; set; }
 
-    public int Depth { get; private set; }
+    public int Depth { get;  set; }
 
-    public int MaxDraft { get; private set; }
+    public int MaxDraft { get;  set; }
 
-    public List<VesselType>? VesselTypesAllowed { get; private set; }
+    public List<VesselType>? VesselTypesAllowed { get; set; }
 
     public DateTime LastModifiedAt { get; set; }
 

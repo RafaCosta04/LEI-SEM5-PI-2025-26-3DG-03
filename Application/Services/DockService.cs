@@ -10,10 +10,12 @@ public class DockService
 {
 
     private readonly IDockRepository _dockRepository;
+    private readonly IVesselTypeRepository _vesselTypeRepository;
 
-    public DockService(IDockRepository dockRepository)
+    public DockService(IDockRepository dockRepository, IVesselTypeRepository vesselTypeRepository)
     {
         _dockRepository = dockRepository;
+        _vesselTypeRepository = vesselTypeRepository;
     }
 
     public async Task<IEnumerable<DockDTO>> GetAllDocks()
@@ -56,8 +58,26 @@ public class DockService
         return null;
     }
 
-    public async Task<IEnumerable<DockDTO?>> GetDocksByVesselTypes(IEnumerable<VesselType> vesselTypes)
+    public async Task<IEnumerable<DockDTO?>> GetDocksByVesselTypes(IEnumerable<long> vesselTypesIds)
     {
+        if (vesselTypesIds == null || !vesselTypesIds.Any())
+        {
+            return Enumerable.Empty<DockDTO?>();
+        }
+        List<VesselType> vesselTypes = new List<VesselType>();
+        foreach (long id in vesselTypesIds)
+        {
+            VesselType? vesselType = await _vesselTypeRepository.GetVesselTypeByIdAsync(id);
+            if (vesselType != null)
+            {
+                vesselTypes.Add(vesselType);
+            }
+        }
+        if (vesselTypes == null || !vesselTypes.Any())
+        {
+            return Enumerable.Empty<DockDTO?>();
+        }
+
         IEnumerable<Dock?> docks = await _dockRepository.GetDocksByVesselTypesAsync(vesselTypes);
         if (docks == null || !docks.Any())
         {
@@ -73,6 +93,12 @@ public class DockService
         if (dock != null)
         {
             errorMessages.Add($"A dock with the name '{dockDTO.Name}' already exists.");
+            return null;
+        }
+        Dock? dockByLocation = await _dockRepository.GetDockByLocationAsync(dockDTO.Location!);
+        if (dockByLocation != null)
+        {
+            errorMessages.Add($"A dock with the location '{dockDTO.Location}' already exists.");
             return null;
         }
         try
@@ -97,7 +123,7 @@ public class DockService
             if (dock != null)
             {
                 DockDTO.UpdateToDomain(dock, dockDTO);
-                await _dockRepository.UpdateDock(dock, errorMessages);
+                await _dockRepository.Update(dock, errorMessages);
                 return true;
             }
             else

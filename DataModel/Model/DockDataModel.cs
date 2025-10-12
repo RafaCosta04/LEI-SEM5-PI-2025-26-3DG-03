@@ -23,7 +23,7 @@ public class DockDataModel
     public int MaxDraft { get; set; }
 
     [Required]
-    public List<VesselTypeDataModel>? VesselTypesAllowed { get; set; }
+    public List<VesselTypeDataModel>? VesselTypesAllowed { get; set; } 
 
     public DockDataModel() { }
 

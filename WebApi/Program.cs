@@ -5,6 +5,7 @@ using DataModel.Repository;
 using DataModel.Mapper;
 using Domain.Factory;
 using Domain.IRepository;
+using WebApi.Helpers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,10 +25,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-//builder.Services.AddTransient<IColaboratorRepository, ColaboratorRepository>();
-//builder.Services.AddTransient<IColaboratorFactory, ColaboratorFactory>();
-//builder.Services.AddTransient<ColaboratorMapper>();
-//builder.Services.AddTransient<ColaboratorService>();
+
 
 builder.Services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
 builder.Services.AddTransient<IVesselTypeFactory, VesselTypeFactory>();
@@ -39,8 +37,16 @@ builder.Services.AddTransient<IQualificationFactory, QualificationFactory>();
 builder.Services.AddTransient<QualificationMapper>();
 builder.Services.AddTransient<QualificationService>();
 
+builder.Services.AddTransient<IDockRepository, DockRepository>();
+builder.Services.AddTransient<IDockFactory, DockFactory>();
+builder.Services.AddTransient<DockMapper>();
+builder.Services.AddTransient<DockService>();
+
 
 var app = builder.Build();
+
+Utilities.InitializeDbForApp(app);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
