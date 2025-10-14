@@ -20,6 +20,9 @@ public class ShippingManagementContext : DbContext
     public virtual DbSet<QualificationDataModel> Qualifications { get; set; } = null!;
     public virtual DbSet<DockDataModel> Docks { get; set; } = null!;
 
+    public virtual DbSet<VesselRecordDataModel> VesselRecords { get; set; } = null!;
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new VesselTypeConfiguration());

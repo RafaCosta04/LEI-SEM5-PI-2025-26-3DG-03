@@ -9,4 +9,8 @@ public interface IShippingManagementContext
 {
     DbSet<VesselTypeDataModel> VesselTypes { get; set; }
     DbSet<DockDataModel> Docks { get; set; }
+
+    DbSet<VesselRecordDataModel> VesselRecords { get; set; }
+
+    DbSet<QualificationDataModel> Qualifications { get; set; }
 }

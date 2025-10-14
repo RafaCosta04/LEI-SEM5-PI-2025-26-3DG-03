@@ -1,6 +1,5 @@
 namespace Domain.IRepository;
-
-using ShippingManagement.Domain.Vessels;
+using Domain.Model;
 
 public interface IVesselRecordRepository : IGenericRepository<VesselRecord>
 {
@@ -8,9 +7,9 @@ public interface IVesselRecordRepository : IGenericRepository<VesselRecord>
 
     Task<VesselRecord?> GetVesselRecordByIdAsync(long id);
 
-    Task<VesselRecord?> GetVesselRecordByNameAsync(string name);
+    Task<VesselRecord?> GetVesselRecordByVesselNameAsync(string name);
 
-    Task<VesselRecord?> GetVesselRecordByImoNumberAsync(int imoNumber);
+    Task<VesselRecord?> GetVesselRecordByImoNumberAsync(string imoNumber);
 
     Task<VesselRecord?> GetVesselRecordByOperatorAsync(string operatorName);
 

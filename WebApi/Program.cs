@@ -32,6 +32,11 @@ builder.Services.AddTransient<IVesselTypeFactory, VesselTypeFactory>();
 builder.Services.AddTransient<VesselTypeMapper>();
 builder.Services.AddTransient<VesselTypeService>();
 
+builder.Services.AddTransient<IVesselRecordRepository, VesselRecordRepository>();
+builder.Services.AddTransient<IVesselRecordFactory, VesselRecordFactory>();
+builder.Services.AddTransient<VesselRecordMapper>();
+builder.Services.AddTransient<VesselRecordService>();
+
 builder.Services.AddTransient<IQualificationRepository, QualificationRepository>();
 builder.Services.AddTransient<IQualificationFactory, QualificationFactory>();
 builder.Services.AddTransient<QualificationMapper>();

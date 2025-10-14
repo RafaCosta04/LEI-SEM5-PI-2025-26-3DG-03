@@ -5,7 +5,6 @@ using Application.DTO;
 
 using Microsoft.EntityFrameworkCore;
 using Domain.IRepository;
-using ShippingManagement.Domain.Vessels;
 
 public class VesselRecordService
 {
@@ -23,7 +22,7 @@ public class VesselRecordService
         return vesselRecordDTOs;
     }
 
-    public async Task<VesselRecordDTO?> GetVesselRecordByIMONumber(int imoNumber)
+    public async Task<VesselRecordDTO?> GetVesselRecordByIMONumber(string imoNumber)
     {
         VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByImoNumberAsync(imoNumber);
         if (vesselRecord != null)
@@ -45,9 +44,9 @@ public class VesselRecordService
         return null;
     }
 
-    public async Task<VesselRecordDTO?> GetVesselRecordByName(string name)
+    public async Task<VesselRecordDTO?> GetVesselRecordByVesselName(string name)
     {
-        VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByNameAsync(name);
+        VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByVesselNameAsync(name);
         if (vesselRecord != null)
         {
             VesselRecordDTO vesselRecordDTO = VesselRecordDTO.ToDTO(vesselRecord);
@@ -81,7 +80,7 @@ public class VesselRecordService
         return vrDTO;
     }
 
-    public async Task<bool> UpdateVesselRecord(int imoNumber, VesselRecordDTO vesselRecordDTO, List<string> errorMessages)
+    public async Task<bool> UpdateVesselRecord(string imoNumber, VesselRecordDTO vesselRecordDTO, List<string> errorMessages)
     {
         VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByImoNumberAsync(imoNumber);
         if (vesselRecord != null)

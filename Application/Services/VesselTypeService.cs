@@ -5,7 +5,6 @@ using Application.DTO;
 
 using Microsoft.EntityFrameworkCore;
 using Domain.IRepository;
-using ShippingManagement.Domain.Vessels;
 
 public class VesselTypeService
 {
