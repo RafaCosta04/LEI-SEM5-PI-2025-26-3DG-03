@@ -9,26 +9,25 @@ public class VesselRecordDTO
 
     public string? VesselName { get; set; }
 
-    public VesselTypeDTO? VesselType { get; set; }
+    public string? VesselTypeName { get; set; }
 
     public string? Operator { get; set; }
 
     public VesselRecordDTO() { }
 
-    public VesselRecordDTO(string imoNumber, string vesselName, VesselTypeDTO vesselType, string operatorName)
+    public VesselRecordDTO(string imoNumber, string vesselName, string vesselTypeName, string operatorName)
     {
         IMONumber = imoNumber;
         VesselName = vesselName;
-        VesselType = vesselType;
         Operator = operatorName;
+        VesselTypeName = vesselTypeName;
     }
 
     static public VesselRecordDTO ToDTO(VesselRecord vesselRecord)
     {
         try
         {
-            VesselTypeDTO vesselTypeDTO = VesselTypeDTO.ToDTO(vesselRecord.VesselType!);
-            VesselRecordDTO vesselRecordDTO = new VesselRecordDTO(vesselRecord.IMONumber, vesselRecord.VesselName!, vesselTypeDTO, vesselRecord.Operator!);
+            VesselRecordDTO vesselRecordDTO = new VesselRecordDTO(vesselRecord.IMONumber!, vesselRecord.VesselName!, vesselRecord.VesselType!.Name!, vesselRecord.Operator!);
             return vesselRecordDTO;
         }
         catch (ArgumentOutOfRangeException ex)
@@ -46,35 +45,6 @@ public class VesselRecordDTO
             vesselRecordDTOs.Add(vesselRecordDTO);
         }
         return vesselRecordDTOs;
-    }
-
-    static public VesselRecord ToDomain(VesselRecordDTO vesselRecordDTO)
-    {
-        if (vesselRecordDTO.VesselName is null)
-            throw new InvalidOperationException("VesselRecord.VesselName cannot be null");
-
-        if (vesselRecordDTO.VesselType is null)
-            throw new InvalidOperationException("VesselRecord.VesselType cannot be null");
-
-        if (vesselRecordDTO.Operator is null)
-            throw new InvalidOperationException("VesselRecord.Operator cannot be null");
-
-        if (vesselRecordDTO.IMONumber.Length != 7)
-            throw new ArgumentOutOfRangeException("IMONumber must have 7 digits.");
-
-        VesselType vesselType = VesselTypeDTO.ToDomain(vesselRecordDTO.VesselType);
-        VesselRecord vesselRecord = new VesselRecord(vesselRecordDTO.IMONumber, vesselRecordDTO.VesselName, vesselType, vesselRecordDTO.Operator);
-        return vesselRecord;
-    }
-
-    static public VesselRecord UpdateToDomain(VesselRecord vesselRecord, VesselRecordDTO vesselRecordDTO)
-    {
-        vesselRecord.ChangeIMONumber(vesselRecordDTO.IMONumber);
-        vesselRecord.ChangeVesselName(vesselRecordDTO.VesselName!);
-        VesselType vesselType = VesselTypeDTO.ToDomain(vesselRecordDTO.VesselType!);
-        vesselRecord.ChangeVesselType(vesselType);
-        vesselRecord.ChangeOperator(vesselRecordDTO.Operator!);
-        return vesselRecord;
     }
 
 }

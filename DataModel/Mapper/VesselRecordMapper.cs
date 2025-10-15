@@ -3,6 +3,7 @@ namespace DataModel.Mapper;
 using DataModel.Model;
 using Domain.Factory;
 using Domain.Model;
+using Microsoft.EntityFrameworkCore;
 
 public class VesselRecordMapper
 {
@@ -21,7 +22,7 @@ public class VesselRecordMapper
         if (vesselRecordDM.VesselType != null)
             vesselType = _vesselTypeMapper.ToDomain(vesselRecordDM.VesselType);
 
-        VesselRecord vesselRecordDomain = _vesselRecordFactory.NewVesselRecord(vesselRecordDM.IMONumber, vesselRecordDM.VesselName!, vesselType!, vesselRecordDM.Operator!);
+        VesselRecord vesselRecordDomain = _vesselRecordFactory.NewVesselRecord(vesselRecordDM.IMONumber!, vesselRecordDM.VesselName!, vesselType!, vesselRecordDM.Operator!);
         vesselRecordDomain.Id = vesselRecordDM.Id;
         return vesselRecordDomain;
     }
@@ -41,17 +42,17 @@ public class VesselRecordMapper
     public VesselRecordDataModel ToDataModel(VesselRecord vesselRecord)
     {
         VesselRecordDataModel vesselRecordDataModel = new VesselRecordDataModel(vesselRecord);
-        if (vesselRecord.VesselType != null)
-            vesselRecordDataModel.VesselType = new VesselTypeDataModel(vesselRecord.VesselType);
         return vesselRecordDataModel;
     }
 
-    public void UpdateDataModel(VesselRecordDataModel vesselRecordDM, VesselRecord vesselRecord)
+    public async Task UpdateDataModelAsync(VesselRecordDataModel vesselRecordDM, VesselRecord vesselRecord, DbContext context)
     {
-        vesselRecordDM.IMONumber = vesselRecord.IMONumber;
         vesselRecordDM.VesselName = vesselRecord.VesselName;
-        if (vesselRecord.VesselType != null)
-            vesselRecordDM.VesselType = new VesselTypeDataModel(vesselRecord.VesselType);
+        var existingVesselType = await context.Set<VesselTypeDataModel>().FindAsync(vesselRecord.VesselType!.Id);
+        if (existingVesselType != null)
+        {
+            vesselRecordDM.VesselType = existingVesselType;
+        }
         vesselRecordDM.Operator = vesselRecord.Operator;
     }
 }

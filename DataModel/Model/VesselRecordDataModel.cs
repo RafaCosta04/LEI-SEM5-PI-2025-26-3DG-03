@@ -27,8 +27,7 @@ public class VesselRecordDataModel
         Id = vesselRecord.Id;
         IMONumber = vesselRecord.IMONumber;
         VesselName = vesselRecord.VesselName;
-        if (vesselRecord.VesselType != null)
-            VesselType = new VesselTypeDataModel(vesselRecord.VesselType);
+        VesselType = new VesselTypeDataModel(vesselRecord.VesselType!);
         Operator = vesselRecord.Operator;
     }
 

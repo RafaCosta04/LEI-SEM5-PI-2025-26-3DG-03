@@ -21,6 +21,7 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         try
         {
             IEnumerable<VesselRecordDataModel> vesselRecordDataModels = await _context.Set<VesselRecordDataModel>()
+                .Include(v => v.VesselType)
                     .ToListAsync();
             IEnumerable<VesselRecord> vesselRecords = _vrMapper.ToDomain(vesselRecordDataModels);
             return vesselRecords;
@@ -36,6 +37,7 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         try
         {
             VesselRecordDataModel? vesselRecordDM = await _context.Set<VesselRecordDataModel>()
+            .Include(v => v.VesselType)
             .SingleOrDefaultAsync(v => v.IMONumber == imoNumber);
             if (vesselRecordDM != null)
             {
@@ -56,6 +58,7 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         try
         {
             VesselRecordDataModel? vesselRecordDM = await _context.Set<VesselRecordDataModel>()
+            .Include(v => v.VesselType)
             .SingleOrDefaultAsync(v => v.Id == id);
             if (vesselRecordDM != null)
             {
@@ -70,30 +73,25 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         }
     }
 
-    public async Task<VesselRecord> GetVesselRecordByVesselNameAsync(string name)
+    public async Task<VesselRecord?> GetVesselRecordByVesselNameAsync(string name)
     {
-        try
-        {
-            VesselRecordDataModel? vesselRecordDM = await _context.Set<VesselRecordDataModel>()
+        VesselRecordDataModel? vesselRecordDM = await _context.Set<VesselRecordDataModel>()
+            .Include(v => v.VesselType)
             .SingleOrDefaultAsync(v => v.VesselName == name);
-            if (vesselRecordDM != null)
-            {
-                VesselRecord vesselRecord = _vrMapper.ToDomain(vesselRecordDM);
-                return vesselRecord;
-            }
-            throw new InvalidOperationException($"Vessel with name {name} not found.");
-        }
-        catch
-        {
-            throw;
-        }
+
+
+        if (vesselRecordDM == null)
+            return null;
+
+        return _vrMapper.ToDomain(vesselRecordDM);
     }
 
-    public async Task<VesselRecord> GetVesselRecordByOperatorAsync(string operatorName)
+    public async Task<VesselRecord?> GetVesselRecordByOperatorAsync(string operatorName)
     {
         try
         {
             VesselRecordDataModel? vesselRecordDM = await _context.Set<VesselRecordDataModel>()
+            .Include(v => v.VesselType)
             .SingleOrDefaultAsync(v => v.Operator == operatorName);
             if (vesselRecordDM != null)
             {
@@ -113,6 +111,8 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         try
         {
             VesselRecordDataModel vesselRecordDM = _vrMapper.ToDataModel(vesselRecord);
+            var vesselType = await _context.Set<VesselTypeDataModel>().Where(vt=> vt.Id == vesselRecord.VesselType!.Id).FirstOrDefaultAsync();
+            vesselRecordDM.VesselType = vesselType;
             EntityEntry<VesselRecordDataModel> vesselRecordDM_EE = _context.Set<VesselRecordDataModel>().Add(vesselRecordDM);
             await _context.SaveChangesAsync();
             VesselRecordDataModel VesselRecordDataModelSaved = vesselRecordDM_EE.Entity;
@@ -130,7 +130,8 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         try
         {
             var vesselRecordDataModel = await _context.Set<VesselRecordDataModel>()
-            .FirstOrDefaultAsync(v => v.Id == vesselRecord.Id);
+                .Include(v => v.VesselType)
+                .FirstOrDefaultAsync(v => v.Id == vesselRecord.Id);
 
             if (vesselRecordDataModel == null)
             {
@@ -138,7 +139,7 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
                 return null;
             }
 
-            _vrMapper.UpdateDataModel(vesselRecordDataModel, vesselRecord);
+            await _vrMapper.UpdateDataModelAsync(vesselRecordDataModel, vesselRecord, _context);
             await _context.SaveChangesAsync();
             return _vrMapper.ToDomain(vesselRecordDataModel);
         }
@@ -159,8 +160,9 @@ public class VesselRecordRepository : GenericRepository<VesselRecord>, IVesselRe
         return await _context.Set<VesselRecordDataModel>().AnyAsync(v => v.Id == id);
     }
 }
+    
 
+        
+    
 
-
-
-
+    

@@ -5,14 +5,20 @@ using Application.DTO;
 
 using Microsoft.EntityFrameworkCore;
 using Domain.IRepository;
+using Domain.Factory;
 
 public class VesselRecordService
 {
     private readonly IVesselRecordRepository _vesselRecordRepository;
+    private readonly IVesselTypeRepository _vesselTypeRepository;
 
-    public VesselRecordService(IVesselRecordRepository vesselRecordRepository)
+    private readonly IVesselRecordFactory _vesselRecordFactory;
+
+    public VesselRecordService(IVesselRecordRepository vesselRecordRepository, IVesselTypeRepository vesselTypeRepository, IVesselRecordFactory vesselRecordFactory)
     {
         _vesselRecordRepository = vesselRecordRepository;
+        _vesselTypeRepository = vesselTypeRepository;
+        _vesselRecordFactory = vesselRecordFactory;
     }
 
     public async Task<IEnumerable<VesselRecordDTO>> GetAllVesselRecords()
@@ -66,33 +72,84 @@ public class VesselRecordService
         return null;
     }
 
+
     public async Task<VesselRecordDTO?> AddVesselRecord(VesselRecordDTO vesselRecordDTO, List<string> errorMessages)
     {
-        VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByImoNumberAsync(vesselRecordDTO.IMONumber);
+        VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByVesselNameAsync(vesselRecordDTO.VesselName!);
         if (vesselRecord != null)
         {
-            errorMessages.Add("Vessel Record with this IMO Number Already Exists!");
+            errorMessages.Add($"A vessel Record with the name '{vesselRecordDTO.VesselName}' already exists.");
             return null;
         }
-        vesselRecord = VesselRecordDTO.ToDomain(vesselRecordDTO);
+        VesselRecord? vesselRecordByIMO = await _vesselRecordRepository.GetVesselRecordByImoNumberAsync(vesselRecordDTO.IMONumber!);
+        if (vesselRecordByIMO != null)
+        {
+            errorMessages.Add($"A vessel Record with the IMO number '{vesselRecordDTO.IMONumber}' already exists.");
+            return null;
+        }
+
+        var vesselType = await _vesselTypeRepository.GetVesselTypeByNameAsync(vesselRecordDTO.VesselTypeName!);
+
+        if (vesselType == null)
+        {
+            errorMessages.Add($"Vessel type '{vesselRecordDTO.VesselTypeName}' does not exist.");
+            return null;
+        }
+        try
+        {
+            vesselRecord = _vesselRecordFactory.NewVesselRecord(
+                vesselRecordDTO.IMONumber!,
+                vesselRecordDTO.VesselName!,
+                vesselType,
+                vesselRecordDTO.Operator!
+            );
+        }
+        catch (Exception ex)
+        {
+            errorMessages.Add("Error in converting DTO to Domain: " + ex.Message);
+            return null;
+        }
+
         VesselRecord vesselRecordSaved = await _vesselRecordRepository.AddVesselRecord(vesselRecord);
         VesselRecordDTO vrDTO = VesselRecordDTO.ToDTO(vesselRecordSaved);
         return vrDTO;
     }
 
+
     public async Task<bool> UpdateVesselRecord(string imoNumber, VesselRecordDTO vesselRecordDTO, List<string> errorMessages)
     {
         VesselRecord? vesselRecord = await _vesselRecordRepository.GetVesselRecordByImoNumberAsync(imoNumber);
-        if (vesselRecord != null)
+        if (imoNumber != vesselRecordDTO.IMONumber)
         {
-            VesselRecordDTO.UpdateToDomain(vesselRecord, vesselRecordDTO);
+            errorMessages.Add("IMO number is not updatable");
+            return false;
+        }
+        if (vesselRecord == null)
+        {
+            errorMessages.Add($"Vessel Record with IMO number '{imoNumber}' not found.");
+            return false;
+        }
+
+        var vesselType = await _vesselTypeRepository.GetVesselTypeByNameAsync(vesselRecordDTO.VesselTypeName!);
+        if (vesselType == null)
+        {
+            errorMessages.Add($"Vessel type '{vesselRecordDTO.VesselTypeName}' does not exist.");
+            return false;
+        }
+
+        try
+        {
+            vesselRecord.ChangeVesselName(vesselRecordDTO.VesselName!);
+            vesselRecord.ChangeVesselType(vesselType);
+            vesselRecord.ChangeOperator(vesselRecordDTO.Operator!);
             await _vesselRecordRepository.Update(vesselRecord, errorMessages);
             return true;
         }
-        else
+        catch (Exception ex)
         {
-            errorMessages.Add("Vessel Record Not Found!");
+            errorMessages.Add("Error in updating Vessel Record: " + ex.Message);
             return false;
         }
+
     }
 }
