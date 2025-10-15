@@ -40,6 +40,7 @@ public class Dock
         Length = length;
         Depth = depth;
         MaxDraft = maxDraft;
+        LastModifiedAt = DateTime.UtcNow;
     }
 
     public bool AddVesselType(VesselType vesselType)

@@ -10,8 +10,12 @@ public static class Utilities
     public static void InitializeDbForTests(ShippingManagementContext db)
     {
         db.VesselTypes.AddRange(GetSeedingVesselTypesDataModel());
+        db.SaveChanges();
+
         db.Qualifications.AddRange(GetSeedingQualificationsDataModel());
-        db.Docks.AddRange(GetSeedingDocksDataModel(db.VesselTypes.ToList()));
+        db.SaveChanges();
+        var vesselTypes = db.VesselTypes.ToList();
+        db.Docks.AddRange(GetSeedingDocksDataModel(vesselTypes));
         db.SaveChanges();
     }
 

@@ -105,11 +105,13 @@ public class DockRepository : GenericRepository<Dock>, IDockRepository
 
         var dockDataModels = await _context.Set<DockDataModel>()
             .Include(d => d.VesselTypesAllowed)
-            .Where(dock => dock.VesselTypesAllowed != null &&
-                           vesselTypeNames.All(vtName => dock.VesselTypesAllowed.Any(vt => vt.Name == vtName)))
             .ToListAsync();
 
-        var docks = _dockMapper.ToDomain(dockDataModels);
+        var filtered = dockDataModels
+        .Where(d => vesselTypeNames.All(vtName => d.VesselTypesAllowed!.Any(vt => vt.Name == vtName)))
+        .ToList();
+
+        var docks = _dockMapper.ToDomain(filtered);
         return docks;
     }
 
@@ -137,27 +139,32 @@ public class DockRepository : GenericRepository<Dock>, IDockRepository
 
 
     public async Task<Dock?> Update(Dock dock, List<string> errorMessages)
+{
+    try
     {
-        try
+        DockDataModel? dockDM = await _context.Set<DockDataModel>()
+            .Include(d => d.VesselTypesAllowed)
+            .SingleOrDefaultAsync(d => d.Id == dock.Id);
+
+        if (dockDM == null)
         {
-            DockDataModel? dockDM = await _context.Set<DockDataModel>()
-                .Include(d => d.VesselTypesAllowed)
-                .SingleOrDefaultAsync(d => d.Id == dock.Id);
-            if (dockDM == null)
-            {
-                errorMessages.Add($"Dock with ID {dock.Id} not found.");
-                return null;
-            }
-            _dockMapper.UpdateDataModel(dockDM, dock);
-            await _context.SaveChangesAsync();
-            return _dockMapper.ToDomain(dockDM);
-        }
-        catch (Exception ex)
-        {
-            errorMessages.Add($"An error occurred while updating the dock: {ex.Message}");
+            errorMessages.Add($"Dock with ID {dock.Id} not found.");
             return null;
         }
+
+        await _dockMapper.UpdateDataModelAsync(dockDM, dock, _context);
+
+        await _context.SaveChangesAsync();
+
+        return _dockMapper.ToDomain(dockDM);
     }
+    catch (Exception ex)
+    {
+        errorMessages.Add($"An error occurred while updating the dock: {ex.Message}");
+        return null;
+    }
+}
+
 
     public async Task<bool> DockExists(long id)
     {

@@ -4,6 +4,8 @@ using DataModel.Model;
 
 using Domain.Model;
 using Domain.Factory;
+using DataModel.Repository;
+using Microsoft.EntityFrameworkCore;
 
 public class DockMapper
 {
@@ -40,14 +42,24 @@ public class DockMapper
         return dockDM;
     }
 
-    public void UpdateDataModel(DockDataModel dockDM, Dock dock)
+    public async Task UpdateDataModelAsync(DockDataModel dockDM, Dock dock,DbContext  context)
     {
         dockDM.Name = dock.Name;
         dockDM.Location = dock.Location;
         dockDM.Length = dock.Length;
         dockDM.Depth = dock.Depth;
         dockDM.MaxDraft = dock.MaxDraft;
-        dockDM.VesselTypesAllowed = dock.VesselTypesAllowed!.Select(vt => new VesselTypeMapper(new Domain.Factory.VesselTypeFactory()).ToDataModel(vt)).ToList();
+
+        dockDM.VesselTypesAllowed!.Clear();
+
+        foreach (var vt in dock.VesselTypesAllowed!)
+        {
+            var existingVT = await context.Set<VesselTypeDataModel>().FindAsync(vt.Id);
+            if (existingVT != null)
+            {
+                dockDM.VesselTypesAllowed.Add(existingVT);
+            }
+        }
     }
 
 

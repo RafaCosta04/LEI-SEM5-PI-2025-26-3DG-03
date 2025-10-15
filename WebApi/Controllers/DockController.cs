@@ -57,13 +57,13 @@ public class DockController : ControllerBase
     }
 
     [HttpPost("ByVesselTypes")]
-    public async Task<ActionResult<IEnumerable<DockDTO>>> GetDocksByVesselTypes([FromBody] List<int> vesselTypeIds)
+    public async Task<ActionResult<IEnumerable<DockDTO>>> GetDocksByVesselTypes([FromBody] List<string> vesselTypeNames)
     {
-        if (vesselTypeIds == null || !vesselTypeIds.Any())
+        if (vesselTypeNames == null || !vesselTypeNames.Any())
         {
-            return BadRequest("You must provide at least one vessel type ID.");
+            return BadRequest("You must provide at least one vessel type name.");
         }
-        var docks = await _dockService.GetDocksByVesselTypes(vesselTypeIds.Select(id => (long)id).ToList());
+        var docks = await _dockService.GetDocksByVesselTypes(vesselTypeNames);
         if (docks == null || !docks.Any())
         {
             return NotFound("No docks found that support all provided vessel types.");
@@ -75,6 +75,10 @@ public class DockController : ControllerBase
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutDock(long id, DockDTO dockDTO)
     {
+        if (dockDTO == null)
+        {
+            return BadRequest("Dock data must be provided.");
+        }
         bool wasUpdated = await _dockService.UpdateDock(id, dockDTO, _errorMessages);
         if (!wasUpdated && _errorMessages.Any())
         {

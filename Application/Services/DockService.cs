@@ -62,16 +62,16 @@ public class DockService
         return null;
     }
 
-    public async Task<IEnumerable<DockDTO?>> GetDocksByVesselTypes(IEnumerable<long> vesselTypesIds)
+    public async Task<IEnumerable<DockDTO?>> GetDocksByVesselTypes(List<string> vesselTypesNames)
     {
-        if (vesselTypesIds == null || !vesselTypesIds.Any())
+        if (vesselTypesNames == null || !vesselTypesNames.Any())
         {
             return Enumerable.Empty<DockDTO?>();
         }
         List<VesselType> vesselTypes = new List<VesselType>();
-        foreach (long id in vesselTypesIds)
+        foreach (string name in vesselTypesNames)
         {
-            VesselType? vesselType = await _vesselTypeRepository.GetVesselTypeByIdAsync(id);
+            VesselType? vesselType = await _vesselTypeRepository.GetVesselTypeByNameAsync(name);
             if (vesselType != null)
             {
                 vesselTypes.Add(vesselType);
@@ -105,7 +105,6 @@ public class DockService
             errorMessages.Add($"A dock with the location '{dockDTO.Location}' already exists.");
             return null;
         }
-
         var vesselTypes = new List<VesselType>();
         foreach (var vesselTypeName in dockDTO.VesselTypesAllowed!)
         {
@@ -153,6 +152,18 @@ public class DockService
 
     public async Task<bool> UpdateDock(long id, DockDTO dockDTO, List<string> errorMessages)
     {
+        Dock? dockname = await _dockRepository.GetDockByNameAsync(dockDTO.Name!);
+        if (dockname != null)
+        {
+            errorMessages.Add($"A dock with the name '{dockDTO.Name}' already exists.");
+            return false;
+        }
+        Dock? dockByLocation = await _dockRepository.GetDockByLocationAsync(dockDTO.Location!);
+        if (dockByLocation != null)
+        {
+            errorMessages.Add($"A dock with the location '{dockDTO.Location}' already exists.");
+            return false;
+        }
         Dock? dock = await _dockRepository.GetDockByIdAsync(id);
         if (dock == null)
         {
