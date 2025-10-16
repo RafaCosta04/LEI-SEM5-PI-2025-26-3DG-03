@@ -1,4 +1,4 @@
-@startuml
+@startuml DomainModel
 
 package "**«Aggregate» Vessel Type**" #DDDDDD {
         entity "Vessel Type" as entity_vesselType <<entity root>>{
@@ -294,41 +294,6 @@ package "**«Aggregate» Container**" #DDDDDD {
 
 }
 
-
-package "**«Aggregate» Staff**" #DDDDDD {
-        entity "Staff" as entity_staff <<entity root>>{
-        }
-
-        class "StaffId" as vObject_staffID  <<(V, #7E84F7)>>{
-        }
-
-        class "Name"     as vObject_staffName  <<(V, #7E84F7)>>{
-        }
-
-        class "Email" as vObject_staffEmail <<(V, #7E84F7)>>{
-        }
-
-        class "Phone Number" as vObject_staffPhoneNumber <<(V, #7E84F7)>>{
-        }
-
-        class "Status" as vObject_status <<(V, #7E84F7)>>{
-                Available
-                Unavailable
-        }
-
-        class "Operational Window" as vObject_operationalWindow <<(V, #7E84F7)>>{
-        }
-
-
-        entity_staff *-- vObject_staffID
-        entity_staff *-- vObject_staffName
-        entity_staff *-- vObject_staffEmail
-        entity_staff *-- vObject_staffPhoneNumber
-        entity_staff *-- vObject_status
-        entity_staff *-- vObject_operationalWindow
-
-}
-
 package "**«Aggregate» Qualification**" #DDDDDD {
         entity "Qualification" as entity_qualification <<entity root>>{
         }
@@ -374,6 +339,38 @@ package "**«Aggregate» Resources**" #DDDDDD {
         class "ID" as vObject_id <<(V, #7E84F7)>>{
         }
 
+         entity "Staff" as entity_staff{
+        }
+
+        class "StaffId" as vObject_staffID  <<(V, #7E84F7)>>{
+        }
+
+        class "Name"     as vObject_staffName  <<(V, #7E84F7)>>{
+        }
+
+        class "Email" as vObject_staffEmail <<(V, #7E84F7)>>{
+        }
+
+        class "Phone Number" as vObject_staffPhoneNumber <<(V, #7E84F7)>>{
+        }
+
+        class "Status" as vObject_status <<(V, #7E84F7)>>{
+                Available
+                Unavailable
+        }
+
+        class "Operational Window" as vObject_operationalWindow <<(V, #7E84F7)>>{
+        }
+
+
+        entity_staff *-- vObject_staffID
+        entity_staff *-- vObject_staffName
+        entity_staff *-- vObject_staffEmail
+        entity_staff *-- vObject_staffPhoneNumber
+        
+        entity_staff *-- vObject_operationalWindow
+
+
 
         entity_resources *-- entity_crane
         entity_resources *-- vObject_time
@@ -383,6 +380,8 @@ package "**«Aggregate» Resources**" #DDDDDD {
         entity_resources *- vObject_id
         entity_crane *-- vObject_isMobile
         entity_resources *-- vObject_description
+        
+        entity_resources *-- entity_staff
 
 }
 
