@@ -10,22 +10,27 @@ public class StaffDTO
     public IEnumerable<string>? QualificationCodes { get; set; }
     public string? Email { get; set; }
     public string? Phone { get; set; }
+    public OperationalWindowDTO? OperationalWindow { get; set; }
+    public ResourceStatus? Status { get; set; }
 
     public StaffDTO() { }
-    public StaffDTO(long id, string name, IEnumerable<string>? qualificationCodes, string email, string phone)
+    public StaffDTO(long id, string name, IEnumerable<string>? qualificationCodes, string email, string phone, OperationalWindowDTO operationalWindow, ResourceStatus status)
     {
         Id = id;
         Name = name;
         QualificationCodes = qualificationCodes;
         Email = email;
         Phone = phone;
+        OperationalWindow = operationalWindow;
+        Status = status;
     }
     public static StaffDTO ToDTO(Staff s)
     {
         IEnumerable<string>? qualCodes = s.Qualification?.Select(q => q.Code).ToList();
         try
         {
-            StaffDTO staffDTO = new StaffDTO(s.Id!, s.Name!, qualCodes, s.Email, s.Phone);
+            OperationalWindowDTO opWindowDTO = OperationalWindowDTO.ToDTO(s.OperationalWindow!);
+            StaffDTO staffDTO = new StaffDTO(s.Id!, s.Name!, qualCodes, s.Email, s.Phone, opWindowDTO, s.Status);
             return staffDTO;
         }
         catch (ArgumentOutOfRangeException ex)
@@ -34,7 +39,7 @@ public class StaffDTO
         }
     }
 
-    public static Staff ToDomain(StaffDTO dto, IEnumerable<Qualification> qualifications)
+    public static Staff ToDomain(StaffDTO dto, IEnumerable<Qualification> qualifications, OperationalWindow operationalWindow)
     {
         if (dto.QualificationCodes == null || !dto.QualificationCodes.Any())
             throw new InvalidOperationException("At least one QualificationCode must be provided to create a Staff.");
@@ -48,6 +53,11 @@ public class StaffDTO
         if (dto.Phone is null)
             throw new InvalidOperationException("Phone number cannot be null.");
 
-        return new Staff(dto.Name!, qualifications, dto.Email!, dto.Phone!);
+        if (dto.OperationalWindow is null)
+            throw new InvalidOperationException("OperationalWindow cannot be null.");
+
+        ResourceStatus status = dto.Status ?? ResourceStatus.Available;
+        
+        return new Staff(dto.Name!, qualifications, dto.Email!, dto.Phone!, operationalWindow, status);
     }
 }

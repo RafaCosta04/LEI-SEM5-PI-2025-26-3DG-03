@@ -20,7 +20,8 @@ public class StaffMapper
         var qualificationsData = staffDM.Qualification ?? Enumerable.Empty<QualificationDataModel>();
         var qualifications = _qualificationMapper.ToDomain(qualificationsData);
 
-        Staff staffDomain = _staffFactory.NewStaff(staffDM.Name!, qualifications, staffDM.Email!, staffDM.Phone!);
+        var status = staffDM.Status ?? ResourceStatus.Available;
+        Staff staffDomain = _staffFactory.NewStaff(staffDM.Name!, qualifications, staffDM.Email!, staffDM.Phone!, staffDM.OperationalWindow!, status);
         staffDomain.Id = staffDM.Id;
         return staffDomain;
     }

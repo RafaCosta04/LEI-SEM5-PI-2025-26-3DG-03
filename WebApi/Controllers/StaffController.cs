@@ -45,7 +45,7 @@ public class StaffController : ControllerBase
         {
             return BadRequest("At least one QualificationCode must be provided to create a Staff.");
         }
-        IEnumerable<Qualification> qualification = await _qualificationRepository.GetQualificationsByCodesAsync(staffDTO.QualificationCodes!);
+        IEnumerable<Qualification> qualification = await _qualificationRepository.GetQualificationsByCodesAsync(staffDTO.QualificationCodes!);        
         StaffDTO? createdStaff = await _staffService.AddStaff(staffDTO, qualification, _errorMessages);
         if (createdStaff == null)
         {

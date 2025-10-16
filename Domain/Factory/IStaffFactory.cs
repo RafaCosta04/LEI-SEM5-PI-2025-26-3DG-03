@@ -5,5 +5,5 @@ using ShippingManagement.Domain.Qualifications;
 
 public interface IStaffFactory
 {
-    Staff NewStaff(String name, IEnumerable<Qualification> qualification, String email, String phone);
+    Staff NewStaff(string name, IEnumerable<Qualification> qualification, string email, string phone, OperationalWindow operationalWindow, ResourceStatus status);
 }

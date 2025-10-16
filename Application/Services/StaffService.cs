@@ -18,12 +18,12 @@ public class StaffService
     public async Task<IEnumerable<StaffDTO>> GetStaffByName(String name)
     {
         IEnumerable<Staff> staffs = await _staffRepository.GetStaffByNameAsync(name);
-        List<StaffDTO> dtos = new List<StaffDTO>();
+        List<StaffDTO> StaffDTOs = new List<StaffDTO>();
         foreach (var s in staffs)
         {
-            dtos.Add(StaffDTO.ToDTO(s));
+            StaffDTOs.Add(StaffDTO.ToDTO(s));
         }
-        return dtos;
+        return StaffDTOs;
     }
 
     public async Task<StaffDTO?> AddStaff(StaffDTO staffDTO, IEnumerable<Qualification> qualifications, List<String> errorMessages)
@@ -57,7 +57,8 @@ public class StaffService
 
         try
         {
-            staff = StaffDTO.ToDomain(staffDTO, qualifications);
+            OperationalWindow opWindow = OperationalWindowDTO.ToDomain(staffDTO.OperationalWindow!);
+            staff = StaffDTO.ToDomain(staffDTO, qualifications, opWindow);
         }
         catch (Exception ex)
         {

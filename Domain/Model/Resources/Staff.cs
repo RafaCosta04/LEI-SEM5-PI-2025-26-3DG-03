@@ -3,61 +3,63 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ShippingManagement.Domain.Qualifications;
 
-namespace Domain.Model;
-public class Staff : Resource
+namespace Domain.Model
 {
-    public string Email { get; private set; }
-
-    public string Phone { get; private set; }
-
-    protected Staff() : base() { Email = string.Empty; Phone = string.Empty; }
-
-    public Staff(string name, IEnumerable<Qualification> qualification, string email, string phone) : base(name, qualification)
+    public class Staff : Resource
     {
-        ValidateEmail(email);
-        ValidatePhone(phone);
+        public string Email { get; private set; }
 
-        Email = email.Trim();
-        Phone = phone.Trim();
-    }
+        public string Phone { get; private set; }
 
-    public void ChangeEmail(string email)
-    {
-        ValidateEmail(email);
-        Email = email.Trim();
-    }
+        protected Staff() : base() { Email = string.Empty; Phone = string.Empty; }
 
-    public void ChangePhone(string phone)
-    {
-        ValidatePhone(phone);
-        Phone = phone.Trim();
-    }
+        public Staff(string name, IEnumerable<Qualification> qualification, string email, string phone, OperationalWindow operationalWindow, ResourceStatus status) : base(name, qualification, operationalWindow, status)
+        {
+            ValidateEmail(email);
+            ValidatePhone(phone);
 
-    private static void ValidateEmail(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+            Email = email.Trim();
+            Phone = phone.Trim();
+        }
 
-        var trimmed = email.Trim();
-        if (trimmed.Length > 254)
-            throw new ArgumentException("Email must be at most 254 characters long.", nameof(email));
+        public void ChangeEmail(string email)
+        {
+            ValidateEmail(email);
+            Email = email.Trim();
+        }
 
-        if (!Regex.IsMatch(trimmed, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            throw new ArgumentException("Email is not a valid email address.", nameof(email));
-    }
+        public void ChangePhone(string phone)
+        {
+            ValidatePhone(phone);
+            Phone = phone.Trim();
+        }
 
-    private static void ValidatePhone(string phone)
-    {
-        if (string.IsNullOrWhiteSpace(phone))
-            throw new ArgumentException("Phone cannot be null or empty.", nameof(phone));
+        private static void ValidateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Email cannot be null or empty.", nameof(email));
 
-        var trimmed = phone.Trim();
+            var trimmed = email.Trim();
+            if (trimmed.Length > 254)
+                throw new ArgumentException("Email must be at most 254 characters long.", nameof(email));
 
-        if (trimmed.Length > 9)
-            throw new ArgumentException("Phone must be at most 9 digits long.", nameof(phone));
+            if (!Regex.IsMatch(trimmed, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                throw new ArgumentException("Email is not a valid email address.", nameof(email));
+        }
 
-        if (!Regex.IsMatch(trimmed, @"^\d+$"))
-            throw new ArgumentException("Phone must contain only numeric digits.", nameof(phone));
+        private static void ValidatePhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                throw new ArgumentException("Phone cannot be null or empty.", nameof(phone));
+
+            var trimmed = phone.Trim();
+
+            if (trimmed.Length > 9)
+                throw new ArgumentException("Phone must be at most 9 digits long.", nameof(phone));
+
+            if (!Regex.IsMatch(trimmed, @"^\d+$"))
+                throw new ArgumentException("Phone must contain only numeric digits.", nameof(phone));
+        }
     }
 }
 
