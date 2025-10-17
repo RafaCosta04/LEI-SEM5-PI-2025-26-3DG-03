@@ -31,4 +31,13 @@ public class StaffMapper
         StaffDataModel staffDM = new StaffDataModel(staff);
         return staffDM;
     }
+
+    public void UpdateDataModel(StaffDataModel staffDM, Staff staff)
+    {
+        staffDM.Name = staff.Name;
+        staffDM.Email = staff.Email;
+        staffDM.Phone = staff.Phone;
+        staffDM.OperationalWindow = staff.OperationalWindow;
+        staffDM.Status = staff.Status;
+    }
 }

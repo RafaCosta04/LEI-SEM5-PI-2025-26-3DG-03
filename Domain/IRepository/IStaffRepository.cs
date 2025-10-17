@@ -10,4 +10,6 @@ public interface IStaffRepository : IGenericRepository<Staff>
     Task<IEnumerable<Staff>> GetStaffByNameAsync(String name);
     Task<Staff> AddStaff(Staff staff);
     Task<IEnumerable<Staff>> GetStaffByQualificationCodeAsync(String qualificationCode);
+    Task<IEnumerable<Staff>> GetStaffByStatusAsync(ResourceStatus status);
+    Task<Staff?> Update(Staff staff, List<string> errorMessages);
 }

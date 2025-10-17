@@ -46,6 +46,22 @@ public class StaffService
         }
         return StaffDTOs;
     }
+
+    public async Task<IEnumerable<StaffDTO>> GetStaffByStatus(ResourceStatus status, List<string> errorMessages)
+    {
+        if (status != ResourceStatus.Available && status != ResourceStatus.Unavailable)
+        {
+            errorMessages.Add("At least one valid QualificationCode must be provided to update a Staff.");
+            return Enumerable.Empty<StaffDTO>();
+        }
+        IEnumerable<Staff> staffs = await _staffRepository.GetStaffByStatusAsync(status);
+        List<StaffDTO> StaffDTOs = new List<StaffDTO>();
+        foreach (var s in staffs)
+        {
+            StaffDTOs.Add(StaffDTO.ToDTO(s));
+        }
+        return StaffDTOs;
+    }
     public async Task<StaffDTO?> AddStaff(StaffDTO staffDTO, IEnumerable<Qualification> qualifications, List<String> errorMessages)
     {
         if (qualifications == null || !qualifications.Any())
@@ -53,9 +69,9 @@ public class StaffService
             errorMessages.Add("At least one valid QualificationCode must be provided to update a Staff.");
             return null;
         }
-        if (staffDTO.Status != ResourceStatus.Available || staffDTO.Status != ResourceStatus.Unavailable)
+        if (staffDTO.Status != ResourceStatus.Available && staffDTO.Status != ResourceStatus.Unavailable)
         {
-            errorMessages.Add("Staff status must be either 'Available' or 'Unavailable'.");
+            errorMessages.Add("Staff status must be either Available(0) or Unavailable(1).");
             return null;
         }
         Staff staff;
@@ -98,27 +114,22 @@ public class StaffService
 
     public async Task<bool> UpdateStaff(long id, StaffDTO staffDTO, IEnumerable<Qualification> qualifications, List<string> errorMessages)
     {
-        if (staffDTO.Status != ResourceStatus.Available || staffDTO.Status != ResourceStatus.Unavailable)
+        if (staffDTO.Status != ResourceStatus.Available && staffDTO.Status != ResourceStatus.Unavailable)
         {
-            errorMessages.Add("Staff status must be either 'Available' or 'Unavailable'.");
+            errorMessages.Add("Staff status must be either Available(0) or Unavailable(1).");
             return false;
         }
         Staff? staffByID = await _staffRepository.GetStaffByIDAsync(staffDTO.Id!.Value);
-        if (staffByID != null)
-        {
-            errorMessages.Add($"Staff with ID '{staffDTO.Id}' already exist.");
-            return false;
-        }
 
         Staff? staffByEmail = await _staffRepository.GetStaffByEmailAsync(staffDTO.Email!);
-        if (staffByEmail != null)
+        if (staffByEmail != null && staffByEmail.Id != staffByID?.Id)
         {
             errorMessages.Add($"Staff with email '{staffDTO.Email}' already exists.");
             return false;
         }
 
         Staff? staffByPhone = await _staffRepository.GetStaffByPhoneAsync(staffDTO.Phone!);
-        if (staffByPhone != null)
+        if (staffByPhone != null && staffByPhone.Id != staffByID?.Id)
         {
             errorMessages.Add($"Staff with phone '{staffDTO.Phone}' already exists.");
             return false;
@@ -138,6 +149,7 @@ public class StaffService
             staff.ChangeQualifications(qualifications);
             staff.ChangeStatus(staffDTO.Status!.Value);
             staff.ChangeOperationalWindow(opWindow);
+            await _staffRepository.Update(staff, errorMessages);
             return true;
         }
         catch (Exception ex)

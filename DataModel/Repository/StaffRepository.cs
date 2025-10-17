@@ -70,19 +70,53 @@ public class StaffRepository : GenericRepository<Staff>, IStaffRepository
     }
     public async Task<IEnumerable<Staff>> GetStaffByQualificationCodeAsync(string qualificationCode)
     {
-        var staffDMs = await _context.Set<StaffDataModel>()
-            .Include(s => s.Qualification)
+        var staffQuery = _context.Set<StaffDataModel>().AsQueryable();
+
+        var staffList = await staffQuery.AsNoTracking().ToListAsync();
+
+        foreach (var s in staffList)
+        {
+            await _context.Entry(s)
+                .Collection(x => x.Qualification!)
+                .LoadAsync();
+        }
+        var filtered = staffList
             .Where(s => s.Qualification != null && s.Qualification.Any(q => q.Code == qualificationCode))
-            .ToListAsync();
+            .ToList();
 
         var result = new List<Staff>();
-        foreach (var staffDM in staffDMs)
+        foreach (var staffDM in filtered)
         {
-            if (staffDM != null)
-                result.Add(_sMapper.ToDomain(staffDM));
+            result.Add(_sMapper.ToDomain(staffDM));
         }
+
         return result;
     }
+
+    public async Task<IEnumerable<Staff>> GetStaffByStatusAsync(ResourceStatus status)
+    {
+        var staffList = await _context.Set<StaffDataModel>().AsNoTracking().ToListAsync();
+
+        foreach (var s in staffList)
+        {
+            await _context.Entry(s)
+                .Collection(x => x.Qualification!)
+                .LoadAsync();
+        }
+
+        var filtered = staffList
+            .Where(s => s.Status == status)
+            .ToList();
+
+        var result = new List<Staff>();
+        foreach (var staffDM in filtered)
+        {
+            result.Add(_sMapper.ToDomain(staffDM));
+        }
+
+        return result;
+    }
+
     public async Task<Staff> AddStaff(Staff staff)
     {
         try
@@ -115,6 +149,33 @@ public class StaffRepository : GenericRepository<Staff>, IStaffRepository
         }
         catch
         {
+            throw;
+        }
+    }
+    public async Task<Staff?> Update(Staff staff, List<string> errorMessages)
+    {
+        try
+        {
+            var staffDataModel = await _context.Set<StaffDataModel>()
+            .FirstOrDefaultAsync(s => s.Id == staff.Id);
+
+            if (staffDataModel == null)
+            {
+                errorMessages.Add("Staff not found!");
+                return null;
+            }
+            _sMapper.UpdateDataModel(staffDataModel, staff);
+            await _context.SaveChangesAsync();
+            return _sMapper.ToDomain(staffDataModel);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            errorMessages.Add("Concurrency error occurred while updating Staff.");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            errorMessages.Add($"Unexpected error: {ex.Message}");
             throw;
         }
     }
