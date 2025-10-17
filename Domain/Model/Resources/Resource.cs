@@ -29,7 +29,7 @@ namespace Domain.Model
             ValidateName(name);
             ValidateQualification(qualification);
             ValidateOperationalWindow(operationalWindow);
-            
+
             Name = name.Trim();
             Qualification = qualification;
             OperationalWindow = operationalWindow;
@@ -54,7 +54,7 @@ namespace Domain.Model
         }
 
         public void ChangeOperationalWindow(OperationalWindow operationalWindow)
-        {   
+        {
             ValidateOperationalWindow(operationalWindow);
             OperationalWindow = operationalWindow;
         }
