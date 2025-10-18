@@ -68,7 +68,7 @@ public class StorageAreaService
             errorMessages.Add($"Storage area with code {storageAreaDTO.Code} already exists.");
             return null;
         }
-        
+
         StorageArea? existingStorageAreaByLocation = await _storageAreaRepository.GetStorageAreaByLocationAsync(storageAreaDTO.Location);
         if (existingStorageAreaByLocation != null)
         {
@@ -111,8 +111,8 @@ public class StorageAreaService
         return saDTO;
     }
 
-     
-    public async Task<bool> UpdateStorageArea(long id,StorageAreaDTO storageAreaDTO, List<string> errorMessages)
+
+    public async Task<bool> UpdateStorageArea(long id, StorageAreaDTO storageAreaDTO, List<string> errorMessages)
     {
         StorageArea? storageArea = await _storageAreaRepository.GetStorageAreaByIdAsync(id);
         if (storageArea == null)
@@ -132,11 +132,13 @@ public class StorageAreaService
             errorMessages.Add($"Storage area with location {storageAreaDTO.Location} already exists.");
             return false;
         }
-        if(storageAreaDTO.StorageaAreaType != storageArea.Type){
+        if (storageAreaDTO.StorageaAreaType != storageArea.Type)
+        {
             errorMessages.Add("Its not possible to update the storage area type.");
             return false;
         }
-        try{
+        try
+        {
             storageArea.ChangeLocation(storageAreaDTO.Location);
             storageArea.ChangeMaxCapacity(storageAreaDTO.MaxCapacity);
             storageArea.ChangeCurrentCapacity(storageAreaDTO.CurrentCapacity);
@@ -153,13 +155,14 @@ public class StorageAreaService
             }
             await _storageAreaRepository.Update(storageArea, errorMessages);
             return true;
-        }catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             errorMessages.Add("Error in converting DTO to Domain: " + ex.Message);
             return false;
         }
-        
-    } 
+
+    }
 
 
 }

@@ -108,10 +108,10 @@ public class StorageArea
         LastModifiedAt = DateTime.UtcNow;
     }
 
-    
+
     public void AddStorageAreaDock(Dock dock, double distance)
     {
-        if(StorageAreaDocks.Any(sd => sd.DockId == dock.Id))
+        if (StorageAreaDocks.Any(sd => sd.DockId == dock.Id))
         {
             throw new InvalidOperationException($"Dock with ID {dock.Id} is already associated with this storage area.");
         }
