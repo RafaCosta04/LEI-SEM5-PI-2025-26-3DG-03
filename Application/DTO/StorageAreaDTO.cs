@@ -5,21 +5,21 @@ using Domain.Model;
 public class StorageAreaDTO
 {
     public long Id { get; set; }
-    public string Code { get;  set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
 
-    public string Location { get;  set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
 
     public StorageAreaType StorageAreaType { get;  set; }
 
-    public int MaxCapacity { get;  set; }
+    public int MaxCapacity { get; set; }
 
-    public int CurrentCapacity { get; set; }  
+    public int CurrentCapacity { get; set; }
 
     public List<StorageAreaDockDTO>? StorageAreaDocks { get; set; }
 
     public DateTime LastModifiedAt { get; set; }
 
-    public StorageAreaDTO(){}
+    public StorageAreaDTO() { }
 
     public StorageAreaDTO(long id, string code, string location, StorageAreaType type, int maxCapacity, int currentCapacity, List<StorageAreaDockDTO> storageAreaDocks)
     {
