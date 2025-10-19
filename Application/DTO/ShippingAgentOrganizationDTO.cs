@@ -80,5 +80,5 @@ public class ShippingAgentOrganizationDTO
         organization.ChangeTaxNumber(organizationDTO.TaxNumber!);
         return organization;
     }
-    
+
 }

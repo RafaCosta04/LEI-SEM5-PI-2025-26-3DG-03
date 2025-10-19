@@ -8,4 +8,4 @@ public class ShippingAgentOrganizationFactory :IShippingAgentOrganizationFactory
     {
         return new ShippingAgentOrganization(code, legalName, alternativeName, address, taxNumber);
     }
-} 
+}
