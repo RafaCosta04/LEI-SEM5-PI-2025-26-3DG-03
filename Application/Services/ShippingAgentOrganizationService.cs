@@ -8,5 +8,5 @@ using Domain.IRepository;
 
 public class ShippingAgentOrganizationService
 {
-    
+
 }

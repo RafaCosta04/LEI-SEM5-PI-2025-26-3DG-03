@@ -101,5 +101,5 @@ public class ShippingAgentOrganization
         TaxNumeber = newTaxNumber;
         LastModifiedAt = DateTime.UtcNow;
     }
-    
+
 }
