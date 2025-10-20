@@ -210,7 +210,7 @@ public class VesselVisitNotification
         Representative = representative;
         LastModifiedAt = DateTime.UtcNow;
     }
-    
+
     public void ChangeVisitStatus(VisitStatus status)
     {
         VisitStatus = status;

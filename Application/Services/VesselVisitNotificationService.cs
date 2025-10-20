@@ -162,7 +162,7 @@ public class VesselVisitNotificationService
                             throw new Exception($"Invalid container in cargo manifest entry: {ex.Message}");
                         }
                         var storageArea = await _storageAreaRepository.GetStorageAreaByCodeAsync(entryDto.StorageAreaCode);
-                        if(storageArea == null)
+                        if (storageArea == null)
                         {
                             throw new Exception($"Storage area with code '{entryDto.StorageAreaCode}' not found.");
                         }
@@ -220,9 +220,9 @@ public class VesselVisitNotificationService
         Console.WriteLine($"Generated Vessel Visit Code: {code}");
         return code;
     }
-    
 
-    public async Task<bool> UpdateVesselVisitNotification(string visitCode,VesselVisitNotificationDTO notificationDTO, List<string> errorMessages)
+
+    public async Task<bool> UpdateVesselVisitNotification(string visitCode, VesselVisitNotificationDTO notificationDTO, List<string> errorMessages)
     {
         VesselVisitNotification? existingNotification = await _vesselVisitNotificationRepository.GetVisitByCodeAsync(visitCode);
         if (existingNotification == null)
@@ -252,7 +252,8 @@ public class VesselVisitNotificationService
             errorMessages.Add("Representative not found.");
             return false;
         }
-        try{
+        try
+        {
             List<CrewMember> crewMembers = new List<CrewMember>();
             if (notificationDTO.CrewMembers != null)
             {
@@ -309,7 +310,8 @@ public class VesselVisitNotificationService
             existingNotification.ChangeVisitStatus(notificationDTO.VisitStatus);
             await _vesselVisitNotificationRepository.UpdateVisitAsync(existingNotification, errorMessages);
             return true;
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             errorMessages.Add("Error updating Vessel Visit Notification: " + ex.Message);
             return false;

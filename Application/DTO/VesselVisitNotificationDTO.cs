@@ -83,7 +83,7 @@ public class VesselVisitNotificationDTO
             throw new ArgumentException($"Error converting to VesselVisitNotificationDTO: {ex.Message}");
         }
     }
-    
+
     static public IEnumerable<VesselVisitNotificationDTO> ToDTO(IEnumerable<VesselVisitNotification> vesselVisitNotifications)
     {
         List<VesselVisitNotificationDTO> vesselVisitNotificationDTOs = new List<VesselVisitNotificationDTO>();

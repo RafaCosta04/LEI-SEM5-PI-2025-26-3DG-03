@@ -28,5 +28,5 @@ public interface IVesselVisitNotificationRepository : IGenericRepository<VesselV
     Task<VesselVisitNotification> AddNotificationAsync(VesselVisitNotification notification);
 
     Task<bool> UpdateVisitAsync(VesselVisitNotification notification, List<string> errorMessages);
-    
+
 }
