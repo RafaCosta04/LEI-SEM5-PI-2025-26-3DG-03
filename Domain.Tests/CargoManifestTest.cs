@@ -28,7 +28,7 @@ namespace Domain.Tests
                 CreateValidCrew()
             );
         }
-        
+
         private ShippingAgentOrganization CreateValidShippingAgentOrganization() =>
             new ShippingAgentOrganization("AAA", "AAAAAAA", "AAAAAA", "AAAAAA", "A13231");
 

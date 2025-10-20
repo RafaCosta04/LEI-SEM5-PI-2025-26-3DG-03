@@ -7,11 +7,11 @@ namespace Domain.Tests
 {
     public class VesselVisitNotificationTest
     {
-        private VesselRecord CreateValidVessel() => 
-            new VesselRecord("9781889", "Test Vessel", new VesselType("Type1", "Desc", 4,4,4,4), "Operator");
+        private VesselRecord CreateValidVessel() =>
+            new VesselRecord("9781889", "Test Vessel", new VesselType("Type1", "Desc", 4, 4, 4, 4), "Operator");
 
         private Representative CreateValidRepresentative() =>
-            new Representative(new ShippingAgentOrganization("AAA", "AAAA", "AAAA", "AAAA", "A13231"), 
+            new Representative(new ShippingAgentOrganization("AAA", "AAAA", "AAAA", "AAAA", "A13231"),
                                "Joao", "AA1111", "PT", "teste@gmail.com", "999999999");
 
         private List<CrewMember> CreateValidCrew() =>
@@ -163,7 +163,7 @@ namespace Domain.Tests
                 CreateValidCrew()
             );
             var vesselType = new VesselType("Type1", "Desc", 4, 4, 4, 4);
-            var dock = new Dock("Dock1", "Location1", 5000, 2000, 10,new List<VesselType> { vesselType });
+            var dock = new Dock("Dock1", "Location1", 5000, 2000, 10, new List<VesselType> { vesselType });
             var oldTime = vvn.LastModifiedAt;
 
             vvn.AssignDock(dock);

@@ -9,8 +9,8 @@ namespace Domain.Tests
         [Theory]
         [InlineData("CSQU3054383")]
         [InlineData("MSCU6639871")]
-        [InlineData("ABCU1234567")]  
-        [InlineData("TGHU0000001")] 
+        [InlineData("ABCU1234567")]
+        [InlineData("TGHU0000001")]
         public void Constructor_ValidContainerNumbers_ShouldCreate(string containerNumber)
         {
             var c = new Container(containerNumber);
@@ -30,10 +30,10 @@ namespace Domain.Tests
         }
 
         [Theory]
-        [InlineData("ABCD123456")]   
+        [InlineData("ABCD123456")]
         [InlineData("ABCDE1234567")]
-        [InlineData("abc1234567")]   
-        [InlineData("1234ABCD567")]  
+        [InlineData("abc1234567")]
+        [InlineData("1234ABCD567")]
         public void Constructor_InvalidFormat_ShouldThrow(string containerNumber)
         {
             Assert.Throws<ArgumentException>(() => new Container(containerNumber));
