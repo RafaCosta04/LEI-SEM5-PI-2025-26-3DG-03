@@ -10,7 +10,7 @@ public enum CargoType
     Hazardous
 }
 
-public enum Status
+public enum VisitStatus
 {
 
     Pending,
@@ -45,6 +45,8 @@ public class VesselVisitNotification
 
     public Dock? AssignedDock { get; private set; } = null;
 
+    public VisitStatus VisitStatus { get; private set; }
+
     public DateTime LastModifiedAt { get; set; }
 
 
@@ -71,6 +73,7 @@ public class VesselVisitNotification
         Volume = volume;
         CrewMembers = crewMembers;
         LastModifiedAt = DateTime.UtcNow;
+        VisitStatus = VisitStatus.InProgress;
     }
 
     public void AssignDock(Dock dock)
@@ -193,11 +196,24 @@ public class VesselVisitNotification
         CargoManifests = cargoManifests;
         LastModifiedAt = DateTime.UtcNow;
     }
-    
+
     public void ChangeCrewMembers(List<CrewMember> crewMembers)
     {
         ValidateCrewMembers(crewMembers);
         CrewMembers = crewMembers;
+        LastModifiedAt = DateTime.UtcNow;
+    }
+
+    public void ChangeRepresentative(Representative representative)
+    {
+        ValidateRepresentative(representative);
+        Representative = representative;
+        LastModifiedAt = DateTime.UtcNow;
+    }
+    
+    public void ChangeVisitStatus(VisitStatus status)
+    {
+        VisitStatus = status;
         LastModifiedAt = DateTime.UtcNow;
     }
 
