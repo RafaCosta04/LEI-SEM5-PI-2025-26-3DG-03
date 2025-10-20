@@ -153,7 +153,7 @@ namespace Domain.Tests
             var org = new ShippingAgentOrganization("ORG1", "Legal Name", "Alt Name", "123 Street", "TAX123");
             Assert.Throws<ArgumentException>(() => org.ChangeTaxNumber(newTaxNumber));
         }
-        
+
 
     }
 }

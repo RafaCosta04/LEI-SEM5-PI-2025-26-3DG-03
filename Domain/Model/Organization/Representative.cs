@@ -110,7 +110,7 @@ public class Representative
             throw new ArgumentException("Phone number must be 9 digits long.", nameof(phoneNumber));
         }
     }
-    
+
     public void ChangeName(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))

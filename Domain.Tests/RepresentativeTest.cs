@@ -199,6 +199,6 @@ namespace Domain.Tests
             Assert.Throws<ArgumentException>(() => rep.ChangeNationality(newNationality));
         }
 
-        
+
     }
 }
