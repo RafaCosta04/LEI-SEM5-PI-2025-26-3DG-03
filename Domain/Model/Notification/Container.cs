@@ -20,16 +20,16 @@ public class Container
 
 
     public void ValidateContainerNumber(string containerNumber)
+    {
+        if (string.IsNullOrWhiteSpace(containerNumber))
         {
-            if (string.IsNullOrWhiteSpace(containerNumber))
-            {
-                throw new ArgumentException("Container number cannot be null or empty.", nameof(containerNumber));
-            }
-            if (!System.Text.RegularExpressions.Regex.IsMatch(containerNumber, "^[A-Z]{4}\\d{7}$"))
-            {
-                throw new ArgumentException("Container number must have 4 uppercase letters followed by 7 digits (e.g., ABCU1234567).", nameof(containerNumber));
-            }
+            throw new ArgumentException("Container number cannot be null or empty.", nameof(containerNumber));
         }
+        if (!System.Text.RegularExpressions.Regex.IsMatch(containerNumber, "^[A-Z]{4}\\d{7}$"))
+        {
+            throw new ArgumentException("Container number must have 4 uppercase letters followed by 7 digits (e.g., ABCU1234567).", nameof(containerNumber));
+        }
+    }
 
-    
+
 }

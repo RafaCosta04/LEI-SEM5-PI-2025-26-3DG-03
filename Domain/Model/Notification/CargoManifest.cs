@@ -21,7 +21,7 @@ public class CargoManifest
 
     private CargoManifest() { }
 
-    public CargoManifest(CargoManifestType manifestType,List<CargoManifestEntry> cargoManifestEntries, VesselVisitNotification vesselVisitNotification)
+    public CargoManifest(CargoManifestType manifestType, List<CargoManifestEntry> cargoManifestEntries, VesselVisitNotification vesselVisitNotification)
     {
         if (vesselVisitNotification == null)
         {

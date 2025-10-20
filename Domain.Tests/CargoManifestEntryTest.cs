@@ -31,15 +31,15 @@ namespace Domain.Tests
                 new List<CargoManifest>(), // vazio
                 CargoType.Container,
                 1000,
-                CreateValidCrew()   
+                CreateValidCrew()
             );
         }
-        
+
         private ShippingAgentOrganization CreateValidShippingAgentOrganization() =>
             new ShippingAgentOrganization("AAA", "AAAAAAA", "AAAAAA", "AAAAAA", "A13231");
 
-        private VesselType createValidVesselType() => new VesselType("Type1", "Description1", 4,4,4,4);
-        
+        private VesselType createValidVesselType() => new VesselType("Type1", "Description1", 4, 4, 4, 4);
+
         private CargoManifest CreateValidCargoManifest(List<CargoManifestEntry>? entries = null)
         {
             var vesselVisit = CreateValidVesselVisitNotification();

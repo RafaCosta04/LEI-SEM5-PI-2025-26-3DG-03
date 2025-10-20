@@ -193,7 +193,7 @@ public class VesselVisitNotification
         CargoManifests = cargoManifests;
         LastModifiedAt = DateTime.UtcNow;
     }
-    
+
     public void ChangeCrewMembers(List<CrewMember> crewMembers)
     {
         ValidateCrewMembers(crewMembers);
