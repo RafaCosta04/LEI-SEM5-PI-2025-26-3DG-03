@@ -1,0 +1,19 @@
+@startuml 2.2.10
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Shipping Agent Representative" as shippingAgentRepresentative
+participant "System" as system
+
+title System Sequence Diagram - US2.2.10
+
+== View Status of Vessel Visit Notification ==
+activate shippingAgentRepresentative
+
+shippingAgentRepresentative -> system : Asks to view the status of a vessel visit notification
+activate system
+
+system -> shippingAgentRepresentative : Displays the status of the vessel visit notification and displays operation success
+
+@enduml

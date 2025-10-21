@@ -32,14 +32,18 @@ When a Shipping agent representative wants to check the status of a Vessel Visit
 > According to the US acceptance criteria, "Vessel Visit Notifications must be searchable and filterable by vessel, status, representative and time."
 So, you may show all (s)he can view and allow filtering by representative.
 
+>>As a Shipping Agent Representative, I want to view the status of all my submitted Vessel Visit Notifications (in progress, pending, approved with current dock assignment, or rejected with reason), so that I am always informed about the decisions of the Port Authority.\
+Acceptance Criteria / Comments:\
+• The Shipping Agent Representative may also view the status of Vessel Visit Notifications submitted by other representatives working for the same shipping agent organization.\
+• Vessel Visit Notifications must be searchable and filterable by vessel, status, representative and time.\
+Boa tarde, quando diz que as Vessel Visit Notifications devem ser filtráveis por tempo, o que é exatamente o tempo? Devemos ter uma data de início e uma data de fim ou devemos ter apenas um tempo respetivo à demora da Vessel Visit?
+>
+>Não é filtrar por tempo mas sim por período, o que implica início e fim.
+
+
 ## 3. Analysis
 
-Review and Approved 
+![System Sequence Diagram ](images/system-sequence-diagram-US2.2.10.png)
 
-![System Sequence Diagram ](images/system-sequence-diagram-US2.2.7-approved.png)
-
-Review and Rejected
-
-![System Sequence Diagram ](images/system-sequence-diagram-US2.2.7-rejected.png)
 
 
