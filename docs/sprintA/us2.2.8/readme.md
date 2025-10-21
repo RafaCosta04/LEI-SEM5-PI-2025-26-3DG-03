@@ -2,7 +2,16 @@
 
 ## 1. Context
 
-*Shipping agents are organizations that represent vessel owners or operators in port operations. Their primary responsibility is to coordinate administrative and operational tasks associated with a vessel visit, including submitting Vessel Visit notifications and providing cargo information in compliance with port regulations. Each shipping agent organization may have multiple representatives authorized to interact with the system on its behalf.*
+*A Vessel Visit represents the planned arrival and departure of a vessel at the port, including associated
+operations such as cargo loading and unloading. The process begins when a shipping agent
+representative submits a Vessel Visit notification for an authorized vessel, providing key information
+such as expected arrival (ETA), departure (ETD), cargo type and volume, and any special handling
+requirements.\
+Additionally, a Vessel Visit Notification may also include basic crew information to support regulatory
+and operational needs. For most visits, this information is limited to the captain’s name and the total
+number of crew members on board However, when the vessel carries dangerous cargo, the
+notification must explicitly identify the designated crew safety officers, as their presence is a
+prerequisite for port operations involving hazardous materials*
 
 ## 2. Requirements
 
@@ -42,14 +51,39 @@ Cumprimentos,
 > Enquanto o estado do Vessel Visit Notification for "in progress" (US 2.2.8 e US 2.2.9) todos os seus dados podem ser alterados/adicionados.
 Depois de ser submetido, já não pode ser alterado pelo Shipping Agent Representative.
 
+
+>>"The process begins when a shipping agent representative submits a Vessel Visit notification for an authorized vessel, providing key information such as expected arrival (ETA), departure (ETD), cargo type and volume, and any special handling
+requirements."\
+Quando fazemos uma notificação, o navio só está a carregar um tipo de carga?
+>
+>Não! O tipo de carga varia de um contentor para outro.
+Contudo, no mesmo manifesto de carga, podem existir vários contentores com o mesmo tipo de carga.
+
+>>"Information about the crew (name, citizen id, nationality) might be requested, when
+necessary, for compliance with security protocols."\
+Gostariamos de saber se  esta informação é relativa apenas ao capitão ou a todos os membros da crew.
+>
+>No contexto de uma Vessel Visit Notification, é sempre necessário solicitar o identificação do capitão (name, citizen id, nationality) e o número total de pessoas que compõe a tripulação a bordo.\
+Adicionalmente, quando ocorre o transporte de mercadoria perigosa é necessário solicitar também a identificação (name, citizen id, nationality) dos oficiais responsáveis pela segurança (safety).
+
+>>What is the attribute that uniquely identifies a vessel visit notification?
+>
+>Great question!!!\
+Different approaches are usually followed.\
+However, in this case, each Vessel Visit Notificationmust have a unique business identifier following the pattern
+{YEAR}-{PORT_CODE}-{SEQUENTIAL_NUMBER}
+where:\
+-- YEAR: the calendar year when the visit is first registered.\
+-- PORT_CODE: a short alphanumeric code uniquely identifying the port (e.g., “PTLEI” for "Porto de Leixões").\
+-- SEQUENTIAL_NUMBER: a zero-padded integer (e.g., 000001, 000002, …) assigned incrementally per port and year.
+The combination (YEAR, PORT_CODE, SEQUENTIAL_NUMBER) must be unique across the system.\
+Once assigned, the identifier must remain immutable even if other visit details (dates, vessel, etc.) are updated.
+
 ## 3. Analysis
 
-Review and Approved 
+![System Sequence Diagram ](images/system-sequence-diagram-US2.2.8.png)
 
-![System Sequence Diagram ](images/system-sequence-diagram-US2.2.7-approved.png)
 
-Review and Rejected
 
-![System Sequence Diagram ](images/system-sequence-diagram-US2.2.7-rejected.png)
 
 
