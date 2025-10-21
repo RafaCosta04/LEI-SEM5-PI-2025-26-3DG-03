@@ -3,23 +3,23 @@ skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-actor "Shipping Agent Representative" as shippingAgenteRepresentative
+actor "Shipping Agent Representative" as shippingAgentRepresentative
 participant "System" as system
 
 title System Sequence Diagram - US2.2.8
 
 == Create/Submit Vessel Visit Notification ==
-activate shippingAgenteRepresentative
+activate shippingAgentRepresentative
 
-shippingAgenteRepresentative -> system : Asks to create/submit a vessel visit notification
+shippingAgentRepresentative -> system : Asks to create/submit a vessel visit notification
 activate system
 
-system -> shippingAgenteRepresentative : Request data(vessel, expected arrival, expected departure,\n cargo manifest, cargo type, crew)
+system -> shippingAgentRepresentative : Request data(vessel, expected arrival, expected departure,\n cargo manifest, cargo type, crew)
 deactivate system
-shippingAgenteRepresentative -> system : Types requested data
+shippingAgentRepresentative -> system : Types requested data
 
 activate system
-system -> shippingAgenteRepresentative : Displays operation success
+system -> shippingAgentRepresentative : Displays operation success
 
 
 @enduml

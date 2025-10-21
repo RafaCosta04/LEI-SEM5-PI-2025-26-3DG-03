@@ -1,0 +1,30 @@
+@startuml 2.2.9
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Shipping Agent Representative" as shippingAgentRepresentative
+participant "System" as system
+
+title System Sequence Diagram - US2.2.9
+
+== Change/Complete a Vessel Visit Notification ==
+activate shippingAgentRepresentative
+
+shippingAgentRepresentative -> system : Asks to change/complete a vessel visit notification
+activate system
+
+system -> shippingAgentRepresentative : Requests vessel visit notification id
+deactivate system
+shippingAgentRepresentative -> system : Types vessel visit notification id
+
+activate system
+system -> shippingAgentRepresentative : Request missing information or changes
+deactivate system
+shippingAgentRepresentative -> system : Types data
+activate system
+system -> shippingAgentRepresentative : Displays operation success
+
+
+
+@enduml
