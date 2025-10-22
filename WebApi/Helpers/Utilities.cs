@@ -60,13 +60,13 @@ public static class Utilities
                 db.VesselVisitNotifications.AddRange(GetSeedingVesselVisitNotificationsDataModel(vesselRecords, representatives, storageAreas));
                 db.SaveChanges();
             }
-            
+
             if (!db.Qualifications.Any())
             {
                 db.Qualifications.AddRange(GetSeedingQualificationsDataModel());
                 db.SaveChanges();
             }
-            
+
             if (!db.PhysicalResources.Any())
             {
                 var qualifications = db.Qualifications.ToList();
@@ -419,8 +419,8 @@ public static class Utilities
                 QualificationRequirements = new List<QualificationDataModel> { stsOpQual },
                 StartDay = DayOfWeek.Monday,
                 EndDay = DayOfWeek.Saturday,
-                StartTime = new TimeSpan(6,0,0),
-                EndTime = new TimeSpan(22,0,0),
+                StartTime = new TimeSpan(6, 0, 0),
+                EndTime = new TimeSpan(22, 0, 0),
                 Status = ResourceStatus.Available
             });
         }
@@ -439,8 +439,8 @@ public static class Utilities
                 QualificationRequirements = new List<QualificationDataModel> { truckDriverQual },
                 StartDay = DayOfWeek.Monday,
                 EndDay = DayOfWeek.Friday,
-                StartTime = new TimeSpan(7,0,0),
-                EndTime = new TimeSpan(19,0,0),
+                StartTime = new TimeSpan(7, 0, 0),
+                EndTime = new TimeSpan(19, 0, 0),
                 Status = ResourceStatus.Available
             });
         }
@@ -458,8 +458,8 @@ public static class Utilities
                 QualificationRequirements = new List<QualificationDataModel> { mbOpQual },
                 StartDay = DayOfWeek.Monday,
                 EndDay = DayOfWeek.Friday,
-                StartTime = new TimeSpan(8,0,0),
-                EndTime = new TimeSpan(18,0,0),
+                StartTime = new TimeSpan(8, 0, 0),
+                EndTime = new TimeSpan(18, 0, 0),
                 Status = ResourceStatus.Available
             });
         }
