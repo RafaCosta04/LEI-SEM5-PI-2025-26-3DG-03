@@ -2,7 +2,7 @@ using Domain.IRepository;
 using Domain.Model.Resources;
 using Domain.Model;
 using Application.DTO;
-using Domain.Factory.Resources;
+using Domain.Factory;
 using ShippingManagement.Domain.Qualifications;
 using System.Collections.Generic;
 using System.Linq;

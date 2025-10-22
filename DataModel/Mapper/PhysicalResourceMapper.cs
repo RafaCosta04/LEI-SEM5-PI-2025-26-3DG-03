@@ -1,6 +1,6 @@
 using DataModel.Model;
 using Domain.Model.Resources;
-using Domain.Factory.Resources;
+using Domain.Factory;
 using System.Collections.Generic;
 using System.Linq;
 
