@@ -368,7 +368,7 @@ namespace WebApi.IntegrationTests.Tests
             Assert.Equal(HttpStatusCode.Created, r1.StatusCode);
 
             var dto2 = BuildValidDto();
-            dto2.Eta = dto.Eta.AddDays(0); 
+            dto2.Eta = dto.Eta.AddDays(0);
             dto2.Etd = dto.Etd.AddDays(0);
 
             var r2 = await _client.PostAsJsonAsync("/api/VesselVisitNotification", dto2);
@@ -540,7 +540,7 @@ namespace WebApi.IntegrationTests.Tests
             Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
             var created = await createResp.Content.ReadFromJsonAsync<VesselVisitNotificationDTO>();
 
-            created!.VesselIMO = "0000000"; 
+            created!.VesselIMO = "0000000";
             var updResp = await _client.PutAsJsonAsync($"/api/VesselVisitNotification/Update/{created.Code}", created);
             Assert.Equal(HttpStatusCode.BadRequest, updResp.StatusCode);
             var errors = await updResp.Content.ReadFromJsonAsync<List<string>>() ?? new List<string>();
