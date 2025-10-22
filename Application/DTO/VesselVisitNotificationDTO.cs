@@ -75,7 +75,7 @@ public class VesselVisitNotificationDTO
                 Nationality = cm.Nationality
             }
             ).ToList();
-            VesselVisitNotificationDTO vesselVisitNotificationDTO = new VesselVisitNotificationDTO(vesselVisitNotification.Id,vesselVisitNotification.Code, vesselVisitNotification.Vessel.IMONumber!, vesselVisitNotification.Representative.CitizenId!, vesselVisitNotification.ETA, vesselVisitNotification.ETD, cargoManifestDTOs, vesselVisitNotification.CargoType, vesselVisitNotification.Volume, crewMemberDTOs, vesselVisitNotification.VisitStatus);
+            VesselVisitNotificationDTO vesselVisitNotificationDTO = new VesselVisitNotificationDTO(vesselVisitNotification.Id, vesselVisitNotification.Code, vesselVisitNotification.Vessel.IMONumber!, vesselVisitNotification.Representative.CitizenId!, vesselVisitNotification.ETA, vesselVisitNotification.ETD, cargoManifestDTOs, vesselVisitNotification.CargoType, vesselVisitNotification.Volume, crewMemberDTOs, vesselVisitNotification.VisitStatus);
             vesselVisitNotificationDTO.LastModifiedAt = vesselVisitNotification.LastModifiedAt;
             return vesselVisitNotificationDTO;
         }

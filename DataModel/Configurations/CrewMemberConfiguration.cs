@@ -25,6 +25,6 @@ public class CrewMemberConfiguration : IEntityTypeConfiguration<CrewMemberDataMo
         builder.Property(c => c.Rank)
             .HasMaxLength(50)
             .IsRequired();
-        
+
     }
 }

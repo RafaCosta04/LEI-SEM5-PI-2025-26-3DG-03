@@ -113,7 +113,7 @@ public class VesselVisitNotificationController : ControllerBase
             return BadRequest("Vessel Visit Notification data must be provided.");
         }
 
-         bool wasUpdated = await _vesselVisitNotificationService.UpdateVesselVisitNotification(visitCode, vesselVisitNotificationDTO, _errorMessages);
+        bool wasUpdated = await _vesselVisitNotificationService.UpdateVesselVisitNotification(visitCode, vesselVisitNotificationDTO, _errorMessages);
         if (!wasUpdated && _errorMessages.Any())
         {
             if (_errorMessages.Contains("Vessel Visit Notification not found."))

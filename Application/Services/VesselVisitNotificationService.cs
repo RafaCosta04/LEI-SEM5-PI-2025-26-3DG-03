@@ -232,7 +232,7 @@ public class VesselVisitNotificationService
         int year = eta.Year;
 
         var existingVisits = await _vesselVisitNotificationRepository.GetAllVisitsAsync();
-        
+
         var relevantCodes = existingVisits
             .Select(v => v.Code)
             .Where(code => code.StartsWith($"{year}-{portCode}-"))
@@ -281,7 +281,7 @@ public class VesselVisitNotificationService
             errorMessages.Add("Only visits with 'InProgress' status can be updated.");
             return false;
         }
-        if(notificationDTO.VisitStatus != VisitStatus.InProgress && notificationDTO.VisitStatus != VisitStatus.Submitted)
+        if (notificationDTO.VisitStatus != VisitStatus.InProgress && notificationDTO.VisitStatus != VisitStatus.Submitted)
         {
             errorMessages.Add("Visit status can only be changed to 'InProgress' or 'Submitted'.");
             return false;

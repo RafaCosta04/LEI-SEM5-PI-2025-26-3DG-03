@@ -15,9 +15,9 @@ public class CargoManifestEntryDataModel
 
     public int Tier { get; set; }
 
-    public long StorageAreaId { get;  set; }
+    public long StorageAreaId { get; set; }
 
-    public StorageAreaDataModel StorageArea { get;  set; } = null!;
+    public StorageAreaDataModel StorageArea { get; set; } = null!;
 
     public long CargoManifestId { get; set; }
     public CargoManifestDataModel CargoManifest { get; set; } = null!;

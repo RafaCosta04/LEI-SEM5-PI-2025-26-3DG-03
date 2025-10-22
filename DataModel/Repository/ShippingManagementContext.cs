@@ -29,7 +29,7 @@ public class ShippingManagementContext : DbContext
     public virtual DbSet<CargoManifestDataModel> CargoManifests { get; set; } = null!;
     public virtual DbSet<CargoManifestEntryDataModel> CargoManifestEntries { get; set; } = null!;
     public virtual DbSet<CrewMemberDataModel> CrewMembers { get; set; } = null!;
-    public virtual DbSet<PhysicalResourceDataModel> PhysicalResources { get; set; } = null!; 
+    public virtual DbSet<PhysicalResourceDataModel> PhysicalResources { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

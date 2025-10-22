@@ -30,7 +30,7 @@ public class VesselVisitNotification
 
     public long VesselId { get; set; }
     public VesselRecord Vessel { get; private set; } = null!;
-    
+
     public long RepresentativeId { get; set; }
     public Representative Representative { get; private set; } = null!;
 
@@ -48,7 +48,7 @@ public class VesselVisitNotification
 
     public Dock? AssignedDock { get; private set; } = null;
 
-    public VisitStatus VisitStatus { get;  set; }
+    public VisitStatus VisitStatus { get; set; }
 
     public DateTime LastModifiedAt { get; set; }
 

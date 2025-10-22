@@ -105,7 +105,7 @@ public static class Utilities
         {
             new VesselRecordDataModel
             {
-                IMONumber = "9074729", 
+                IMONumber = "9074729",
                 VesselName = "Vessel One",
                 VesselType = vesselTypes[0],
                 Operator = "JOAO Shipping",
@@ -113,7 +113,7 @@ public static class Utilities
             },
             new VesselRecordDataModel
             {
-                IMONumber = "9235672", 
+                IMONumber = "9235672",
                 VesselName = "Vessel Two",
                 VesselType = vesselTypes[1],
                 Operator = "MARIA Shipping",
@@ -194,11 +194,11 @@ public static class Utilities
             Type = CargoManifestType.Loading.ToString(),
             Entries = new List<CargoManifestEntryDataModel>()
         };
-        
+
         cm1.Entries.Add(new CargoManifestEntryDataModel { Container = "ABCU1112222", Row = 1, Bay = 1, Tier = 1, StorageArea = storageAreas[0], StorageAreaId = storageAreas[0].Id });
         cm1.Entries.Add(new CargoManifestEntryDataModel { Container = "ABCU2223334", Row = 2, Bay = 1, Tier = 1, StorageArea = storageAreas[0], StorageAreaId = storageAreas[0].Id });
         n1.CargoManifests.Add(cm1);
-        
+
         var eta1 = now.AddDays(4);
         var etd1 = eta1.AddDays(1);
         var n2 = new VesselVisitNotificationDataModel
@@ -222,13 +222,13 @@ public static class Utilities
             LastModifiedAt = now
         };
 
-        
+
         var cm2 = new CargoManifestDataModel
         {
             Type = CargoManifestType.Unloading.ToString(),
             Entries = new List<CargoManifestEntryDataModel>()
         };
-        
+
         cm2.Entries.Add(new CargoManifestEntryDataModel { Container = "ABCU3332221", Row = 1, Bay = 2, Tier = 1, StorageArea = storageAreas[0], StorageAreaId = storageAreas[0].Id });
         n2.CargoManifests.Add(cm2);
 
@@ -267,7 +267,7 @@ public static class Utilities
             n3.CargoManifests.Add(cm3b);
         }
 
-        
+
         var eta3 = now.AddDays(10);
         var etd3 = eta3.AddDays(1);
         var n4 = new VesselVisitNotificationDataModel
@@ -302,7 +302,8 @@ public static class Utilities
 
     public static List<(ShippingAgentOrganizationDataModel organization, List<RepresentativeDataModel> representatives)> GetSeedingOrganizationDataModelsAndRepresentatives()
     {
-        var org1 = new ShippingAgentOrganizationDataModel {
+        var org1 = new ShippingAgentOrganizationDataModel
+        {
             Code = "AAA1",
             LegalName = "LegalName1",
             AlternativeName = "AltName1",
@@ -310,7 +311,8 @@ public static class Utilities
             TaxNumber = "TaxNumber1",
             LastModifiedAt = DateTime.UtcNow
         };
-        var org2 = new ShippingAgentOrganizationDataModel {
+        var org2 = new ShippingAgentOrganizationDataModel
+        {
             Code = "BBB2",
             LegalName = "LegalName2",
             AlternativeName = "AltName2",
@@ -319,7 +321,8 @@ public static class Utilities
             LastModifiedAt = DateTime.UtcNow
         };
 
-        var rep1_org1 = new RepresentativeDataModel {
+        var rep1_org1 = new RepresentativeDataModel
+        {
             Name = "Rep1 Org1",
             CitizenId = "CID1",
             Nationality = "PT",
@@ -328,7 +331,8 @@ public static class Utilities
             Organization = org1,
             LastModifiedAt = DateTime.UtcNow
         };
-        var rep2_org1 = new RepresentativeDataModel {
+        var rep2_org1 = new RepresentativeDataModel
+        {
             Name = "Rep2 Org1",
             CitizenId = "CID2",
             Nationality = "PT",
@@ -338,7 +342,8 @@ public static class Utilities
             LastModifiedAt = DateTime.UtcNow
         };
 
-        var rep1_org2 = new RepresentativeDataModel {
+        var rep1_org2 = new RepresentativeDataModel
+        {
             Name = "Rep1 Org2",
             CitizenId = "CID3",
             Nationality = "ES",
@@ -347,7 +352,8 @@ public static class Utilities
             Organization = org2,
             LastModifiedAt = DateTime.UtcNow
         };
-        var rep2_org2 = new RepresentativeDataModel {
+        var rep2_org2 = new RepresentativeDataModel
+        {
             Name = "Rep2 Org2",
             CitizenId = "CID4",
             Nationality = "ES",

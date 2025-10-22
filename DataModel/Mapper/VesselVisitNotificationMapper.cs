@@ -79,7 +79,7 @@ public class VesselVisitNotificationMapper
         }
         return vesselVisitDomain;
     }
-    
+
     public IEnumerable<VesselVisitNotification> ToDomain(IEnumerable<VesselVisitNotificationDataModel> vesselVisitDataModels)
     {
         List<VesselVisitNotification> vesselVisitsDomain = new List<VesselVisitNotification>();
@@ -149,7 +149,7 @@ public class VesselVisitNotificationMapper
         }
     }
 
-    
+
 
 
 }

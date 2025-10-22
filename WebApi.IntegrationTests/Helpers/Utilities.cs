@@ -52,21 +52,21 @@ public static class Utilities
     }
 
     public static void ReinitializeDbForTests(ShippingManagementContext db)
-{
-    db.VesselVisitNotifications.RemoveRange(db.VesselVisitNotifications);
-    db.Representatives.RemoveRange(db.Representatives);
-    db.Staffs.RemoveRange(db.Staffs);
-    db.StorageAreas.RemoveRange(db.StorageAreas);
-    db.Docks.RemoveRange(db.Docks);
-    db.VesselRecords.RemoveRange(db.VesselRecords);
-    db.Qualifications.RemoveRange(db.Qualifications);
-    db.VesselTypes.RemoveRange(db.VesselTypes);
-    db.ShippingAgentOrganizations.RemoveRange(db.ShippingAgentOrganizations);
+    {
+        db.VesselVisitNotifications.RemoveRange(db.VesselVisitNotifications);
+        db.Representatives.RemoveRange(db.Representatives);
+        db.Staffs.RemoveRange(db.Staffs);
+        db.StorageAreas.RemoveRange(db.StorageAreas);
+        db.Docks.RemoveRange(db.Docks);
+        db.VesselRecords.RemoveRange(db.VesselRecords);
+        db.Qualifications.RemoveRange(db.Qualifications);
+        db.VesselTypes.RemoveRange(db.VesselTypes);
+        db.ShippingAgentOrganizations.RemoveRange(db.ShippingAgentOrganizations);
 
-    db.SaveChanges(); 
+        db.SaveChanges();
 
-    InitializeDbForTests(db);
-}
+        InitializeDbForTests(db);
+    }
 
     public static List<VesselTypeDataModel> GetSeedingVesselTypesDataModel()
     {
@@ -268,7 +268,7 @@ public static class Utilities
             (org2, new List<RepresentativeDataModel> { rep1_org2, rep2_org2 })
         };
     }
-    
+
 
     public static List<VesselVisitNotificationDataModel> GetSeedingVesselVisitNotificationsDataModel(List<VesselRecordDataModel> vesselRecords, List<RepresentativeDataModel> representatives, List<StorageAreaDataModel> storageAreas)
     {
@@ -302,11 +302,11 @@ public static class Utilities
             Type = CargoManifestType.Loading.ToString(),
             Entries = new List<CargoManifestEntryDataModel>()
         };
-        
+
         cm1.Entries.Add(new CargoManifestEntryDataModel { Container = "ABCU1112222", Row = 1, Bay = 1, Tier = 1, StorageArea = storageAreas[0], StorageAreaId = storageAreas[0].Id });
         cm1.Entries.Add(new CargoManifestEntryDataModel { Container = "ABCU2223334", Row = 2, Bay = 1, Tier = 1, StorageArea = storageAreas[0], StorageAreaId = storageAreas[0].Id });
         n1.CargoManifests.Add(cm1);
-        
+
         var eta1 = now.AddDays(4);
         var etd1 = eta1.AddDays(1);
         var n2 = new VesselVisitNotificationDataModel
@@ -330,13 +330,13 @@ public static class Utilities
             LastModifiedAt = now
         };
 
-        
+
         var cm2 = new CargoManifestDataModel
         {
             Type = CargoManifestType.Unloading.ToString(),
             Entries = new List<CargoManifestEntryDataModel>()
         };
-        
+
         cm2.Entries.Add(new CargoManifestEntryDataModel { Container = "ABCU3332221", Row = 1, Bay = 2, Tier = 1, StorageArea = storageAreas[0], StorageAreaId = storageAreas[0].Id });
         n2.CargoManifests.Add(cm2);
 
@@ -375,7 +375,7 @@ public static class Utilities
             n3.CargoManifests.Add(cm3b);
         }
 
-        
+
         var eta3 = now.AddDays(10);
         var etd3 = eta3.AddDays(1);
         var n4 = new VesselVisitNotificationDataModel

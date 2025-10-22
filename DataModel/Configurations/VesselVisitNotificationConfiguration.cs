@@ -40,7 +40,7 @@ public class VesselVisitNotificationConfiguration : IEntityTypeConfiguration<Ves
 
         builder.HasMany(vvn => vvn.CrewMembers)
         .WithOne()
-        .OnDelete(DeleteBehavior.Cascade);  
+        .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(v => v.AssignedDock)
             .WithMany()

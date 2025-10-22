@@ -31,7 +31,7 @@ public class VesselVisitNotificationRepository : GenericRepository<VesselVisitNo
                         .ThenInclude(e => e.StorageArea)
                 .Include(vvn => vvn.CrewMembers)!
                 .ToListAsync();
-            IEnumerable<VesselVisitNotification> vesselVisits = vesselVisitDMs.Select(vvn => _vesselVisitNotificationMapper.ToDomain(vvn)); 
+            IEnumerable<VesselVisitNotification> vesselVisits = vesselVisitDMs.Select(vvn => _vesselVisitNotificationMapper.ToDomain(vvn));
             return vesselVisits;
         }
         catch
