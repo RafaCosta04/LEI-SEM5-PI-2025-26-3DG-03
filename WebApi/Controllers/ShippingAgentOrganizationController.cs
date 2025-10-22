@@ -154,7 +154,7 @@ public class ShippingAgentOrganizationController : ControllerBase
         ShippingAgentOrganizationWithRepresentativeDTO? createdOrganization = await _shippingAgentOrganizationService.AddShippingAgentOrganizationWithRepresentative(organizationRepDTO, _errorMessages);
         if (createdOrganization == null && _errorMessages.Any())
         {
-            if (_errorMessages.Any(e => 
+            if (_errorMessages.Any(e =>
                 e.Contains("already exists", StringComparison.OrdinalIgnoreCase) ||
                 e.Contains("Shipping Agent Organization Already Exists!", StringComparison.OrdinalIgnoreCase)))
                 return Conflict(_errorMessages);

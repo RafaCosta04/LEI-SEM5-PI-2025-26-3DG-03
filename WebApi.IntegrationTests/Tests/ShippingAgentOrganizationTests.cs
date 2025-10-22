@@ -291,8 +291,8 @@ namespace WebApi.IntegrationTests.Tests
         }
 
         [Theory]
-        [InlineData("UNIQUECODE", "LegalName1", "Unique SA", "789 New Harbor St", "TAX789012","Test1", "TEST1", "PT", "test@gmail.com", "123456789")]
-        [InlineData("ANOTHERCODE", "LegalName2", "Another SA", "101 New Dock Rd", "TAX345678","Test2", "TEST2", "PT", "test2@gmail.com", "123456782")]
+        [InlineData("UNIQUECODE", "LegalName1", "Unique SA", "789 New Harbor St", "TAX789012", "Test1", "TEST1", "PT", "test@gmail.com", "123456789")]
+        [InlineData("ANOTHERCODE", "LegalName2", "Another SA", "101 New Dock Rd", "TAX345678", "Test2", "TEST2", "PT", "test2@gmail.com", "123456782")]
         public async Task PostShippingAgentOrganization_DuplicateLegalName_ReturnsConflict(string code, string legalName, string alternativeName, string address, string taxNumber, string reName, string reCitizenId, string reNationality, string reEmail, string rePhone)
         {
             var newOrg = new ShippingAgentOrganizationWithRepresentativeDTO
@@ -314,8 +314,8 @@ namespace WebApi.IntegrationTests.Tests
         }
 
         [Theory]
-        [InlineData("UNIQUECODE", "Unique Shipping Agent", "Unique SA", "Address1", "TAX123456","Test1", "TEST1", "PT", "test@gmail.com", "123456789")]
-        [InlineData("ANOTHERCODE", "Another Shipping Agent", "Another SA", "Address2", "TAX654321","Test2", "TEST2", "PT", "test2@gmail.com", "123456782")]
+        [InlineData("UNIQUECODE", "Unique Shipping Agent", "Unique SA", "Address1", "TAX123456", "Test1", "TEST1", "PT", "test@gmail.com", "123456789")]
+        [InlineData("ANOTHERCODE", "Another Shipping Agent", "Another SA", "Address2", "TAX654321", "Test2", "TEST2", "PT", "test2@gmail.com", "123456782")]
         public async Task PostShippingAgentOrganization_DuplicateAddress_ReturnsConflict(string code, string legalName, string alternativeName, string address, string taxNumber, string repName, string repCitizenId, string repNationality, string repEmail, string repPhone)
         {
             var newOrg = new ShippingAgentOrganizationWithRepresentativeDTO
@@ -337,8 +337,8 @@ namespace WebApi.IntegrationTests.Tests
         }
 
         [Theory]
-        [InlineData("UNIQUECODE", "Unique Shipping Agent", "Unique SA", "789 New Harbor St", "TaxNumber1","Test1", "TEST1", "PT", "test@gmail.com", "123456789")]
-        [InlineData("ANOTHERCODE", "Another Shipping Agent", "Another SA", "101 New Dock Rd", "TaxNumber2","Test2", "TEST2", "PT", "test2@gmail.com", "123456729")]
+        [InlineData("UNIQUECODE", "Unique Shipping Agent", "Unique SA", "789 New Harbor St", "TaxNumber1", "Test1", "TEST1", "PT", "test@gmail.com", "123456789")]
+        [InlineData("ANOTHERCODE", "Another Shipping Agent", "Another SA", "101 New Dock Rd", "TaxNumber2", "Test2", "TEST2", "PT", "test2@gmail.com", "123456729")]
         public async Task PostShippingAgentOrganization_DuplicateTaxNumber_ReturnsConflict(string code, string legalName, string alternativeName, string address, string taxNumber, string repName, string repCitizenId, string repNationality, string repEmail, string repPhone)
         {
             var newOrg = new ShippingAgentOrganizationWithRepresentativeDTO
