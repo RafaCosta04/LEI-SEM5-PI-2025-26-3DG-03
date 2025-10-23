@@ -449,7 +449,7 @@ public static class Utilities
         {
             resources.Add(new PhysicalResourceDataModel
             {
-                Code = "MB001",
+                Code = "MBL001",
                 Name = "Mobile Crane 1",
                 Description = "Mobile Crane 1",
                 Kind = PhysicalResourceKind.MobileCrane,

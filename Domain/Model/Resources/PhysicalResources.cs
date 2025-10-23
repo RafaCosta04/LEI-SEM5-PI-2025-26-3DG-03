@@ -132,7 +132,11 @@ namespace Domain.Model.Resources
         private static void ValidateDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description cannot be null or empty.", nameof(description));
-            if (description.Trim().Length > 250) throw new ArgumentException("Description must be at most 250 characters long.", nameof(description));
+            var trimmed = description.Trim();
+            if (trimmed.Length > 250) throw new ArgumentException("Description must be at most 250 characters long.", nameof(description));
+            
+            var wordCount = trimmed.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
+            if (wordCount < 2) throw new ArgumentException("Description must contain at least two words.", nameof(description));
         }
 
         private static void ValidateOperationalCapacity(int capacity)

@@ -2,6 +2,7 @@ using System.Data.Common;
 using DataModel.Model;
 using DataModel.Repository;
 using Domain.Model;
+using Domain.Model.Resources;
 using ShippingManagement.Domain.Qualifications;
 
 namespace WebApi.IntegrationTests.Helpers;
@@ -25,6 +26,9 @@ public static class Utilities
         db.StorageAreas.AddRange(GetSeedingStorageAreasDataModel(db.Docks.ToList()));
         var qualifications = db.Qualifications.ToList();
         db.Staffs.AddRange(GetSeedingStaffDataModel(qualifications));
+        db.SaveChanges();
+
+        db.PhysicalResources.AddRange(GetSeedingPhysicalResourcesDataModel(qualifications));
         db.SaveChanges();
 
 
@@ -56,6 +60,7 @@ public static class Utilities
     {
         db.VesselVisitNotifications.RemoveRange(db.VesselVisitNotifications);
         db.Representatives.RemoveRange(db.Representatives);
+        db.PhysicalResources.RemoveRange(db.PhysicalResources);
         db.Staffs.RemoveRange(db.Staffs);
         db.StorageAreas.RemoveRange(db.StorageAreas);
         db.Docks.RemoveRange(db.Docks);
@@ -412,5 +417,75 @@ public static class Utilities
         notifications.Add(n4);
 
         return notifications;
+    }
+
+    public static List<PhysicalResourceDataModel> GetSeedingPhysicalResourcesDataModel(List<QualificationDataModel> qualifications)
+    {
+        var resources = new List<PhysicalResourceDataModel>();
+
+        var qual1 = qualifications.FirstOrDefault(q => q.Code == "QUAL1");
+        var qual2 = qualifications.FirstOrDefault(q => q.Code == "QUAL2");
+        var qual3 = qualifications.FirstOrDefault(q => q.Code == "QUAL3");
+
+        if (qual1 != null)
+        {
+            resources.Add(new PhysicalResourceDataModel
+            {
+                Code = "STS001",
+                Name = "STS Crane Alpha",
+                Description = "Ship-to-Shore Crane Alpha for container handling",
+                Kind = PhysicalResourceKind.STSCrane,
+                SetupTimeMinutes = 15,
+                OperationalCapacity = 50,
+                AssignedDockName = "Dock A",
+                QualificationRequirements = new List<QualificationDataModel> { qual1 },
+                StartDay = DayOfWeek.Monday,
+                EndDay = DayOfWeek.Friday,
+                StartTime = new TimeSpan(8, 0, 0),
+                EndTime = new TimeSpan(20, 0, 0),
+                Status = ResourceStatus.Available
+            });
+        }
+
+        if (qual2 != null)
+        {
+            resources.Add(new PhysicalResourceDataModel
+            {
+                Code = "MBL001",
+                Name = "Mobile Crane Beta",
+                Description = "Mobile Crane Beta for flexible cargo operations",
+                Kind = PhysicalResourceKind.MobileCrane,
+                SetupTimeMinutes = 10,
+                OperationalCapacity = 25,
+                QualificationRequirements = new List<QualificationDataModel> { qual2 },
+                StartDay = DayOfWeek.Monday,
+                EndDay = DayOfWeek.Saturday,
+                StartTime = new TimeSpan(7, 0, 0),
+                EndTime = new TimeSpan(19, 0, 0),
+                Status = ResourceStatus.Available
+            });
+        }
+
+        if (qual3 != null)
+        {
+            resources.Add(new PhysicalResourceDataModel
+            {
+                Code = "TRUCK001",
+                Name = "Heavy Truck Gamma",
+                Description = "Heavy duty truck for cargo transport within port area",
+                Kind = PhysicalResourceKind.Truck,
+                SetupTimeMinutes = 5,
+                OperationalCapacity = 30,
+                AssignedStorageAreaCode = "WH001",
+                QualificationRequirements = new List<QualificationDataModel> { qual3 },
+                StartDay = DayOfWeek.Sunday,
+                EndDay = DayOfWeek.Saturday,
+                StartTime = new TimeSpan(6, 0, 0),
+                EndTime = new TimeSpan(22, 0, 0),
+                Status = ResourceStatus.Available
+            });
+        }
+
+        return resources;
     }
 }
