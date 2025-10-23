@@ -106,7 +106,7 @@ public class StaffController : ControllerBase
         {
             return BadRequest("At least one QualificationCode must be provided to create a Staff.");
         }
-        
+
         StaffDTO? createdStaff = await _staffService.AddStaff(staffDTO, _errorMessages);
         if (createdStaff == null)
         {
@@ -127,7 +127,7 @@ public class StaffController : ControllerBase
         {
             return BadRequest("Staff data must be provided.");
         }
-        
+
         bool wasUpdated = await _staffService.UpdateStaff(id, staffDTO, _errorMessages);
         if (!wasUpdated && _errorMessages.Any())
         {

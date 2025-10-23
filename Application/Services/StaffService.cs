@@ -11,7 +11,7 @@ using Application.DTO;
 
 public class StaffService
 {
-    private readonly IStaffRepository _staffRepository;  
+    private readonly IStaffRepository _staffRepository;
     private readonly IQualificationRepository _qualificationRepository;
     public StaffService(IStaffRepository staffRepository, IQualificationRepository qualificationRepository)
     {
