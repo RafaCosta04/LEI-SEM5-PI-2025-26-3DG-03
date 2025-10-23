@@ -1,0 +1,160 @@
+@startuml 2.2.3
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Port Authority Officer" as portOfficer
+participant "Dock Controller" as DockController
+participant "Dock Service" as DockService
+participant "Dock Repository" as DockRepository
+participant "VesselType Repository" as VesselTypeRepository
+participant "Dock Mapper" as DockMapper
+participant "Dock (domain)" as DockDomain
+participant "DockDTO" as DockDTO
+participant "ShippingManagementContext" as DbContext
+participant "ShippingManagementDatabase" as Database
+
+
+title System Sequence Diagram - US2.2.3 (Update Dock)
+
+activate portOfficer
+    portOfficer -> DockController: PUT /api/Dock/Update/{id} (DockDTO)
+    activate DockController
+
+        DockController -> DockService: UpdateDock(id, dockDTO, _errorMessages)
+        activate DockService
+
+            ' Validation and preparation happens here
+
+            DockService -> DockRepository: GetDockByNameAsync(dockDTO.Name)
+            activate DockRepository
+                DockRepository -> DbContext: Set<DockDataModel>().Include(d => d.VesselTypesAllowed).SingleOrDefaultAsync(d => d.Name == name)
+                activate DbContext
+                    DbContext --> Database: SELECT * FROM Dock WHERE Name = @name (Include VesselTypesAllowed)
+                    activate Database
+                    Database --> DbContext: DockDataModel? (found/null)
+                    deactivate Database
+                    DbContext --> DockRepository: DockDataModel? (found/null)
+                deactivate DbContext
+                alt exists
+                    DockRepository -> DockMapper: ToDomain(DockDataModel)
+                        activate DockMapper
+                            DockMapper --> DockRepository: dock (domain)
+                        deactivate DockMapper
+                    DockRepository --> DockService: dockWithSameName
+                else
+                    DockRepository --> DockService: null
+                end
+            deactivate DockRepository
+
+            DockService -> DockRepository: GetDockByLocationAsync(dockDTO.Location)
+            activate DockRepository
+                DockRepository -> DbContext: Set<DockDataModel>().Include(d => d.VesselTypesAllowed).SingleOrDefaultAsync(d => d.Location == location)
+                activate DbContext
+                    DbContext --> Database: SELECT * FROM Dock WHERE Location = @location (Include VesselTypesAllowed)
+                    activate Database
+                    Database --> DbContext: DockDataModel? (found/null)
+                    deactivate Database
+                    DbContext --> DockRepository: DockDataModel? (found/null)
+                deactivate DbContext
+                alt exists
+                    DockRepository -> DockMapper: ToDomain(DockDataModel)
+                        activate DockMapper
+                            DockMapper --> DockRepository: dock (domain)
+                        deactivate DockMapper
+                    DockRepository --> DockService: dockWithSameLocation
+                else
+                    DockRepository --> DockService: null
+                end
+            deactivate DockRepository
+
+            DockService -> DockRepository: GetDockByIdAsync(id)
+            activate DockRepository
+                DockRepository -> DbContext: Set<DockDataModel>().Include(d => d.VesselTypesAllowed).SingleOrDefaultAsync(d => d.Id == id)
+                activate DbContext
+                    DbContext --> Database: SELECT * FROM Dock WHERE Id = @id (Include VesselTypesAllowed)
+                    activate Database
+                    Database --> DbContext: DockDataModel? (found/null)
+                    deactivate Database
+                    DbContext --> DockRepository: DockDataModel? (found/null)
+                deactivate DbContext
+                alt exists
+                    DockRepository -> DockMapper: ToDomain(DockDataModel)
+                        activate DockMapper
+                            DockMapper --> DockRepository: dock (domain)
+                        deactivate DockMapper
+                    DockRepository --> DockService: existingDock
+                else
+                    DockRepository --> DockService: null
+                end
+            deactivate DockRepository
+                loop for each vesselTypeName in dockDTO.VesselTypesAllowed
+                    DockService -> VesselTypeRepository: GetVesselTypeByNameAsync(vesselTypeName)
+                    activate VesselTypeRepository
+                        VesselTypeRepository -> DbContext: Set<VesselTypeDataModel>().SingleOrDefaultAsync(v => v.Name == name)
+                        activate DbContext
+                            DbContext --> Database: SELECT * FROM VesselTypes WHERE Name = @name
+                            activate Database
+                            Database --> DbContext: VesselTypeDataModel? (found/null)
+                            deactivate Database
+                            DbContext --> VesselTypeRepository: VesselTypeDataModel? (found/null)
+                        deactivate DbContext
+                        alt found
+                            VesselTypeRepository --> DockService: VesselType (domain)
+                        else
+                            VesselTypeRepository --> DockService: null
+                        end
+                    deactivate VesselTypeRepository
+                end
+
+                alt any missing
+                    DockService -> DockController: return false + ["Vessel type 'X' does not exist"]
+                else
+
+                    DockService -> DockRepository: Update(existingDock, errorMessages)
+                    activate DockRepository
+
+                    DockRepository -> DbContext: Set<DockDataModel>().Include(d => d.VesselTypesAllowed).SingleOrDefaultAsync(d => d.Id == dock.Id)
+                    activate DbContext
+                        DbContext --> Database: SELECT * FROM Dock WHERE Id = @id (Include VesselTypesAllowed)
+                        activate Database
+                        Database --> DbContext: dockDM
+                        deactivate Database
+                        DbContext --> DockRepository: dockDM
+                    deactivate DbContext
+
+                    DockRepository -> DockMapper: UpdateDataModelAsync(dockDM, existingDock, DbContext)
+                        activate DockMapper
+                            DockMapper --> DockRepository: updated dockDM
+                        deactivate DockMapper
+                    DockRepository -> DbContext: SaveChangesAsync()
+                    activate DbContext
+                        DbContext -> Database: UPDATE Dock ... and join table updates
+                        activate Database
+                        Database --> DbContext: Commit/Success
+                        deactivate Database
+                        DbContext --> DockRepository: saved
+                    deactivate DbContext
+
+                    DockRepository -> DockMapper: ToDomain(dockDM)
+                        activate DockMapper
+                            DockMapper --> DockRepository: updatedDock (domain)
+                        deactivate DockMapper
+                    DockRepository --> DockService: updatedDock
+                    deactivate DockRepository
+                    DockService --> DockController: return true
+            end
+
+        deactivate DockService
+
+        alt success
+            DockController --> portOfficer: 200 OK
+        else validation error
+            DockController --> portOfficer: 400 Bad Request (errorMessages)
+        else conflict
+            DockController --> portOfficer: 409 Conflict (errorMessages)
+        end
+
+    deactivate DockController
+deactivate portOfficer
+@enduml

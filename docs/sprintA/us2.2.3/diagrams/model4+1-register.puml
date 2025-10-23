@@ -1,0 +1,143 @@
+@startuml 2.2.3
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Port Authority Officer" as portOfficer
+participant "Dock Controller" as DockController
+participant "Dock Service" as DockService
+participant "Dock Repository" as DockRepository
+participant "VesselType Repository" as VesselTypeRepository
+participant "Dock Factory" as DockFactory
+participant "Dock Mapper" as DockMapper
+participant "Dock" as DockDomain
+participant "DockDTO" as DockDTO
+participant "ShippingManagementContext" as DbContext
+participant "ShippingManagementDatabase" as Database
+
+
+title System Sequence Diagram - US2.2.3 (Create Dock)
+
+activate portOfficer
+    portOfficer -> DockController: POST /api/Dock (DockDTO)
+    activate DockController
+
+        DockController -> DockService: AddDock(dockDTO, _errorMessages)
+        activate DockService
+
+            DockService -> DockRepository: GetDockByNameAsync(dockDTO.Name)
+            activate DockRepository
+                DockRepository -> DbContext: Set<DockDataModel>().Include(d => d.VesselTypesAllowed).SingleOrDefaultAsync(d => d.Name == name)
+                activate DbContext
+                    DbContext --> Database : SELECT * FROM Docks WHERE Name = @name (Include VesselTypesAllowed)
+                    activate Database
+                    Database --> DbContext : DockDataModel? (found/null)
+                    deactivate Database
+                    DbContext --> DockRepository: DockDataModel? (found/null)
+                deactivate DbContext
+                alt exists
+                    DockRepository -> DockMapper: ToDomain(DockDataModel)
+                    activate DockMapper
+                        DockMapper --> DockRepository: Dock (domain)
+                    deactivate DockMapper
+                    DockRepository --> DockService: Dock (not null)
+                else not exists
+                    DockRepository --> DockService: null
+                end
+            deactivate DockRepository
+
+            DockService -> DockRepository: GetDockByLocationAsync(dockDTO.Location)
+            activate DockRepository
+                DockRepository -> DbContext: Set<DockDataModel>().Include(d => d.VesselTypesAllowed).SingleOrDefaultAsync(d => d.Location == location)
+                activate DbContext
+                    DbContext --> Database : SELECT * FROM Docks WHERE Location = @location (Include VesselTypesAllowed)
+                    activate Database
+                    Database --> DbContext : DockDataModel? (found/null)
+                    deactivate Database
+                    DbContext --> DockRepository: DockDataModel? (found/null)
+                deactivate DbContext
+                alt exists
+                    DockRepository -> DockMapper: ToDomain(DockDataModel)
+                    activate DockMapper
+                        DockMapper --> DockRepository: Dock (domain)
+                    deactivate DockMapper
+                    DockRepository --> DockService: Dock (not null)
+                else not exists
+                    DockRepository --> DockService: null
+                end
+            deactivate DockRepository
+
+            DockService -> DockService: Validate dockDTO.VesselTypesAllowed not empty
+            DockService -> VesselTypeRepository: GetVesselTypeByNameAsync(vesselTypeName) [for each name]
+            activate VesselTypeRepository
+                VesselTypeRepository -> DbContext: Set<VesselTypeDataModel>().SingleOrDefaultAsync(v => v.Name == name)
+                activate DbContext
+                    DbContext --> Database : SELECT * FROM VesselTypes WHERE Name = @name
+                    activate Database
+                    Database --> DbContext : VesselTypeDataModel? (found/null)
+                    deactivate Database
+                    DbContext --> VesselTypeRepository: VesselTypeDataModel? (found/null)
+                deactivate DbContext
+            alt any missing    
+                VesselTypeRepository --> DockService: return null + errorMessages (invalid vessel type)
+            else all found
+                VesselTypeRepository --> DockService: List<VesselType> (all found)
+            deactivate VesselTypeRepository
+                DockService -> DockFactory: NewDock(name, location, length, depth, maxDraft, vesselTypes)
+                activate DockFactory
+                    DockFactory -> DockDomain: <<create>> Dock(name, location, length, depth, maxDraft, vesselTypes)
+                    activate DockDomain
+                        DockDomain --> DockFactory: Dock (newly created)
+                    deactivate DockDomain
+                    DockFactory --> DockService: Dock (domain)
+                deactivate DockFactory
+
+                DockService -> DockRepository: AddDock(Dock domain)
+                activate DockRepository
+                    DockRepository -> DockMapper: ToDataModel(Dock domain)
+                    activate DockMapper
+                        DockMapper --> DockRepository: DockDataModel (new)
+                    deactivate DockMapper
+
+                    DockRepository -> DbContext: Set<DockDataModel>().Add(DockDataModel)
+                    activate DbContext
+                        DbContext --> DockRepository: EntityEntry<DockDataModel>
+                    deactivate DbContext
+
+                    DockRepository -> DbContext: SaveChangesAsync()
+                    activate DbContext
+                        DbContext -> Database: INSERT INTO Docks ... (and related join entries for VesselTypes)
+                        activate Database
+                            Database --> DbContext: Commit/Success
+                        deactivate Database
+                        DbContext --> DockRepository: 
+                    deactivate DbContext
+
+                    DockRepository -> DockMapper: ToDomain(DockDataModel)
+                    activate DockMapper
+                        DockMapper --> DockRepository: Dock (domain) 
+                    deactivate DockMapper
+                    DockRepository --> DockService: Dock (saved)
+                deactivate DockRepository
+
+                DockService -> DockDTO: DockDTO.ToDTO(Dock)
+                activate DockDTO
+                    DockDTO --> DockService: DockDTO
+                deactivate DockDTO
+
+                DockService --> DockController: DockDTO (created)
+            end
+
+        deactivate DockService
+
+        alt created
+            DockController --> portOfficer: 201 Created (DockDTO)
+        else validation error
+            DockController --> portOfficer: 400 Bad Request (errorMessages)
+        else conflict
+            DockController --> portOfficer: 409 Conflict (errorMessages)
+        end
+
+    deactivate DockController
+deactivate portOfficer
+@enduml

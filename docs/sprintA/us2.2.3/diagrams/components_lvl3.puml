@@ -1,16 +1,29 @@
-@startuml DockComponents
+@startuml Dock
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-Container_Boundary(api, "Dock API (.NET 8)") {
-    Component(web_api, "Web API Layer", "ASP.NET Core Controllers", "Handles HTTP requests and responses")
-    Component(application, "Application Layer", "C# Services and DTOs", "Implements use cases and coordinates domain logic")
-    Component(domain, "Domain Layer", "C# Domain Models, Factories, IRepositories", "Contains business rules and core entities")
-    Component(data_model, "Data Model Layer", "EF Core Repositories and Mappers", "Implements data persistence using SQLite")
+Person(PAO, "Port Authority Officer", "System user managing port authority operations")
+
+Container_Boundary(Dockapi, "Dock API") {
+    Component(DockController, "Dock Controller", "ASP.NET Core MVC Controller", "Handles HTTP requests related to Docks")
+    Component(DockService, "Dock Service", ".NET 8 (ASP.NET Core)", "Business logic for Docks")
+    Component(Dock, "Dock", "Domain Model", "Represents a Dock")
+    Component(DockRepository, "Dock Repository", ".NET 8 (ASP.NET Core)", "Data access for Docks")
+    Component(DockDbContext, "Dock DbContext", ".NET 8 (Entity Framework Core)", "EF Core DbContext for Docks")
+    ComponentDb(db, "Shipping Management Database", "SQL Server", "Stores all data related to shipping management")
 }
 
-Rel(web_api, application, "Invokes services")
-Rel(application, domain, "Uses domain logic and entities")
-Rel(application, data_model, "Accesses repositories for persistence")
-Rel(data_model, domain, "Implements repository interfaces")
+
+DockService -[hidden]right-> Dock
+DockRepository -[hidden]right-> DockDbContext
+
+
+Rel(PAO, DockController, "Sends HTTP requests", "HTTPS/JSON")
+Rel(DockController, DockService, "Calls methods in", "Method Calls")
+Rel(DockService, Dock, "Uses", "Domain Logic")
+Rel(DockService, DockRepository, "Uses", "Method Calls")
+Rel(DockRepository, DockDbContext, "Uses", "Method Calls")
+Rel(DockDbContext, db, "Reads from and writes to", "EF Core/SQL")
+
 
 @enduml

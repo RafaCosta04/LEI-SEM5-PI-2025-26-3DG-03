@@ -3,54 +3,78 @@
 
 class DockController { 
 	+GetAllDocks()
-	+GetDockByName()
-	+GetDockById()
-	+GetDockByLocation()
-    +GetDocksByVesselTypes()
-	+PutDock()
-	+PostDock()
+	+GetDockByName(string name)
+	+GetDockById(int id)
+	+GetDockByLocation(string location)
+    +GetDocksByVesselTypes([FromBody] List<string> vesselTypeNames)
+	+PutDock(long id, DockDTO dockDTO)
+	+PostDock(DockDTO dockDTO)
 }
 
 class DockService {
 	+GetAllDocks()
-	+GetDockByName()
-	+GetDockByID()
-	+GetDockByLocation()
-    +GetDocksByVesselTypes()
-	+AddDock()
-	+UpdateDock()
+	+GetDockByName(string name)
+	+GetDockById(int id)
+	+GetDockByLocation(string location)
+    +GetDocksByVesselTypes(List<string> vesselTypesNames)
+	+AddDock(DockDTO dockDTO, List<string> errorMessages)
+	+UpdateDock(long id, DockDTO dockDTO, List<string> errorMessages)
 }
 
 class DockDTO{
+    -Id: long
     -Name: string
     -Location: string
     -Length: int
     -Depth: int
     -MaxDraft: int
-    +ToDTO()
-    +ToDomain()
-    +UpdateToDomain()
+    -VesselTypesAllowed : List<string>
+    -LastModifiedAt : DateTime
+    +ToDTO(Dock dock)
 }
 
 
 interface IDockRepository{
     +GetDockAsync()
-    +GetDockByNameAsync() 
-    +GetDockByIdAsync()
-    +GetDockByLocationAsync()
-    +GetDocksByVesselTypesAsync()
-    +AddDock()
-    +UpdateDock()
+    +GetDockByNameAsync(string name)
+    +GetDockByIdAsync(long id)
+    +GetDockByLocationAsync(string location)
+    +GetDocksByVesselTypesAsync(IEnumerable<VesselType> vesselTypes)
+    +AddDock(Dock dock)
+    +Update(Dock dock, List<string> errorMessages)
+    +DockExists(long id)
 }
+
+interface IVesselTypeRepository{
+    +GetVesselTypesAsync()
+    +GetVesselTypeByNameAsync(string name)
+    +GetVesselTypeByIdAsync(long id)
+    +GetVesselTypeByDescriptionAsync(string description)
+    +AddVesselType(VesselType vesselType)
+    +Update(VesselType vesselType, List<string> errorMessages)
+    +VesselTypeExists(long id)
+}
+
+class VesselTypeRepository{
+    +GetVesselTypesAsync()
+    +GetVesselTypeByNameAsync(string name)
+    +GetVesselTypeByIdAsync(long id)
+    +GetVesselTypeByDescriptionAsync(string description)
+    +VesselTypeExists(long id)VesselTypeExists(long id)
+    +AddVesselType(VesselType vesselType)
+    +Update(VesselType vesselType, List<string> errorMessages)
+}
+
 
 class DockRepository{
     +GetDockAsync()
-    +GetDockByNameAsync() 
-    +GetDockByIdAsync()
-    +GetDockByLocationAsync()
-    +GetDocksByVesselTypesAsync()
-    +AddDock()
-    +UpdateDock()
+    +GetDockByNameAsync(string name)
+    +GetDockByIdAsync(long id)
+    +GetDockByLocationAsync(string location)
+    +GetDocksByVesselTypesAsync(IEnumerable<VesselType> vesselTypes)
+    +AddDock(Dock dock)
+    +Update(Dock dock, List<string> errorMessages)
+    +DockExists(long id)
 }
 
 
@@ -61,21 +85,31 @@ class Dock{
     -Length: int
     -Depth: int
     -MaxDraft: int
-    +ChangeName()
-    +ChangeLocation()
-    +ChangeLength()
-    +ChangeDepth()
-    +ChangeMaxDraft()
+    -VesselTypesAllowed : List<VesselType>
+    -LastModifiedAt : DateTime
+    +AddVesselType(VesselType vesselType)
+    +ValidateName(string name)
+    +ValidateLocation(string location)
+    +ValidateLength(int length)
+    +ValidateDepth(int depth)
+    +ValidateMaxDraft(int maxDraft)
+    +ValidateVesselTypes(List<VesselType> vesselTypes)
+    +ChangeName(string name)
+    +ChangeLocation(string location)
+    +ChangeLength(int length)
+    +ChangeDepth(int depth)
+    +ChangeMaxDraft(int maxDraft)
+    +ChangeVesselTypesAlowed(List<VesselType> vesselTypes)
 }
 
 class DockMapper{
-    +ToDomain()
-    +ToDataModel()
-    +UpdateDataModel()
+    +ToDomain(DockDataModel dockDM)
+    +ToDataModel(Dock dock)
+    +UpdateDataModelAsync(DockDataModel dockDM, Dock dock, DbContext context)
 }
 
 interface IDockFactory{
-    +NewDock()
+    +NewDock(string name, string location, int length, int depth, int maxDraft, List<VesselType> vesselTypes)
 }
 
 class DockDataModel{
@@ -85,15 +119,18 @@ class DockDataModel{
     -Length: int
     -Depth: int
     -MaxDraft: int
+    -VesselTypesAllowed : List<VesselTypeDataModel>
+    -LastModifiedAt : DateTime
 }
 
 class DockFactory{
-    +NewDock()
+    +NewDock(string name, string location, int length, int depth, int maxDraft, List<VesselType> vesselTypes)
 }
 
 
 DockController --> DockService: uses 
 DockService --> IDockRepository: uses
+DockService --> IVesselTypeRepository: uses
 DockService --> DockDTO: uses
 
 DockRepository --> DockMapper: uses
@@ -102,8 +139,8 @@ DockMapper --> IDockFactory : uses
 DockFactory --> Dock: creates
 
 
-DockFactory ..|> IDockFactory : implements
+DockFactory .up.|> IDockFactory : implements
 
 DockRepository ..|> IDockRepository : implements
-
+VesselTypeRepository .up.|> IVesselTypeRepository : implements
 @enduml

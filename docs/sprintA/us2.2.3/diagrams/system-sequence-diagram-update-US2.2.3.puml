@@ -1,0 +1,31 @@
+@startuml 2.2.3
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Port Authority Officer" as portOfficer
+participant "System" as system
+
+title System Sequence Diagram - US2.2.3
+
+== Update Dock ==
+activate portOfficer
+
+portOfficer -> system : Update Dock
+activate system
+
+system -> portOfficer : Request Dock Information("Dock Name,\n Location within the Port, Length, Depth, Max Draft") to Update
+deactivate system
+portOfficer -> system : Provide Dock Information to Update
+
+
+activate system
+
+system -> system : Update \ndock record
+
+system -> portOfficer : Confirm Dock update
+deactivate system
+
+
+
+@enduml
