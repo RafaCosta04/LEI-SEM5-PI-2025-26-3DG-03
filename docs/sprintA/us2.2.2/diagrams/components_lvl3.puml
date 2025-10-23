@@ -9,27 +9,25 @@ Container_Boundary(vesselapi, "Vessel API") {
     Component(VesselRecordService, "Vessel Service", ".NET 8 (ASP.NET Core)", "Business logic for Vessels")
     Component(Vessel, "Vessel", "Domain Model", "Represents a Vessel")
     Component(VesselRecordRepository, "Vessel Repository", ".NET 8 (ASP.NET Core)", "Data access for Vessels")
-    Component(VesselRecordDbContext, "Vessel DbContext", ".NET 8 (Entity Framework Core)", "EF Core DbContext for Vessels")
     ComponentDb(db, "Shipping Management Database", "SQL Server", "Stores all data related to shipping management")
 
     Component(VesselTypeRepository, "VesselType Repository", ".NET 8 (ASP.NET Core)", "Data access for VesselTypes")
-    Component(VesselTypeDbContext, "VesselType DbContext", ".NET 8 (Entity Framework Core)", "EF Core DbContext for VesselTypes")
+    Component(DbContext, "DbContext", ".NET 8 (Entity Framework Core)", "EF Core DbContext for Shipping Management")
 }
 
 
 VesselRecordService -[hidden]right-> Vessel
-VesselRecordRepository -[hidden]right-> VesselRecordDbContext
+VesselRecordRepository -[hidden]right-> DbContext
 
 
 Rel(PAO, VesselRecordController, "Sends HTTP requests", "HTTPS/JSON")
 Rel(VesselRecordController, VesselRecordService, "Calls methods in", "Method Calls")
 Rel(VesselRecordService, Vessel, "Uses", "Domain Logic")
 Rel(VesselRecordService, VesselRecordRepository, "Uses", "Method Calls")
-Rel(VesselRecordRepository, VesselRecordDbContext, "Uses", "Method Calls")
-Rel(VesselRecordDbContext, db, "Reads from and writes to", "EF Core/SQL")
+Rel(VesselRecordRepository, DbContext, "Uses", "Method Calls")
 
 Rel(VesselRecordService, VesselTypeRepository, "Uses", "Method Calls")
-Rel(VesselTypeRepository, VesselTypeDbContext, "Uses", "Method Calls")
-Rel(VesselTypeDbContext, db, "Reads from and writes to", "EF Core/SQL")
+Rel(VesselTypeRepository, DbContext, "Uses", "Method Calls")
+Rel(DbContext, db, "Reads from and writes to", "EF Core/SQL")
 
 @enduml

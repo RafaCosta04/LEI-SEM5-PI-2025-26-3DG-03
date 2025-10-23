@@ -1,0 +1,223 @@
+@startuml ShippingAgentOrganizationCode
+
+
+class ShippingAgentOrganizationController {
+	+GetAllShippingAgentOrganizations()
+	+GetShippingAgentOrganizationByCode(string code)
+	+GetShippingAgentOrganizationById(long id)
+	+GetShippingAgentOrganizationByLegalName(string legalName)
+    +GetShippingAgentOrganizationByAlternativeNameAsync(string alternativeName)
+	+GetShippingAgentOrganizationByTaxNumber(string taxNumber)
+	+PutShippingAgentOrganization(string code, ShippingAgentOrganizationDTO organizationDTO)
+	+PostShippingAgentOrganization(ShippingAgentOrganizationDTO organizationDTO)
+}
+class ShippingAgentOrganizationService {
+	+GetAllShippingAgentOrganizations()
+	+GetShippingAgentOrganizationByCode(string code)
+	+GetShippingAgentOrganizationById(long id)
+	+GetShippingAgentOrganizationByLegalName(string legalName)
+    +GetShippingAgentOrganizationByAlternativeNameAsync(string alternativeName)
+	+GetShippingAgentOrganizationByTaxNumber(string taxNumber)
+	+AddShippingAgentOrganization(ShippingAgentOrganizationDTO organizationDTO, List<string> errorMessages)
+	+UpdateShippingAgentOrganization(string code, ShippingAgentOrganizationDTO organizationDTO, List<string> errorMessages)
+}
+
+class ShippingAgentOrganizationDTO{
+    -Code: string
+    -LegalName: string
+    -AlternativeName: string
+    -Address: string
+    -TaxNumber: string
+    +ToDTO(ShippingAgentOrganization organization)
+    +ToDTO(IEnumerable<ShippingAgentOrganization> organizations)
+    +ToDomain(ShippingAgentOrganizationDTO organizationDTO)
+    +UpdateToDomain(ShippingAgentOrganization organization, ShippingAgentOrganizationDTO organizationDTO)
+}
+
+
+interface IShippingAgentOrganizationRepository{
+    +GetShippingAgentOrganizationsAsync()
+    +GetShippingAgentOrganizationByCodeAsync(string code) 
+    +GetShippingAgentOrganizationByIdAsync(long id)
+    +GetShippingAgentOrganizationByLegalNameAsync(string legalName)
+    +GetShippingAgentOrganizationByAlternativeNameAsync(string alternativeName)
+    +GetShippingAgentOrganizationByTaxNumberAsync(string taxNumber)
+    +AddShippingAgentOrganization(ShippingAgentOrganization organization)
+    +Update(ShippingAgentOrganization organization, List<string> errorMessages)
+}
+
+class ShippingAgentOrganizationRepository{
+    +GetShippingAgentOrganizationsAsync()
+    +GetShippingAgentOrganizationByCodeAsync(string code) 
+    +GetShippingAgentOrganizationByIdAsync(long id)
+    +GetShippingAgentOrganizationByLegalNameAsync(string legalName)
+    +GetShippingAgentOrganizationByAlternativeNameAsync(string alternativeName)
+    +GetShippingAgentOrganizationByTaxNumberAsync(string taxNumber)
+    +AddShippingAgentOrganization(ShippingAgentOrganization organization)
+    +Update(ShippingAgentOrganization organization, List<string> errorMessages)
+}
+
+
+class ShippingAgentOrganization{
+    -Id: long
+    -Code: string
+    -LegalName: string
+    -AlternativeName: string
+    -Address: string
+    -TaxNumber: string
+    +CheckCode(string code)
+    +CheckLegalName(string legalName)
+    +CheckAlternativeName(string alternativeName)
+    +CheckAddress(string address)
+    +CheckTaxNumber(string taxNumber)
+    +ChangeCode(string newCode)
+    +ChangeLegalName(string newLegalName)
+    +ChangeAlternativeName(string newAlternativeName)
+    +ChangeAddress(string newAddress)
+    +ChangeTaxNumber(string newTaxNumber)
+}
+
+class ShippingAgentOrganizationMapper{
+    +ToDomain(ShippingAgentOrganizationDataModel organizationDM)
+    +ToDomain(IEnumerable<ShippingAgentOrganizationDataModel> organizationDataModels)
+    +ToDataModel(ShippingAgentOrganization organization)
+    +UpdateDataModel(ShippingAgentOrganizationDataModel organizationDM, ShippingAgentOrganization organization)
+}
+
+interface IShippingAgentOrganizationFactory{
+    +NewShippingAgentOrganization(string code, string legalName, string alternativeName, string address, string taxNumber)
+}
+
+class ShippingAgentOrganizationDataModel{
+    -Id: long
+    -Code: string
+    -LegalName: string
+    -AlternativeName: string
+    -Address: string
+    -TaxNumber: string
+}
+
+class ShippingAgentOrganizationFactory{
+    +NewShippingAgentOrganization(string code, string legalName, string alternativeName, string address, string taxNumber)
+}
+
+
+class RepresentativeService{
+    +GetRepresentativesAsync()
+    +GetRepresentativeById(long id)
+    +GetRepresentativeByEmail(string email)
+    +GetRepresentativeByCitizenId(string citizenId)
+    +GetRepresentativesByOrganizationId(long organizationId)
+    +AddRepresentative(RepresentativeDTO representativeDTO, List<string> errorMessages)
+    +UpdateRepresentative(long id, RepresentativeDTO representativeDTO, List<string> errorMessages)
+    +DeleteRepresentative(long id, List<string> errorMessages)
+}
+
+class RepresentativeDTO{
+    -Name: string
+    -CitizenId: string
+    -Nationality: string
+    -Email: string
+    -PhoneNumber: string
+    -OrganizationCode: string
+    +ToDTO(Representative representative)
+    +ToDTO(IEnumerable<Representative> representatives)
+    +ToDomain(RepresentativeDTO representativeDTO, ShippingAgentOrganization organization)
+}
+
+interface IRepresentativeRepository{
+    +GetRepresentativesAsync()
+    +GetRepresentativeByCitizenIdAsync(string citizenId)
+    +GetRepresentativeByIdAsync(long id)
+    +GetRepresentativeByEmailAsync(string email)
+    +GetRepresentativesByOrganizationIdAsync(long organizationId)
+    +AddRepresentative(Representative representative)
+    +Update(Representative representative, List<string> errorMessages)
+    +Delete(Representative representative, List<string> errorMessages)
+}
+
+class RepresentativeRepository{
+    +GetRepresentativesAsync()
+    +GetRepresentativeByCitizenIdAsync(string citizenId)
+    +GetRepresentativeByIdAsync(long id)
+    +GetRepresentativeByEmailAsync(string email)
+    +GetRepresentativesByOrganizationIdAsync(long organizationId)
+    +AddRepresentative(Representative representative)
+    +Update(Representative representative, List<string> errorMessages)
+    +Delete(Representative representative, List<string> errorMessages)
+}
+
+class Representative{
+    -Id: long
+    -Name: string
+    -CitizenId: string
+    -Nationality: string
+    -Email: string
+    -PhoneNumber: string
+    -Organization: ShippingAgentOrganization
+    +CheckOrganization(ShippingAgentOrganization organization)
+    +CheckName(string name)
+    +CheckNationality(string nationality)
+    +CheckEmail(string email)
+    +CheckPhoneNumber(string phoneNumber)
+    +ChangeName(string newName)
+    +ChangeNationality(string newNationality)
+    +ChangeEmail(string newEmail)
+    +ChangePhoneNumber(string newPhoneNumber)
+}
+
+class RepresentativeMapper{
+    +ToDomain(RepresentativeDataModel representativeDM)
+    +ToDomain(IEnumerable<RepresentativeDataModel> representativeDataModels)
+    +ToDataModel(Representative representative)
+    +UpdateDataModel(RepresentativeDataModel representativeDM, Representative representative)
+}
+
+interface IRepresentativeFactory{
+    +NewRepresentative(ShippingAgentOrganization organization, string name, string citizenId, string nationality, string email, string phoneNumber)
+}
+
+class RepresentativeDataModel{
+    -Id: long
+    -Name: string
+    -CitizenId: string
+    -Nationality: string
+    -Email: string
+    -PhoneNumber: string
+    -OrganizationId: long
+    -Organization: ShippingAgentOrganizationDataModel
+}
+
+class RepresentativeFactory{
+    +NewRepresentative(ShippingAgentOrganization organization, string name, string citizenId, string nationality, string email, string phoneNumber)
+}
+
+
+
+ShippingAgentOrganizationService --> RepresentativeService: uses
+RepresentativeService --> IRepresentativeRepository: uses
+RepresentativeService --> RepresentativeDTO: uses
+RepresentativeService --> IShippingAgentOrganizationRepository: uses
+
+RepresentativeRepository --> RepresentativeMapper: uses
+RepresentativeMapper --> RepresentativeDataModel: uses
+RepresentativeMapper --> IRepresentativeFactory: uses
+RepresentativeFactory --> Representative: creates
+
+RepresentativeFactory ..|> IRepresentativeFactory: implements
+RepresentativeRepository ..|> IRepresentativeRepository : implements
+
+
+ShippingAgentOrganizationController --> ShippingAgentOrganizationService: uses 
+ShippingAgentOrganizationService --> IShippingAgentOrganizationRepository: uses
+ShippingAgentOrganizationService --> ShippingAgentOrganizationDTO: uses
+
+ShippingAgentOrganizationRepository --> ShippingAgentOrganizationMapper: uses
+ShippingAgentOrganizationMapper --> ShippingAgentOrganizationDataModel : uses
+ShippingAgentOrganizationMapper --> IShippingAgentOrganizationFactory : uses
+ShippingAgentOrganizationFactory --> ShippingAgentOrganization: creates
+
+ShippingAgentOrganizationFactory ..|> IShippingAgentOrganizationFactory : implements
+ShippingAgentOrganizationRepository ..|> IShippingAgentOrganizationRepository : implements
+
+@enduml

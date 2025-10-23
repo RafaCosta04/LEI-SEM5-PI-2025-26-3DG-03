@@ -9,21 +9,21 @@ Container_Boundary(vessetypeapi, "Vessel Type Type API") {
     Component(VesselTypeService, "Vessel Type Service", ".NET 8 (ASP.NET Core)", "Business logic for Vessels")
     Component(VesselType, "Vessel Type", "Domain Model", "Represents a Vessel Type")
     Component(VesselRecordRepository, "Vessel Type Repository", ".NET 8 (ASP.NET Core)", "Data access for Vessels")
-    Component(VesselRecordDbContext, "Vessel Type DbContext", ".NET 8 (Entity Framework Core)", "EF Core DbContext for Vessels")
+    Component(DbContext, "DbContext", ".NET 8 (Entity Framework Core)", "EF Core DbContext for Shipping Management")
     ComponentDb(db, "Shipping Management Database", "SQL Server", "Stores all data related to shipping management")
 }
 
 
 VesselTypeService -[hidden]right-> VesselType
-VesselRecordRepository -[hidden]right-> VesselRecordDbContext
+VesselRecordRepository -[hidden]right-> DbContext
 
 
 Rel(PAO, VesselTypeController, "Sends HTTP requests", "HTTPS/JSON")
 Rel(VesselTypeController, VesselTypeService, "Calls methods in", "Method Calls")
 Rel(VesselTypeService, VesselType, "Uses", "Domain Logic")
 Rel(VesselTypeService, VesselRecordRepository, "Uses", "Method Calls")
-Rel(VesselRecordRepository, VesselRecordDbContext, "Uses", "Method Calls")
-Rel(VesselRecordDbContext, db, "Reads from and writes to", "EF Core/SQL")
+Rel(VesselRecordRepository, DbContext, "Uses", "Method Calls")
+Rel(DbContext, db, "Reads from and writes to", "EF Core/SQL")
 
 
 @enduml

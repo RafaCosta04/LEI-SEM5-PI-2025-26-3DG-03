@@ -108,7 +108,7 @@ class VesselTypeRepository{
 }
 
 VesselRecordService -left-> IVesselTypeRepository: uses
-VesselTypeRepository -up-> IVesselTypeRepository : implements
+VesselTypeRepository .up.|> IVesselTypeRepository : implements
 
 
 VesselRecordController --> VesselRecordService: uses 

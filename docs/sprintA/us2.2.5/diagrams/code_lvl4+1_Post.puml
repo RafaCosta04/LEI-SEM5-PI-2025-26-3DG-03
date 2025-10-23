@@ -1,0 +1,191 @@
+@startuml code_lvl4+1_Post_ShippingAgentOrganization
+!define RECTANGLE class
+
+title Sequence Diagram - POST ShippingAgentOrganization with Representative (Level 4+1)
+
+actor Client
+participant "ShippingAgentOrganizationController" as Controller
+participant "ShippingAgentOrganizationService" as Service
+participant "RepresentativeService" as RepService
+participant "IShippingAgentOrganizationRepository" as SARepository
+participant "IRepresentativeRepository" as RepRepository
+participant "ShippingAgentOrganizationMapper" as SAMapper
+participant "RepresentativeMapper" as RepMapper
+participant "IShippingAgentOrganizationFactory" as SAFactory
+participant "IRepresentativeFactory" as RepFactory
+participant "ShippingAgentOrganization" as SADomain
+participant "Representative" as RepDomain
+participant "ShippingAgentOrganizationDataModel" as SADataModel
+database "ShippingManagementContext" as Database
+
+Client -> Controller : POST /api/ShippingAgentOrganization\n(ShippingAgentOrganizationWithRepresentativeDTO compositeDTO)
+
+activate Controller
+Controller -> Controller : Validate all required fields\n(Code, LegalName, AlternativeName, Address, TaxNumber,\nRepresentativeName, CitizenId, Nationality, Email, PhoneNumber)
+
+Controller -> Service : AddShippingAgentOrganizationWithRepresentative(compositeDTO, errorMessages)
+activate Service
+
+Service -> Service : GetOrganizationDTO() from compositeDTO
+Service -> Service : GetRepresentativeDTO() from compositeDTO
+
+' Check if organization already exists by LegalName
+Service -> SARepository : GetShippingAgentOrganizationByLegalNameAsync(organizationDTO.LegalName)
+activate SARepository
+SARepository -> Database : SingleOrDefaultAsync(sa => sa.LegalName == legalName)
+activate Database
+Database --> SARepository : ShippingAgentOrganizationDataModel or null
+deactivate Database
+
+alt Organization with LegalName already exists
+    SARepository -> SAMapper : ToDomain(organizationDataModel)
+    activate SAMapper
+    SAMapper -> SAFactory : NewShippingAgentOrganization(code, legalName, alternativeName, address, taxNumber)
+    activate SAFactory
+    SAFactory -> SADomain : new ShippingAgentOrganization(...)
+    activate SADomain
+    SADomain -> SADomain : Validate and normalize code, taxNumber
+    SADomain -> SADomain : CheckCode, CheckLegalName, CheckAlternativeName, CheckAddress, CheckTaxNumber
+    SADomain --> SAFactory : ShippingAgentOrganization instance
+    deactivate SADomain
+    SAFactory --> SAMapper : ShippingAgentOrganization
+    deactivate SAFactory
+    SAMapper -> SADomain : Set Id & LastModifiedAt
+    activate SADomain
+    SADomain --> SAMapper : ShippingAgentOrganization
+    deactivate SADomain
+    SAMapper --> SARepository : ShippingAgentOrganization (existing)
+    deactivate SAMapper
+    SARepository --> Service : ShippingAgentOrganization (existing)
+    deactivate SARepository
+    
+    Service -> Service : errorMessages.Add("Organization with same legal name already exists.")
+    Service --> Controller : null
+else Organization not found
+    SARepository --> Service : null
+    deactivate SARepository
+    
+    ' Check if organization already exists by Code
+    Service -> SARepository : GetShippingAgentOrganizationByCodeAsync(organizationDTO.Code)
+    activate SARepository
+    SARepository -> Database : SingleOrDefaultAsync(sa => sa.Code == code)
+    activate Database
+    Database --> SARepository : ShippingAgentOrganizationDataModel or null
+    deactivate Database
+    
+    alt Organization with Code already exists
+        SARepository --> Service : ShippingAgentOrganization (existing)
+        deactivate SARepository
+        Service -> Service : errorMessages.Add("Organization with same code already exists.")
+        Service --> Controller : null
+    else Code available
+        SARepository --> Service : null
+        deactivate SARepository
+        
+        ' Check TaxNumber and Address uniqueness
+        Service -> SARepository : GetShippingAgentOrganizationByTaxNumberAsync(organizationDTO.TaxNumber)
+        activate SARepository
+        SARepository --> Service : null or existing organization
+        deactivate SARepository
+        
+        Service -> SARepository : GetShippingAgentOrganizationByAddressAsync(organizationDTO.Address)
+        activate SARepository
+        SARepository --> Service : null or existing organization
+        deactivate SARepository
+        
+        opt TaxNumber or Address already exists
+            Service -> Service : errorMessages.Add("TaxNumber or Address already exists.")
+            Service --> Controller : null
+        end
+        
+        ' Check if representative already exists
+        Service -> RepService : GetRepresentativeByCitizenId(representativeDTO.CitizenId)
+        activate RepService
+        RepService -> RepRepository : GetRepresentativeByCitizenIdAsync(citizenId)
+        activate RepRepository
+        RepRepository --> RepService : null or existing representative
+        deactivate RepRepository
+        RepService --> Service : null or RepresentativeDTO
+        deactivate RepService
+        
+        opt Representative already exists
+            Service -> Service : errorMessages.Add("Representative already exists.")
+            Service --> Controller : null
+        end
+        
+        ' Create new organization using factory
+        Service -> Service : ShippingAgentOrganizationDTO.ToDomain(organizationDTO)
+        Service -> SADomain : new ShippingAgentOrganization(code, legalName, alternativeName, address, taxNumber)
+        activate SADomain
+        SADomain -> SADomain : Normalize code and taxNumber to uppercase
+        SADomain -> SADomain : CheckCode(code) - validate alphanumeric
+        SADomain -> SADomain : CheckLegalName, CheckAlternativeName, CheckAddress
+        SADomain -> SADomain : CheckTaxNumber(taxNumber) - validate alphanumeric
+        SADomain -> SADomain : Set properties & LastModifiedAt = DateTime.UtcNow
+        SADomain --> Service : ShippingAgentOrganization
+        deactivate SADomain
+        
+        ' Save organization
+        Service -> SARepository : AddShippingAgentOrganization(organization)
+        activate SARepository
+        SARepository -> SAMapper : ToDataModel(organization)
+        activate SAMapper
+        SAMapper -> SADataModel : new ShippingAgentOrganizationDataModel(organization)
+        activate SADataModel
+        SADataModel --> SAMapper : ShippingAgentOrganizationDataModel
+        deactivate SADataModel
+        SAMapper --> SARepository : ShippingAgentOrganizationDataModel
+        deactivate SAMapper
+        
+        SARepository -> Database : Add(organizationDataModel)
+        activate Database
+        SARepository -> Database : SaveChangesAsync()
+        Database --> SARepository : EntityEntry<ShippingAgentOrganizationDataModel>
+        deactivate Database
+        
+        SARepository -> SAMapper : ToDomain(savedOrganizationDataModel)
+        activate SAMapper
+        SAMapper --> SARepository : ShippingAgentOrganization (saved)
+        deactivate SAMapper
+        SARepository --> Service : ShippingAgentOrganization (saved)
+        deactivate SARepository
+        
+        ' Create representative
+        Service -> RepService : AddRepresentative(representativeDTO, errorMessages)
+        activate RepService
+        RepService -> RepFactory : NewRepresentative(organization, name, citizenId, nationality, email, phoneNumber)
+        activate RepFactory
+        RepFactory -> RepDomain : new Representative(organization, ...)
+        activate RepDomain
+        RepDomain -> RepDomain : CheckOrganization, CheckName, CheckNationality, CheckEmail, CheckPhoneNumber
+        RepDomain --> RepFactory : Representative instance
+        deactivate RepDomain
+        RepFactory --> RepService : Representative
+        deactivate RepFactory
+        
+        RepService -> RepRepository : AddRepresentative(representative)
+        activate RepRepository
+        RepRepository --> RepService : Representative (saved)
+        deactivate RepRepository
+        RepService --> Service : RepresentativeDTO
+        deactivate RepService
+        
+        ' Create composite DTO response
+        Service -> Service : Create ShippingAgentOrganizationWithRepresentativeDTO from saved data
+        Service --> Controller : ShippingAgentOrganizationWithRepresentativeDTO
+    end
+end
+
+deactivate Service
+
+alt Success
+    Controller --> Client : 201 Created\nCreatedAtAction(GetShippingAgentOrganizationByCode, compositeDTO)
+else Conflict (Organization or Representative already exists)
+    Controller --> Client : 409 Conflict\n(errorMessages)
+else Bad Request (Validation errors)
+    Controller --> Client : 400 Bad Request\n(errorMessages)
+end
+
+deactivate Controller
+
+@enduml
