@@ -1,0 +1,47 @@
+@startuml ShippingAgentOrganizationComponents
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+top to bottom direction
+skinparam linetype ortho
+skinparam nodesep 120
+skinparam ranksep 140
+skinparam padding 8
+
+Person(LOA, "Logistics Operator", "System user managing logistics operations")
+
+Container_Boundary(sms, "Physical Resource API") {
+    Component(PhysicalResourceController, "Physical Resource Controller", "ASP.NET Code MVC Controller", "Handles HTTP requests related to Physical Resources")
+    Component(PhysicalResourceService, "Physical Resource Service", ".NET 8 (ASP.NET Core)", "Business logic for Physical Resources management")
+    Component(PhysicalResource, "Physical Resource", "Domain Model", "Represents Physical Resources")
+    Component(Resource, "Resource", "Domain Model", "Represents types of resources")
+    Component(ResourceStatus, "Resource Status", "Domain Model", "Represents status of resources")
+    Component(OperationalWindow, "Operational Window", "Domain Model", "Represents operational time windows")
+    Component(Qualification, "Qualification", "Domain Model", "Represents Resources qualifications")
+    Component(QualificationRepository, "Qualification Repository", ".NET 8 (ASP.NET Core)", "Data access for qualifications")
+    Component(StorageAreaRepository, "Storage Area Repository", ".NET 8 (ASP.NET Core)", "Data access for storage areas")
+     Component(PhysicalResourceRepository, "Physical Resource Repository", ".NET 8 (ASP.NET Core)", "Data access for Physical Resources")
+    Component(DockRepository, "Dock Repository", ".NET 8 (ASP.NET Core)", "Data access for docks")
+    Component(Db, "DbContext", "NET 8 (Entity Framework Core)", "EF Core DbContext for shipping management")
+    Component(ShippingDb, "Shipping Management Database", "SQL Server", "Stores all data related to shipping management")
+}
+
+Rel(LOA, PhysicalResourceController, "Sends HTTP requests ", "HTTPS/JSON")
+Rel(PhysicalResourceController, PhysicalResourceService, "Calls methods in", "Method Calls")
+Rel(PhysicalResource, Resource, "Extends", "Domain Logic")
+Rel(PhysicalResourceService, PhysicalResource, "Uses", "Domain Logic")
+Rel(Resource, ResourceStatus, "Uses", "Domain Logic")
+Rel(Resource, OperationalWindow, "Uses", "Domain Logic")
+Rel(Resource, Qualification, "Uses", "Domain Logic")
+Rel(PhysicalResourceService, PhysicalResourceRepository, "Uses", "Method Calls")
+Rel(PhysicalResourceService, QualificationRepository, "Uses", "Method Calls")
+Rel(PhysicalResourceService, StorageAreaRepository, "Uses", "Method Calls")
+Rel(PhysicalResourceService, DockRepository, "Uses", "Method Calls")
+Rel(PhysicalResourceRepository, Db, "Uses", "Method Calls")
+Rel(QualificationRepository, Db, "Uses", "Method Calls")
+Rel(StorageAreaRepository, Db, "Uses", "Method Calls")
+Rel(DockRepository, Db, "Uses", "Method Calls")
+Rel(Db, ShippingDb, "Reads from and writes to", "EF Core/SQL")
+
+
+@enduml
