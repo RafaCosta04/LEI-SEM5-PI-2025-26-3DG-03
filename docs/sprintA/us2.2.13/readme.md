@@ -67,14 +67,111 @@ Qualification Update
 
 #### Level +1
 
-Qualification POST
+##### Qualification POST
 ![nivel+1](images/nivel-+1-post.png)
 
-Qualification BET ByName
+##### Qualification BET ByName
 ![nivel+1](images/nivel-+1-BYName.png)
 
-Qualification GET ByCode
+##### Qualification GET ByCode
 ![nivel+1](images/nivel-+1-BYCode.png)
 
-Qualification UPDATE
+##### Qualification UPDATE
 ![nivel+1](images/nivel-+1-UPDATE.png)
+
+## 5. Integration Tests
+
+### Tests Related to Post
+
+```csharp
+    [Fact]
+        public async Task PostQualification_ValidData_ReturnsCreatedAndOK()
+        {
+            var newQualification = new QualificationDTO
+            {
+                Code = "QUAL4",
+                Name = "Fourth Qualification",
+                Description = "Description for fourth qualification test"
+            };
+
+            var postResponse = await _client.PostAsJsonAsync("/api/Qualification", newQualification);
+            Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
+
+            var createdQualification = await postResponse.Content.ReadFromJsonAsync<QualificationDTO>();
+            Assert.NotNull(createdQualification);
+            Assert.Equal(newQualification.Code, createdQualification.Code);
+            Assert.Equal(newQualification.Name, createdQualification.Name);
+            Assert.Equal(newQualification.Description, createdQualification.Description);
+
+
+            var getResponse = await _client.GetAsync($"/api/Qualification/ByCode/{newQualification.Code}");
+            Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("QUAL1", "Duplicate Code Test", "Valid description for duplicate code test")]
+        [InlineData("QUAL2", "Another Duplicate", "Another valid description for duplicate code")]
+        [InlineData("QUAL3", "Third Duplicate", "Third valid description for duplicate code")]
+        public async Task PostQualification_DuplicateCode_ReturnsBadRequest(string code, string name, string description)
+        {
+            var duplicateQualification = new QualificationDTO
+            {
+                Code = code,
+                Name = name,
+                Description = description
+            };
+
+            var postResponse = await _client.PostAsJsonAsync("/api/Qualification", duplicateQualification);
+            Assert.Equal(HttpStatusCode.BadRequest, postResponse.StatusCode);
+        }
+```
+
+### Test Related to Update
+
+```csharp 
+    [Theory]
+        [InlineData("Fifth Qualification", "Updated Description with multiple words")]
+        [InlineData("Sixth Qualification", "Another updated description with words")]
+        public async Task PutQualification_UpdatesSuccessfully(string name, string description)
+        {
+            var response = await _client.GetAsync("/api/Qualification/ByCode/QUAL1");
+            var qualification = await response.Content.ReadFromJsonAsync<QualificationDTO>();
+            Assert.NotNull(qualification);
+            Assert.Equal("QUAL1", qualification.Code);
+
+
+            qualification.Name = name;
+            qualification.Description = description;
+
+            var putResponse = await _client.PutAsJsonAsync($"/api/Qualification/Update/{qualification.Id}", qualification);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+
+
+            var getResponse = await _client.GetAsync($"/api/Qualification/ByCode/{qualification.Code}");
+            Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+            var updatedQualification = await getResponse.Content.ReadFromJsonAsync<QualificationDTO>();
+            Assert.NotNull(updatedQualification);
+            Assert.Equal(name, updatedQualification.Name);
+            Assert.Equal(description, updatedQualification.Description);
+        }
+
+
+        [Theory]
+        [InlineData("Invalid Name 123", "Valid description but invalid name")]
+        [InlineData("Valid Name", "OnlyOneWord")]
+        [InlineData("Invalid@Name", "Valid description with multiple words")]
+        public async Task PutQualification_InvalidData_ReturnsBadRequest(string name, string description)
+        {
+
+            var response = await _client.GetAsync("/api/Qualification/ByCode/QUAL1");
+            var qualification = await response.Content.ReadFromJsonAsync<QualificationDTO>();
+            Assert.NotNull(qualification);
+            Assert.Equal("QUAL1", qualification.Code);
+
+            qualification.Name = name;
+            qualification.Description = description;
+
+            var putResponse = await _client.PutAsJsonAsync($"/api/Qualification/Update/{qualification.Id}", qualification);
+            Assert.Equal(HttpStatusCode.BadRequest, putResponse.StatusCode);
+        }
+```
