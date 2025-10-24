@@ -87,7 +87,7 @@ Record Deactivation
 
 #### Components - Level 3
 
-![Components](images/code_lvl3.png)
+![Components](images/components_lvl3.png)
 
 #### Code - Level 4
 

@@ -1,0 +1,40 @@
+@startuml ShippingAgentOrganizationComponents
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+top to bottom direction
+skinparam linetype ortho
+skinparam nodesep 120
+skinparam ranksep 140
+skinparam padding 8
+
+Person(LOA, "Logistics Operator", "System user managing logistics operations")
+
+Container_Boundary(sms, "Staff API") {
+    Component(StaffController, "Staff Controller", "ASP.NET Code MVC Controller", "Handles HTTP requests related to Staff")
+    Component(StaffService, "Staff Service", ".NET 8 (ASP.NET Core)", "Business logic for staff management")
+    Component(Staff, "Staff", "Domain Model", "Represents staff")
+    Component(Resource, "Resource", "Domain Model", "Represents types of resources")
+    Component(ResourceStatus, "Resource Status", "Domain Model", "Represents status of resources")
+    Component(OperationalWindow, "Operational Window", "Domain Model", "Represents operational time windows")
+    Component(Qualification, "Qualification", "Domain Model", "Represents Resources qualifications")
+    Component(QualificationRepository, "Qualification Repository", ".NET 8 (ASP.NET Core)", "Data access for qualifications")
+    Component(StaffRepository, "Staff Repository", ".NET 8 (ASP.NET Core)", "Data access for staff")
+    Component(Db, "DbContext", "NET 8 (Entity Framework Core)", "EF Core DbContext for shipping management")
+    Component(ShippingDb, "Shipping Management Database", "SQL Server", "Stores all data related to shipping management")
+}
+
+Rel(LOA, StaffController, "Sends HTTP requests ", "HTTPS/JSON")
+Rel(StaffController, StaffService, "Calls methods in", "Method Calls")
+Rel(Staff, Resource, "Extends", "Domain Logic")
+Rel(StaffService, Staff, "Uses", "Domain Logic")
+Rel(Resource, ResourceStatus, "Uses", "Domain Logic")
+Rel(Resource, OperationalWindow, "Uses", "Domain Logic")
+Rel(Resource, Qualification, "Uses", "Domain Logic")
+Rel(StaffService, StaffRepository, "Uses", "Method Calls")
+Rel(StaffService, QualificationRepository, "Uses", "Method Calls")
+Rel(StaffRepository, Db, "Uses", "Method Calls")
+Rel(QualificationRepository, Db, "Uses", "Method Calls")
+Rel(Db, ShippingDb, "Reads from and writes to", "EF Core/SQL")
+
+@enduml
