@@ -1,0 +1,96 @@
+@startuml DecisionCode
+
+class VesselVisitNotificationController {
+    +GetAllDecisions()
+    +GetDecisionById(long id)
+    +PostDecision(DecisionDTO decisionDTO)
+}
+
+class VesselVisitNotificationService {
+    +GetAllDecisions()
+    +GetDecisionById(long id)
+    +AddDecision(DecisionDTO decisionDTO, List<string> errorMessages)
+}
+
+class DecisionDTO {
+    +Id: long
+    +OfficerId: long
+    +Status: string
+    +VesselVisitNotificationCode: string
+    +ResponseMessage: string
+    +ToDTO(Decision decision)
+    +ToDTO(IEnumerable<Decision> decisions)
+    +ToDomain(DecisionDTO dto, VesselVisitNotification notification)
+}
+
+enum DecisionStatus {
+    Approved
+    Rejected
+}
+
+interface IDecisionRepository {
+    +GetAllAsync()
+    +GetDecisionByIdAsync(long id)
+    +AddDecisionAsync(Decision decision)
+}
+
+interface IDockRepository {
+    +GetDockByNameAsync(string name)
+}
+
+interface IVesselVisitNotificationRepository {
+    +GetVisitByCodeAsync(string visitCode)
+    +UpdateVisitAsync(VesselVisitNotification notification, List<string> errorMessages)
+}
+
+class DecisionRepository {
+    +GetAllAsync()
+    +GetDecisionByIdAsync(long id)
+    +AddDecisionAsync(Decision decision)
+}
+
+class Decision {
+    +Id: long
+    +Status: DecisionStatus
+    +ResponseMessage: string
+    +DecisionDate: DateTime
+    +OfficerId: long
+    +VesselVisitNotification: VesselVisitNotification
+    +ValidateStatus(DecisionStatus status)
+    +ValidateResponseMessage(string responseMessage, DecisionStatus status)
+}
+
+class DecisionMapper {
+    +ToDomain(DecisionDataModel dm)
+    +ToDataModel(Decision decision)
+    +UpdateDataModelAsync(DecisionDataModel dm, Decision decision, DbContext context)
+}
+
+class DecisionDataModel {
+    +Id: long
+    +OfficerId: long
+    +DecisionDate: DateTime
+    +Status: DecisionStatus
+    +ResponseMessage: string
+    +VesselVisitNotification: VesselVisitNotificationDataModel
+}
+
+' Relationships
+VesselVisitNotificationController --> VesselVisitNotificationService : uses
+VesselVisitNotificationController --> DecisionDTO : uses
+
+VesselVisitNotificationService --> IDecisionRepository : uses
+VesselVisitNotificationService --> IDockRepository : uses
+VesselVisitNotificationService --> IVesselVisitNotificationRepository : uses
+VesselVisitNotificationService --> DecisionDTO : uses
+
+DecisionRepository --> DecisionMapper : uses
+DecisionMapper --> DecisionDataModel : uses
+DecisionMapper --> IDecisionFactory : uses
+DecisionFactory --> Decision : creates
+
+DecisionFactory ..|> IDecisionFactory : implements
+Decision --> DecisionStatus : uses
+DecisionRepository ..|> IDecisionRepository : implements
+
+@enduml

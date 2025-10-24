@@ -1,0 +1,190 @@
+@startuml PostDecisionSequence
+
+participant "Port Authority Officer" as Officer
+participant "VesselVisitNotificationController" as Controller
+participant "VesselVisitNotificationService" as Service
+participant "IVesselVisitNotificationRepository" as VVNRepo
+participant "VesselVisitNotificationMapper" as VVNMapper
+participant "IDockRepository" as DockRepo
+participant "DockMapper" as DockMapper
+participant "IDecisionRepository" as DecisionRepo
+participant "DecisionMapper" as DecisionMapper
+participant "Database" as DB
+participant "DecisionDTO" as DTO
+participant "DecisionFactory" as Factory
+participant "VesselVisitNotification" as VVN
+participant "Decision" as Decision
+
+Officer -> Controller: POST /api/VesselVisitNotification/Decision\n(DecisionDTO)
+
+activate Controller
+Controller -> Controller: Validate DecisionDTO != null
+alt DecisionDTO is null
+    Controller --> Officer: BadRequest("Decision data must be provided.")
+end
+
+Controller -> Service: AddDecision(decisionDTO, errorMessages)
+activate Service
+
+Service -> Service: Validate DecisionStatus\n(Approved or Rejected)
+alt Invalid Decision Status
+    Service --> Controller: null + errorMessages
+    Controller --> Officer: BadRequest(errorMessages)
+end
+
+Service -> VVNRepo: GetVisitByCodeAsync(vesselVisitNotificationCode)
+activate VVNRepo
+
+VVNRepo -> DB: Query VesselVisitNotificationDataModel\nWHERE Code = vesselVisitNotificationCode
+activate DB
+DB --> VVNRepo: VesselVisitNotificationDataModel or null
+deactivate DB
+
+alt VesselVisitNotificationDataModel found
+    VVNRepo -> VVNMapper: ToDomain(vesselVisitNotificationDataModel)
+    activate VVNMapper
+    VVNMapper --> VVNRepo: VesselVisitNotification
+    deactivate VVNMapper
+else VesselVisitNotificationDataModel not found
+    VVNRepo --> Service: null
+end
+
+VVNRepo --> Service: VesselVisitNotification or null
+deactivate VVNRepo
+
+alt Vessel Visit Notification not found
+    Service --> Controller: null + "Vessel Visit Notification not found."
+    Controller --> Officer: Conflict(errorMessages)
+end
+
+Service -> Service: Validate VisitStatus == Submitted
+alt VisitStatus != Submitted
+    Service --> Controller: null + errorMessages
+    Controller --> Officer: BadRequest(errorMessages)
+end
+
+alt Decision Status is Approved
+    Service -> DockRepo: GetDockByNameAsync(dockName)
+    activate DockRepo
+    
+    DockRepo -> DB: Query DockDataModel\nWHERE Name = dockName
+    activate DB
+    DB --> DockRepo: DockDataModel or null
+    deactivate DB
+    
+    alt DockDataModel found
+        DockRepo -> DockMapper: ToDomain(dockDataModel)
+        activate DockMapper
+        DockMapper --> DockRepo: Dock
+        deactivate DockMapper
+    else DockDataModel not found
+        DockRepo --> Service: null
+    end
+    
+    DockRepo --> Service: Dock or null
+    deactivate DockRepo
+    
+    alt Dock not found
+        Service --> Controller: null + "Dock with name not found."
+        Controller --> Officer: BadRequest(errorMessages)
+    end
+    
+    Service -> Service: Set visitStatus = Approved
+else Decision Status is Rejected
+    Service -> Service: Set visitStatus = Rejected
+end
+
+Service -> VVN: ChangeVisitStatus(visitStatus)
+activate VVN
+VVN -> VVN: Set VisitStatus = visitStatus
+VVN -> VVN: Set LastModifiedAt = DateTime.UtcNow
+VVN --> Service: void
+deactivate VVN
+
+Service -> VVNRepo: UpdateVisitAsync(vesselVisitNotification, errorMessages)
+activate VVNRepo
+
+VVNRepo -> DB: Find VesselVisitNotificationDataModel\nWHERE Id = vesselVisitNotification.Id
+activate DB
+DB --> VVNRepo: VesselVisitNotificationDataModel
+deactivate DB
+
+VVNRepo -> VVNMapper: UpdateDataModelAsync(dataModel, vesselVisitNotification, context)
+activate VVNMapper
+VVNMapper -> VVNMapper: Update dataModel properties\nfrom domain object
+VVNMapper --> VVNRepo: void
+deactivate VVNMapper
+
+VVNRepo -> DB: SaveChangesAsync()
+activate DB
+DB --> VVNRepo: Changes saved
+deactivate DB
+
+VVNRepo --> Service: void
+deactivate VVNRepo
+
+Service -> DTO: ToDomain(decisionDTO, vesselVisitNotification)
+activate DTO
+DTO -> Factory: NewDecision(status, responseMessage, officerId, vesselVisitNotification)
+activate Factory
+Factory -> Decision: new Decision(status, responseMessage, officerId, vesselVisitNotification)
+activate Decision
+Decision -> Decision: Validate inputs
+Decision --> Factory: Decision object
+deactivate Decision
+Factory --> DTO: Decision object
+deactivate Factory
+DTO --> Service: Decision domain object
+deactivate DTO
+
+alt Error creating Decision
+    Service --> Controller: null + "Error creating Decision"
+    Controller --> Officer: BadRequest(errorMessages)
+end
+
+Service -> DecisionRepo: AddDecisionAsync(decision)
+activate DecisionRepo
+
+DecisionRepo -> DecisionMapper: ToDataModel(decision)
+activate DecisionMapper
+DecisionMapper -> DecisionMapper: Create DecisionDataModel\nfrom Decision
+DecisionMapper --> DecisionRepo: DecisionDataModel
+deactivate DecisionMapper
+
+DecisionRepo -> DecisionMapper: UpdateDataModelAsync(dataModel, decision, context)
+activate DecisionMapper
+DecisionMapper -> DecisionMapper: Set navigation properties\nand relationships
+DecisionMapper --> DecisionRepo: void
+deactivate DecisionMapper
+
+DecisionRepo -> DB: Add DecisionDataModel
+activate DB
+DecisionRepo -> DB: SaveChangesAsync()
+DB --> DecisionRepo: DecisionDataModel with Id
+deactivate DB
+
+DecisionRepo -> DecisionMapper: ToDomain(savedDataModel)
+activate DecisionMapper
+DecisionMapper -> Factory: NewDecision(...) 
+activate Factory
+Factory --> DecisionMapper: Decision with Id
+deactivate Factory
+DecisionMapper --> DecisionRepo: Decision
+deactivate DecisionMapper
+
+DecisionRepo --> Service: Decision (with Id)
+deactivate DecisionRepo
+
+Service -> DTO: ToDTO(decisionAdded)
+activate DTO
+DTO -> DTO: Create DecisionDTO\nfrom Decision
+DTO --> Service: DecisionDTO
+deactivate DTO
+
+Service --> Controller: DecisionDTO
+deactivate Service
+
+Controller --> Officer: CreatedAtAction(GetDecisionById, DecisionDTO)
+deactivate Controller
+
+@enduml

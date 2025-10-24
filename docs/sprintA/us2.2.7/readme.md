@@ -47,13 +47,26 @@ Review and Rejected
 
 #### Context - Level 1
 
+![Context](/docs/Global_Artifacts/context_lvl1.png)
+
 #### Containers - Level 2
+
+![Containers](/docs/Global_Artifacts/containers_lvl2.png)
 
 #### Components - Level 3
 
+![Components](images/nivel-3.png)
+
 #### Code - Level 4
 
+![Code](images/nivel-4.png)
+
 #### Level +1
+
+##### Qualification POST
+![nivel+1](images/nivel-+1-post.png)
+
+
 
 
 ## 5. Integration Tests
@@ -124,7 +137,5 @@ Review and Rejected
             Assert.NotNull(created);
             Assert.Equal("Dock A", created!.ResponseMessage);
             Assert.Equal("Approved", created.Status);
-        }
-
-        
+        } 
 ```
