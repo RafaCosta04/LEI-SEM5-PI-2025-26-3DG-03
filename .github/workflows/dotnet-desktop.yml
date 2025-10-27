@@ -32,21 +32,21 @@ jobs:
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Restaurar dependências
-        run: dotnet restore
+        run: dotnet restore API/LEI-SEM5-PI-2025-26-3DG-03.sln
 
       - name: Compilar
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build API/LEI-SEM5-PI-2025-26-3DG-03.sln --no-restore --configuration Release
 
       - name: Executar testes
-        run: dotnet test --verbosity normal --configuration Release
+        run: dotnet test API/LEI-SEM5-PI-2025-26-3DG-03.sln --verbosity normal --configuration Release
 
       - name: Verificar formatação do código
-        run: dotnet format --verify-no-changes || true 
+        run: dotnet format API/LEI-SEM5-PI-2025-26-3DG-03.sln --verify-no-changes || true 
 
       - name: Autoformat e push
         if: ${{ github.event_name != 'schedule' }}
         run: |
-          dotnet format
+          dotnet format API/LEI-SEM5-PI-2025-26-3DG-03.sln
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
