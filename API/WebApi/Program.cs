@@ -25,11 +25,22 @@ builder.Services.AddDbContext<ShippingManagementContext>(opt =>
     //opt.UseSqlite(Host.CreateApplicationBuilder().Configuration.GetConnectionString("ShippingManagementDatabase"))
     );
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
 
 
 builder.Services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
@@ -88,10 +99,10 @@ builder.Services.AddTransient<PhysicalResourceService>();
 
 var app = builder.Build();
 
-Utilities.InitializeDbForApp(app);
+Utilities.InitializeDatabase(app);
 
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -99,6 +110,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthorization();
 

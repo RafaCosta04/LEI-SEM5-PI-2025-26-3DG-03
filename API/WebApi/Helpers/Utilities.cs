@@ -1,5 +1,6 @@
 using DataModel.Repository;
 using Microsoft.Extensions.DependencyInjection;
+
 namespace WebApi.Helpers;
 
 using DataModel.Model;
@@ -9,31 +10,41 @@ using ShippingManagement.Domain.Qualifications;
 
 public static class Utilities
 {
+    private static bool _isInitialized = false; 
+    private static readonly object _lock = new object();
 
-    public static void InitializeDbForApp(WebApplication app)
+    public static void InitializeDatabase(WebApplication app)
     {
-        using (var scope = app.Services.CreateScope())
+        lock (_lock)
         {
-            var db = scope.ServiceProvider.GetRequiredService<ShippingManagementContext>();
-            if (!db.VesselTypes.Any())
+            if (_isInitialized) return;
+
+            using (var scope = app.Services.CreateScope())
             {
+                var db = scope.ServiceProvider.GetRequiredService<ShippingManagementContext>();
+                
+        
+                db.Database.EnsureCreated();
+                
+        
+                if (db.Qualifications.Any()) 
+                {
+                    _isInitialized = true;
+                    return;
+                }
+
+                // Seeding
                 db.VesselTypes.AddRange(GetSeedingVesselTypesDataModel());
                 db.SaveChanges();
-            }
-            if (!db.Docks.Any())
-            {
-                var vesselTypes = db.VesselTypes.ToList(); // agora já existem
+                
+                var vesselTypes = db.VesselTypes.ToList();
                 db.Docks.AddRange(GetSeedingDocksDataModel(vesselTypes));
                 db.SaveChanges();
-            }
-            if (!db.StorageAreas.Any())
-            {
+                
                 var docks = db.Docks.ToList();
                 db.StorageAreas.AddRange(GetSeedingStorageAreasDataModel(docks));
                 db.SaveChanges();
-            }
-            if (!db.ShippingAgentOrganizations.Any())
-            {
+                
                 var orgsAndReps = GetSeedingOrganizationDataModelsAndRepresentatives();
                 foreach (var (orgDM, repsDM) in orgsAndReps)
                 {
@@ -44,40 +55,27 @@ public static class Utilities
                     }
                 }
                 db.SaveChanges();
-            }
 
-            if (!db.VesselRecords.Any())
-            {
-                var vesselTypes = db.VesselTypes.ToList();
                 db.VesselRecords.AddRange(GetSeedingVesselRecordsDataModel(vesselTypes));
                 db.SaveChanges();
-            }
-            if (!db.VesselVisitNotifications.Any())
-            {
+                
                 var vesselRecords = db.VesselRecords.ToList();
                 var representatives = db.Representatives.ToList();
                 var storageAreas = db.StorageAreas.ToList();
                 db.VesselVisitNotifications.AddRange(GetSeedingVesselVisitNotificationsDataModel(vesselRecords, representatives, storageAreas));
                 db.SaveChanges();
-            }
 
-            if (!db.Qualifications.Any())
-            {
                 db.Qualifications.AddRange(GetSeedingQualificationsDataModel());
                 db.SaveChanges();
-            }
 
-            if (!db.Staffs.Any())
-            {
                 db.Staffs.AddRange(GetSeedingStaffDataModel(db.Qualifications.ToList()));
                 db.SaveChanges();
-            }
 
-            if (!db.PhysicalResources.Any())
-            {
                 var qualifications = db.Qualifications.ToList();
                 db.PhysicalResources.AddRange(GetSeedingPhysicalResourcesDataModel(qualifications));
                 db.SaveChanges();
+                
+                _isInitialized = true;
             }
         }
     }
@@ -188,14 +186,30 @@ public static class Utilities
         var qual2 = qualifications.FirstOrDefault(q => q.Code == "MBLOP");
         if (qual1 == null || qual2 == null)
             throw new InvalidOperationException("Required qualifications not found in seeding data.");
+        
+        
         return new List<StaffDataModel>()
         {
-            new StaffDataModel(new Staff("Staff One", new List<Qualification> { new Qualification(qual1.Code!, qual1.Name!, qual1.Description!),
-                new Qualification(qual2.Code!, qual2.Name!, qual2.Description!) }, "staff1@gmail.com", "987654321", new OperationalWindow(DayOfWeek.Monday,
-                DayOfWeek.Friday, new TimeSpan(9,0,0), new TimeSpan(17,0,0)), ResourceStatus.Available)),
-            new StaffDataModel(new Staff("Staff Two", new List<Qualification> { new Qualification(qual1.Code!, qual1.Name!, qual1.Description!) },
-                "staff2@gmail.com", "987654322", new OperationalWindow(DayOfWeek.Tuesday, DayOfWeek.Saturday, new TimeSpan(10,0,0), new TimeSpan(18,0,0)),
-                ResourceStatus.Unavailable))
+            new StaffDataModel
+            {
+                Name = "Staff One",
+                Email = "staff1@gmail.com",
+                Phone = "987654321",
+                Qualification = new List<QualificationDataModel> { qual1, qual2 },
+                OperationalWindow = new OperationalWindow(DayOfWeek.Monday, DayOfWeek.Friday, new TimeSpan(9,0,0), new TimeSpan(17,0,0)),
+                Status = ResourceStatus.Available,
+                LastModifiedAt = DateTime.UtcNow
+            },
+            new StaffDataModel
+            {
+                Name = "Staff Two", 
+                Email = "staff2@gmail.com",
+                Phone = "987654322",
+                Qualification = new List<QualificationDataModel> { qual1 },
+                OperationalWindow = new OperationalWindow(DayOfWeek.Tuesday, DayOfWeek.Saturday, new TimeSpan(10,0,0), new TimeSpan(18,0,0)),
+                Status = ResourceStatus.Unavailable,
+                LastModifiedAt = DateTime.UtcNow
+            }
         };
     }
     public static List<VesselVisitNotificationDataModel> GetSeedingVesselVisitNotificationsDataModel(List<VesselRecordDataModel> vesselRecords, List<RepresentativeDataModel> representatives, List<StorageAreaDataModel> storageAreas)
