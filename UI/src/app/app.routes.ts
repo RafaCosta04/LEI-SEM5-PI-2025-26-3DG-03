@@ -16,12 +16,12 @@ export const routes: Routes = [
         loadChildren: () => import('./routing/dashboard.routes').then((m) => m.routes)
       },
     ],
-
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login').then(m => m.Login),
+    data: { title: 'Login Page' }
   }
-
-
-
-
 
 
 ];
