@@ -186,3 +186,87 @@
     </div>
   </div>
 </div>
+
+<!-- Edit Qualification Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Qualification</h2>
+      <button class="close-button" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error message display -->
+      <div *ngIf="editModalErrorMessage" class="alert alert-danger">
+        {{ editModalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveEditQualification()" #editQualificationForm="ngForm">
+        <div class="form-group">
+          <label for="editCode">Code (Read-only)</label>
+          <input
+            type="text"
+            id="editCode"
+            name="editCode"
+            [value]="editQualification.code"
+            readonly
+            class="form-input readonly"
+            placeholder="Qualification code"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="editName">Name *</label>
+          <input
+            type="text"
+            id="editName"
+            name="editName"
+            [(ngModel)]="editQualification.name"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('name')"
+            placeholder="Enter qualification name"
+          >
+          <div *ngIf="hasEditFieldError('name')" class="field-error">
+            {{ getEditFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription">Description *</label>
+          <textarea
+            id="editDescription"
+            name="editDescription"
+            [(ngModel)]="editQualification.description"
+            required
+            class="form-textarea"
+            [class.error]="hasEditFieldError('description')"
+            placeholder="Enter qualification description"
+            rows="3"
+          ></textarea>
+          <div *ngIf="hasEditFieldError('description')" class="field-error">
+            {{ getEditFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeEditModal()"
+            class="btn btn-secondary"
+            [disabled]="isEditing"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isEditing || !editQualificationForm.form.valid"
+          >
+            {{ isEditing ? 'Updating...' : 'Update Qualification' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

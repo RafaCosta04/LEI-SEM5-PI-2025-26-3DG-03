@@ -31,6 +31,17 @@ export class Qualification implements OnInit, OnDestroy {
   modalErrorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
 
+  // Edit Modal properties
+  showEditModal: boolean = false;
+  isEditing: boolean = false;
+  editQualification: QualificationModel = {
+    code: '',
+    name: '',
+    description: ''
+  };
+  editModalErrorMessage: string = '';
+  editFieldErrors: { [key: string]: string } = {};
+
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
 
@@ -143,8 +154,10 @@ export class Qualification implements OnInit, OnDestroy {
 
   onUpdate() {
     if (this.selectedQualification) {
-      this.router.navigate(['/qualification/edit', this.selectedQualification.id]);
-      console.log('Edit qualification:', this.selectedQualification);
+      this.showEditModal = true;
+      this.resetEditQualification();
+      this.editQualification = { ...this.selectedQualification };
+      console.log('Opening edit qualification modal for:', this.selectedQualification);
     } else {
       alert('Please select a qualification to update.');
     }
@@ -249,7 +262,7 @@ export class Qualification implements OnInit, OnDestroy {
       errorMessage = error.message;
     }
 
-    
+
     if (!errorMessage) {
       errorMessage = 'Error creating qualification. Please try again.';
     }
@@ -269,5 +282,117 @@ export class Qualification implements OnInit, OnDestroy {
 
   getFieldError(fieldName: string): string {
     return this.fieldErrors[fieldName.toLowerCase()] || '';
+  }
+
+  // Edit Modal methods
+  resetEditQualification() {
+    this.editQualification = {
+      code: '',
+      name: '',
+      description: ''
+    };
+    this.editModalErrorMessage = '';
+    this.editFieldErrors = {};
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+    this.resetEditQualification();
+    this.isEditing = false;
+  }
+
+  onSaveEditQualification() {
+    this.editModalErrorMessage = '';
+    this.editFieldErrors = {};
+
+    if (!this.isValidEditQualification()) {
+      this.editModalErrorMessage = 'Please fill in all required fields (name, description).';
+      return;
+    }
+
+    if (!this.selectedQualification?.id) {
+      this.editModalErrorMessage = 'No qualification selected for editing.';
+      return;
+    }
+
+    this.isEditing = true;
+    this.qualificationService.updateQualification(this.selectedQualification.id, this.editQualification)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updatedQualification) => {
+          console.log('Qualification updated successfully:', updatedQualification);
+          this.closeEditModal();
+          this.loadQualifications();
+          this.selectedQualification = null;
+        },
+        error: (error) => {
+          console.error('Error updating qualification:', error);
+          this.handleEditError(error);
+          this.isEditing = false;
+        }
+      });
+  }
+
+  private handleEditError(error: any) {
+    this.editFieldErrors = {};
+
+    console.error('Full error in component:', error);
+
+    let errorMessage = '';
+
+    if (error.originalError && error.originalError.error) {
+      const backendError = error.originalError.error;
+      console.error('Backend error object:', backendError);
+
+      if (Array.isArray(backendError)) {
+        errorMessage = backendError.join('; ');
+        this.editModalErrorMessage = errorMessage;
+        return;
+      }
+
+      if (backendError.errors && typeof backendError.errors === 'object') {
+        for (const field in backendError.errors) {
+          const fieldName = field.toLowerCase();
+          this.editFieldErrors[fieldName] = Array.isArray(backendError.errors[field])
+            ? backendError.errors[field].join('; ')
+            : backendError.errors[field];
+        }
+        this.editModalErrorMessage = 'Please correct the validation errors below.';
+        return;
+      }
+
+      if (backendError.message) {
+        errorMessage = backendError.message;
+      } else if (backendError.title) {
+        errorMessage = backendError.title;
+      } else if (backendError.detail) {
+        errorMessage = backendError.detail;
+      } else if (typeof backendError === 'string') {
+        errorMessage = backendError;
+      }
+    }
+
+    if (!errorMessage && error.message) {
+      errorMessage = error.message;
+    }
+
+    if (!errorMessage) {
+      errorMessage = 'Error updating qualification. Please try again.';
+    }
+
+    this.editModalErrorMessage = errorMessage;
+  }
+
+  private isValidEditQualification(): boolean {
+    return !!(this.editQualification.name?.trim() &&
+              this.editQualification.description?.trim());
+  }
+
+  hasEditFieldError(fieldName: string): boolean {
+    return !!this.editFieldErrors[fieldName.toLowerCase()];
+  }
+
+  getEditFieldError(fieldName: string): string {
+    return this.editFieldErrors[fieldName.toLowerCase()] || '';
   }
 }
