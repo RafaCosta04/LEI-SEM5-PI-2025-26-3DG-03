@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { QualificationService } from '../../services/qualification.service';
 import { QualificationModel } from '../../models/qualification.model';
 
@@ -18,7 +18,11 @@ export class Qualification implements OnInit, OnDestroy {
   selectedQualification: QualificationModel | null = null;
   searchTerm: string = '';
   isLoading: boolean = false;
-  errorMessage: string = '';
+  
+  statusMessage: string = '';
+  statusMessageType: 'success' | 'error' | '' = '';
+  // Controls the hide animation when clearing the status message
+  statusHiding: boolean = false;
 
   // Modal properties
   showCreateModal: boolean = false;
@@ -41,6 +45,7 @@ export class Qualification implements OnInit, OnDestroy {
   };
   editModalErrorMessage: string = '';
   editFieldErrors: { [key: string]: string } = {};
+  originalEditQualification: QualificationModel | null = null;
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
@@ -74,7 +79,6 @@ export class Qualification implements OnInit, OnDestroy {
 
   loadQualifications() {
     this.isLoading = true;
-    this.errorMessage = '';
     this.qualificationService.getAllQualifications()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -84,7 +88,9 @@ export class Qualification implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.errorMessage = 'Error loading qualifications. Please check your connection.';
+            this.statusHiding = false;
+            this.statusMessage = 'Error loading qualifications. Please check your connection.';
+          this.statusMessageType = 'error';
           console.error('Error loading qualifications:', error);
           this.isLoading = false;
         }
@@ -116,7 +122,6 @@ export class Qualification implements OnInit, OnDestroy {
 
   searchByName(name: string) {
     this.isLoading = true;
-    this.errorMessage = '';
     this.qualificationService.getQualificationsByName(name)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -125,12 +130,26 @@ export class Qualification implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.errorMessage = 'Error searching for qualifications. Please try again.';
+            this.statusHiding = false;
+            this.statusMessage = 'Error searching for qualifications. Please try again.';
+          this.statusMessageType = 'error';
           console.error('Error searching qualifications:', error);
           this.filteredQualifications = [];
           this.isLoading = false;
         }
       });
+  }
+
+  clearStatusMessage() {
+    // Play hide animation before removing the node from DOM so the exit animation can be seen.
+    if (!this.statusMessage) return;
+    this.statusHiding = true;
+    // Give the CSS exit animation time to run (match to CSS animation duration: 200ms)
+    setTimeout(() => {
+      this.statusMessage = '';
+      this.statusMessageType = '';
+      this.statusHiding = false;
+    }, 220);
   }
 
   clearSearch() {
@@ -157,6 +176,8 @@ export class Qualification implements OnInit, OnDestroy {
       this.showEditModal = true;
       this.resetEditQualification();
       this.editQualification = { ...this.selectedQualification };
+
+      this.originalEditQualification = { ...this.editQualification };
       console.log('Opening edit qualification modal for:', this.selectedQualification);
     } else {
       alert('Please select a qualification to update.');
@@ -203,6 +224,11 @@ export class Qualification implements OnInit, OnDestroy {
         next: (createdQualification) => {
           console.log('Qualification created successfully:', createdQualification);
           this.closeCreateModal();
+          this.statusHiding = false;
+          this.statusMessage = `Qualification with code "${createdQualification.code}" created successfully!`;
+          this.statusMessageType = 'success';
+          console.debug('Status message set (create):', this.statusMessage);
+          setTimeout(() => this.clearStatusMessage(), 3000);
           this.loadQualifications();
         },
         error: (error) => {
@@ -293,6 +319,7 @@ export class Qualification implements OnInit, OnDestroy {
     };
     this.editModalErrorMessage = '';
     this.editFieldErrors = {};
+    this.originalEditQualification = null;
   }
 
   closeEditModal() {
@@ -315,6 +342,11 @@ export class Qualification implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.isEditDirty()) {
+      this.editModalErrorMessage = 'No changes to save.';
+      return;
+    }
+
     this.isEditing = true;
     this.qualificationService.updateQualification(this.selectedQualification.id, this.editQualification)
       .pipe(takeUntil(this.destroy$))
@@ -323,7 +355,10 @@ export class Qualification implements OnInit, OnDestroy {
           console.log('Qualification updated successfully:', updatedQualification);
           this.closeEditModal();
           this.loadQualifications();
-          this.selectedQualification = null;
+          this.statusHiding = false;
+          this.statusMessage = `Qualification with code "${this.selectedQualification?.code}" updated successfully!`;
+          this.statusMessageType = 'success';
+          setTimeout(() => this.clearStatusMessage(), 3000);
         },
         error: (error) => {
           console.error('Error updating qualification:', error);
@@ -331,6 +366,15 @@ export class Qualification implements OnInit, OnDestroy {
           this.isEditing = false;
         }
       });
+  }
+
+  isEditDirty(): boolean {
+    if (!this.originalEditQualification) return false;
+    const orig = this.originalEditQualification;
+    const curr = this.editQualification;
+    const nameChanged = (orig.name || '').trim() !== (curr.name || '').trim();
+    const descChanged = (orig.description || '').trim() !== (curr.description || '').trim();
+    return nameChanged || descChanged;
   }
 
   private handleEditError(error: any) {

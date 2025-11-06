@@ -41,9 +41,9 @@
   </div>
 
 
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
-    <button (click)="errorMessage = ''" class="close-error">✕</button>
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
   </div>
 
   <div *ngIf="isLoading" class="loading">
@@ -261,7 +261,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="isEditing || !editQualificationForm.form.valid"
+            [disabled]="isEditing || !editQualificationForm.form.valid || !isEditDirty()"
           >
             {{ isEditing ? 'Updating...' : 'Update Qualification' }}
           </button>

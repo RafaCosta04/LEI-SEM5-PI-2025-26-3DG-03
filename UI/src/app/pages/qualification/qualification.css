@@ -166,6 +166,73 @@
   color: #721c24;
 }
 
+/* Top-of-page status messages (error / success) */
+.error-message {
+  background: #fff3f3;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.success-message {
+  background: #1f6d24;
+  border: 1px solid #18531c;
+  color: #e6ffed;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Entrance animation: slide up + fade in */
+@keyframes statusSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Exit animation: slide up slightly + fade out */
+@keyframes statusSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.995);
+  }
+}
+
+.success-message, .error-message {
+  animation: statusSlideIn 280ms ease-out both;
+}
+
+/* When hiding is requested, play the slide-out animation */
+.success-message.hiding, .error-message.hiding {
+  animation: statusSlideOut 200ms ease-in both;
+}
+
+.close-error {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: inherit;
+  padding: 4px 8px;
+}
+
 .field-error {
   color: #dc3545;
   font-size: 12px;
