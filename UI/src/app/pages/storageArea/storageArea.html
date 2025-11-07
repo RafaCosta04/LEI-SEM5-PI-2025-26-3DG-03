@@ -1,0 +1,378 @@
+<div class="page-container">
+  <h1 class="page-title">Storage Areas</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search for storage areas..."
+        class="search-input"
+      >
+      <button
+        *ngIf="searchTerm"
+        (click)="clearSearch()"
+        class="clear-button"
+        title="Clean search"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        (click)="onCreateNew()"
+        class="btn btn-primary"
+        title="Create new storage area"
+      >
+        New Storage Area
+      </button>
+      <button
+        (click)="onUpdate()"
+        class="btn btn-secondary"
+        [disabled]="!selectedStorageArea"
+        title="Edit selected storage area"
+      >
+        Edit Storage Area
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading Storage Areas...
+  </div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Location</th>
+          <th>Type</th>
+          <th>Max Capacity</th>
+          <th>Current Capacity</th>
+          <th>Utilization</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let storageArea of filteredStorageAreas"
+          [class.selected]="selectedStorageArea?.id === storageArea.id"
+          (click)="selectStorageArea(storageArea)"
+        >
+          <td>{{ storageArea.code }}</td>
+          <td>{{ storageArea.location }}</td>
+          <td>{{ storageArea.storageAreaType }}</td>
+          <td>{{ storageArea.maxCapacity }}</td>
+          <td>{{ storageArea.currentCapacity }}</td>
+          <td>
+            <div class="utilization-bar">
+              <div
+                class="utilization-fill"
+                [style.width.%]="storageArea.maxCapacity ? (storageArea.currentCapacity! / storageArea.maxCapacity * 100) : 0"
+                [class.high]="storageArea.maxCapacity ? (storageArea.currentCapacity! / storageArea.maxCapacity) > 0.8 : false"
+                [class.medium]="storageArea.maxCapacity ? (storageArea.currentCapacity! / storageArea.maxCapacity) > 0.6 : false"
+              ></div>
+              <span class="utilization-text">
+                {{ storageArea.maxCapacity ? ((storageArea.currentCapacity! / storageArea.maxCapacity * 100) | number:'1.0-1') : 0 }}%
+              </span>
+            </div>
+          </td>
+          <td>
+            <button
+              (click)="selectStorageArea(storageArea); $event.stopPropagation()"
+              class="btn-select"
+              [class.selected]="selectedStorageArea?.id === storageArea.id"
+            >
+              {{ selectedStorageArea?.id === storageArea.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Message when no results are found -->
+    <div *ngIf="filteredStorageAreas.length === 0 && !isLoading" class="no-results">
+      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No storage areas found.' }}</p>
+    </div>
+  </div>
+
+  <!-- Information of selected storage area -->
+  <div *ngIf="selectedStorageArea" class="selected-info">
+    <h3>Selected Storage Area:</h3>
+    <div class="info-card">
+      <p><strong>Code:</strong> {{ selectedStorageArea.code }}</p>
+      <p><strong>Location:</strong> {{ selectedStorageArea.location }}</p>
+      <p><strong>Type:</strong> {{ selectedStorageArea.storageAreaType }}</p>
+      <p><strong>Max Capacity:</strong> {{ selectedStorageArea.maxCapacity }}</p>
+      <p><strong>Current Capacity:</strong> {{ selectedStorageArea.currentCapacity }}</p>
+      <p><strong>Utilization:</strong>
+        {{ selectedStorageArea.maxCapacity ? ((selectedStorageArea.currentCapacity! / selectedStorageArea.maxCapacity * 100) | number:'1.0-1') : 0 }}%
+      </p>
+      <p *ngIf="selectedStorageArea.lastModifiedAt"><strong>Last Modified:</strong>
+        {{ selectedStorageArea.lastModifiedAt | date:'medium' }}
+      </p>
+      <div *ngIf="selectedStorageArea.storageAreaDocks && selectedStorageArea.storageAreaDocks.length > 0">
+        <strong>Associated Docks:</strong>
+        <ul>
+          <li *ngFor="let dock of selectedStorageArea.storageAreaDocks">
+            {{ dock.dockName }} (Distance: {{ dock.distance }}km)
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Storage Area Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Storage Area</h2>
+      <button class="close-button" (click)="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error message display -->
+      <div *ngIf="modalErrorMessage" class="alert alert-danger">
+        {{ modalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveNewStorageArea()" #storageAreaForm="ngForm">
+        <div class="form-group">
+          <label for="code">Code *</label>
+          <input
+            type="text"
+            id="code"
+            name="code"
+            [(ngModel)]="newStorageArea.code"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('code')"
+            placeholder="Enter storage area code (alphanumeric)"
+          >
+          <div *ngIf="hasFieldError('code')" class="field-error">
+            {{ getFieldError('code') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="location">Location *</label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            [(ngModel)]="newStorageArea.location"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('location')"
+            placeholder="Enter storage area location"
+          >
+          <div *ngIf="hasFieldError('location')" class="field-error">
+            {{ getFieldError('location') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="storageAreaType">Type *</label>
+          <select
+            id="storageAreaType"
+            name="storageAreaType"
+            [(ngModel)]="newStorageArea.storageAreaType"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('storageAreaType')"
+          >
+            <option [value]="StorageAreaType.Yard">Yard</option>
+            <option [value]="StorageAreaType.Warehouse">Warehouse</option>
+          </select>
+          <div *ngIf="hasFieldError('storageAreaType')" class="field-error">
+            {{ getFieldError('storageAreaType') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="maxCapacity">Max Capacity *</label>
+          <input
+            type="number"
+            id="maxCapacity"
+            name="maxCapacity"
+            [(ngModel)]="newStorageArea.maxCapacity"
+            required
+            min="1"
+            class="form-input"
+            [class.error]="hasFieldError('maxCapacity')"
+            placeholder="Enter maximum capacity"
+          >
+          <div *ngIf="hasFieldError('maxCapacity')" class="field-error">
+            {{ getFieldError('maxCapacity') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="currentCapacity">Current Capacity</label>
+          <input
+            type="number"
+            id="currentCapacity"
+            name="currentCapacity"
+            [(ngModel)]="newStorageArea.currentCapacity"
+            min="0"
+            [max]="newStorageArea.maxCapacity || 0"
+            class="form-input"
+            [class.error]="hasFieldError('currentCapacity')"
+            placeholder="Enter current capacity (default: 0)"
+          >
+          <div *ngIf="hasFieldError('currentCapacity')" class="field-error">
+            {{ getFieldError('currentCapacity') }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeCreateModal()"
+            class="btn btn-secondary"
+            [disabled]="isCreating"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isCreating || !storageAreaForm.form.valid"
+          >
+            {{ isCreating ? 'Creating...' : 'Create Storage Area' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Storage Area Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Storage Area</h2>
+      <button class="close-button" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error message display -->
+      <div *ngIf="editModalErrorMessage" class="alert alert-danger">
+        {{ editModalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveEditStorageArea()" #editStorageAreaForm="ngForm">
+        <div class="form-group">
+          <label for="editCode">Code (Read-only)</label>
+          <input
+            type="text"
+            id="editCode"
+            name="editCode"
+            [value]="editStorageArea.code"
+            readonly
+            class="form-input readonly"
+            placeholder="Storage area code"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="editLocation">Location *</label>
+          <input
+            type="text"
+            id="editLocation"
+            name="editLocation"
+            [(ngModel)]="editStorageArea.location"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('location')"
+            placeholder="Enter storage area location"
+          >
+          <div *ngIf="hasEditFieldError('location')" class="field-error">
+            {{ getEditFieldError('location') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editStorageAreaType">Type *</label>
+          <select
+            id="editStorageAreaType"
+            name="editStorageAreaType"
+            [(ngModel)]="editStorageArea.storageAreaType"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('storageAreaType')"
+          >
+            <option [value]="StorageAreaType.Yard">Yard</option>
+            <option [value]="StorageAreaType.Warehouse">Warehouse</option>
+          </select>
+          <div *ngIf="hasEditFieldError('storageAreaType')" class="field-error">
+            {{ getEditFieldError('storageAreaType') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editMaxCapacity">Max Capacity *</label>
+          <input
+            type="number"
+            id="editMaxCapacity"
+            name="editMaxCapacity"
+            [(ngModel)]="editStorageArea.maxCapacity"
+            required
+            min="1"
+            class="form-input"
+            [class.error]="hasEditFieldError('maxCapacity')"
+            placeholder="Enter maximum capacity"
+          >
+          <div *ngIf="hasEditFieldError('maxCapacity')" class="field-error">
+            {{ getEditFieldError('maxCapacity') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editCurrentCapacity">Current Capacity</label>
+          <input
+            type="number"
+            id="editCurrentCapacity"
+            name="editCurrentCapacity"
+            [(ngModel)]="editStorageArea.currentCapacity"
+            min="0"
+            [max]="editStorageArea.maxCapacity || 0"
+            class="form-input"
+            [class.error]="hasEditFieldError('currentCapacity')"
+            placeholder="Enter current capacity"
+          >
+          <div *ngIf="hasEditFieldError('currentCapacity')" class="field-error">
+            {{ getEditFieldError('currentCapacity') }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeEditModal()"
+            class="btn btn-secondary"
+            [disabled]="isEditing"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isEditing || !editStorageAreaForm.form.valid || !isEditDirty()"
+          >
+            {{ isEditing ? 'Updating...' : 'Update Storage Area' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
