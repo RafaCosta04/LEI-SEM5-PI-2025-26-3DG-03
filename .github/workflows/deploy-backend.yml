@@ -1,0 +1,27 @@
+name: Automated Deployment to Oracle VM
+
+on:
+  push:
+    branches:
+      - main   
+  workflow_dispatch:  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Oracle VM via SSH
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.ORACLE_VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+            echo ">>> Starting remote deploy on Oracle VM... <<<"
+            cd /opt/dei-deploy
+            sudo ./deploy.sh
+            echo ">>> Deploy complete. <<<"
