@@ -24,10 +24,4 @@
     <ProjectReference Include="..\DataModel\DataModel.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Port\layout.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <Link>Port\layout.json</Link>
-    </Content>
-  </ItemGroup>
 </Project>
