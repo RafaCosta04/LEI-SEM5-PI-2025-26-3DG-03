@@ -191,7 +191,6 @@ export class Vessel implements OnInit, OnDestroy {
   onCreateNew() {
     this.showCreateModal = true;
     this.resetNewVesselRecord();
-    console.log('Opening create vessel record modal');
   }
 
   onUpdate() {
@@ -201,7 +200,6 @@ export class Vessel implements OnInit, OnDestroy {
       this.editVesselRecord = { ...this.selectedVesselRecord };
 
       this.originalEditVesselRecord = { ...this.editVesselRecord };
-      console.log('Opening edit vessel record modal for:', this.selectedVesselRecord);
     } else {
       alert('Please select a vessel record to update.');
     }
@@ -251,7 +249,6 @@ export class Vessel implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (createdVesselRecord) => {
-          console.log('Vessel record created successfully:', createdVesselRecord);
           this.closeCreateModal();
           this.statusHiding = false;
           this.statusMessage = `Vessel record with IMO "${createdVesselRecord.imoNumber}" created successfully!`;
@@ -387,7 +384,6 @@ export class Vessel implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedVesselRecord) => {
-          console.log('Vessel record updated successfully:', updatedVesselRecord);
           this.closeEditModal();
           this.loadVesselRecords();
           this.statusHiding = false;

@@ -158,7 +158,6 @@ export class Docks implements OnInit, OnDestroy {
   onCreateNew() {
     this.showCreateModal = true;
     this.resetNewDock();
-    console.log('Opening create dock modal');
   }
 
   onUpdate() {

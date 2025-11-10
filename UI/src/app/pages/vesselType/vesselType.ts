@@ -174,7 +174,6 @@ export class VesselType implements OnInit, OnDestroy {
   onCreateNew() {
     this.showCreateModal = true;
     this.resetNewVesselType();
-    console.log('Opening create vessel type modal');
   }
 
   onUpdate() {
@@ -184,7 +183,6 @@ export class VesselType implements OnInit, OnDestroy {
       this.editVesselType = { ...this.selectedVesselType };
 
       this.originalEditVesselType = { ...this.editVesselType };
-      console.log('Opening edit vessel type modal for:', this.selectedVesselType);
     } else {
       alert('Please select a vessel type to update.');
     }
@@ -231,7 +229,6 @@ export class VesselType implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (createdVesselType) => {
-          console.log('Vessel type created successfully:', createdVesselType);
           this.closeCreateModal();
           this.statusHiding = false;
           this.statusMessage = `Vessel type "${createdVesselType.name}" created successfully!`;
@@ -367,7 +364,6 @@ export class VesselType implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedVesselType) => {
-          console.log('Vessel type updated successfully:', updatedVesselType);
           this.closeEditModal();
           this.loadVesselTypes();
           this.statusHiding = false;

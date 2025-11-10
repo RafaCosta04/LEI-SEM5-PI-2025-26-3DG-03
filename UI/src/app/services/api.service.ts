@@ -52,7 +52,7 @@ export class ApiService {
       // Server-side error
       console.error('Full error object:', error);
       console.error('Error response body:', error.error);
-      
+
       // Try to extract meaningful error message from different possible formats
       if (error.error) {
         // Check if error.error is a string (plain text response)
@@ -93,7 +93,7 @@ export class ApiService {
           }
         }
       }
-      
+
       // If we still don't have error details, try the error message
       if (!errorDetails && error.message) {
         errorDetails = error.message;
@@ -127,7 +127,7 @@ export class ApiService {
     }
 
     console.error('Final error message:', errorMessage);
-    
+
     // Return an error object with both message and original error for debugging
     return throwError(() => ({
       message: errorMessage,

@@ -28,8 +28,17 @@ namespace Application.Services
 
         public async Task<IEnumerable<PhysicalResourceDTO>> GetAll()
         {
-            var resources = await _repo.GetAllPhysicalResourcesAsync();
-            return resources.Select(r => PhysicalResourceDTO.ToDTO(r));
+            try
+            {
+                var resources = await _repo.GetAllPhysicalResourcesAsync();
+                return resources.Select(r => PhysicalResourceDTO.ToDTO(r));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PhysicalResourceService.GetAll: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         public async Task<PhysicalResourceDTO?> GetById(long id)
@@ -70,10 +79,12 @@ namespace Application.Services
             if (!string.IsNullOrWhiteSpace(dto.QualificationCode))
             {
                 var qualification = await _qualificationRepository.GetQualificationByCodeAsync(dto.QualificationCode);
-                if (qualification != null)
+                if (qualification == null)
                 {
-                    qualifications = new List<Qualification> { qualification };
+                    errorMessages.Add($"Qualification with code '{dto.QualificationCode}' does not exist.");
+                    return null;
                 }
+                qualifications = new List<Qualification> { qualification };
             }
 
             try
@@ -150,10 +161,12 @@ namespace Application.Services
                 if (!string.IsNullOrWhiteSpace(dto.QualificationCode))
                 {
                     var qualification = await _qualificationRepository.GetQualificationByCodeAsync(dto.QualificationCode);
-                    if (qualification != null)
+                    if (qualification == null)
                     {
-                        resource.ChangeQualifications(new List<Qualification> { qualification });
+                        errorMessages.Add($"Qualification with code '{dto.QualificationCode}' does not exist.");
+                        return false;
                     }
+                    resource.ChangeQualifications(new List<Qualification> { qualification });
                 }
 
 
@@ -187,7 +200,11 @@ namespace Application.Services
         public async Task<IEnumerable<string>> GetAvailableStorageAreas()
         {
             var storageAreas = await _storageAreaRepository.GetStorageAreasAsync();
-            return storageAreas.Select(sa => sa.Code).Where(code => !string.IsNullOrEmpty(code))!;
+            // Filter for Warehouse and Yard types only (for Trucks)
+            return storageAreas
+                .Where(sa => sa.Type == Domain.Model.StorageAreaType.Warehouse || sa.Type == Domain.Model.StorageAreaType.Yard)
+                .Select(sa => sa.Code)
+                .Where(code => !string.IsNullOrEmpty(code))!;
         }
 
         private async Task<bool> ValidateAssignmentArea(PhysicalResourceKind kind, string? assignedArea, List<string> errorMessages)

@@ -25,9 +25,23 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PhysicalResourceDTO>>> GetAll()
         {
-            var list = await _service.GetAll();
-            if (list == null || !list.Any()) return NotFound("No physical resources found.");
-            return Ok(list);
+            try
+            {
+                var list = await _service.GetAll();
+                if (list == null || !list.Any()) return NotFound("No physical resources found.");
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                // Log the detailed error for debugging
+                Console.WriteLine($"Error in GetAll: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("ByCode/{code}")]
@@ -99,6 +113,36 @@ namespace WebApi.Controllers
                 return BadRequest(_errorMessages);
             }
             return Ok();
+        }
+
+        [HttpGet("AvailableDocks")]
+        public async Task<ActionResult<IEnumerable<string>>> GetAvailableDocks()
+        {
+            try
+            {
+                var docks = await _service.GetAvailableDocks();
+                return Ok(docks);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting available docks: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("AvailableStorageAreas")]
+        public async Task<ActionResult<IEnumerable<string>>> GetAvailableStorageAreas()
+        {
+            try
+            {
+                var storageAreas = await _service.GetAvailableStorageAreas();
+                return Ok(storageAreas);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting available storage areas: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

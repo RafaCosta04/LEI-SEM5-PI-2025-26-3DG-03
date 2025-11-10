@@ -20,6 +20,10 @@ export const routes: Routes = [
         loadChildren: () => import('./routing/qualification.routes').then((m) => m.routes)
       },
       {
+        path: 'physicalResources',
+        loadChildren: () => import('./routing/physicalResources.routes').then((m) => m.routes)
+      },
+      {
         path: 'docks',
         loadChildren: () => import('./routing/docks.routes').then((m) => m.routes)
       },
@@ -34,6 +38,10 @@ export const routes: Routes = [
       {
         path: 'vesselType',
         loadChildren: () => import('./routing/vesselType.routes').then((m) => m.routes)
+      },
+      {
+        path: 'vessel',
+        loadChildren: () => import('./routing/vessel.routes').then((m) => m.routes)
       }
     ],
   },

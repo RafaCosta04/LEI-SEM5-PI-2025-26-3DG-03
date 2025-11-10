@@ -18,7 +18,7 @@ export class Qualification implements OnInit, OnDestroy {
   selectedQualification: QualificationModel | null = null;
   searchTerm: string = '';
   isLoading: boolean = false;
-  
+
   statusMessage: string = '';
   statusMessageType: 'success' | 'error' | '' = '';
   // Controls the hide animation when clearing the status message
@@ -182,7 +182,6 @@ export class Qualification implements OnInit, OnDestroy {
   onCreateNew() {
     this.showCreateModal = true;
     this.resetNewQualification();
-    console.log('Opening create qualification modal');
   }
 
   onUpdate() {
@@ -192,7 +191,6 @@ export class Qualification implements OnInit, OnDestroy {
       this.editQualification = { ...this.selectedQualification };
 
       this.originalEditQualification = { ...this.editQualification };
-      console.log('Opening edit qualification modal for:', this.selectedQualification);
     } else {
       alert('Please select a qualification to update.');
     }
@@ -236,12 +234,10 @@ export class Qualification implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (createdQualification) => {
-          console.log('Qualification created successfully:', createdQualification);
           this.closeCreateModal();
           this.statusHiding = false;
           this.statusMessage = `Qualification with code "${createdQualification.code}" created successfully!`;
           this.statusMessageType = 'success';
-          console.debug('Status message set (create):', this.statusMessage);
           setTimeout(() => this.clearStatusMessage(), 3000);
           this.loadQualifications();
         },
@@ -366,7 +362,6 @@ export class Qualification implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedQualification) => {
-          console.log('Qualification updated successfully:', updatedQualification);
           this.closeEditModal();
           this.loadQualifications();
           this.statusHiding = false;

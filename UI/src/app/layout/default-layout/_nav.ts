@@ -12,7 +12,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Vessel',
-    url: '/vessels',
+    url: '/vessel',
     icon: 'nav-img nav-img-vessel',
     children: [
     {
@@ -21,7 +21,7 @@ export const navItems: INavData[] = [
       icon: 'nav-img nav-img-vessel',
     },
     {
-      name: 'Vessel',
+      name: 'Vessel Records',
       url: '/vessel',
       icon: 'nav-img nav-img-vessel'
     }
@@ -48,8 +48,8 @@ export const navItems: INavData[] = [
     icon: 'nav-img nav-img-staff',
   },
   {
-    name:'Physical Resource',
-    url: '/physical-resources',
+    name:'Physical Resources',
+    url: '/physicalResources',
     icon: 'nav-img nav-img-physicalResource'
   },
   {

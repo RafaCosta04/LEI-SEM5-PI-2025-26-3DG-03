@@ -1,0 +1,749 @@
+<div class="page-container">
+  <h1 class="page-title">Physical Resources</h1>
+
+  <!-- Top bar with search and actions -->
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search for physical resources..."
+        class="search-input"
+      >
+      <button
+        *ngIf="searchTerm"
+        (click)="clearSearchAndNotify()"
+        class="clear-button"
+        title="Clean search"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        (click)="onCreateNew()"
+        class="btn btn-primary"
+        title="Create new physical resource"
+      >
+        New Physical Resource
+      </button>
+      <button
+        (click)="onUpdate()"
+        class="btn btn-secondary"
+        [disabled]="!selectedPhysicalResource"
+        title="Edit selected physical resource"
+      >
+        Edit Physical Resource
+      </button>
+    </div>
+  </div>
+
+  <!-- Status messages -->
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading Physical Resources...
+  </div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Kind</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Capacity</th>
+          <th>Assigned Area</th>
+          <th>Qualification</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let resource of filteredPhysicalResources"
+          [class.selected]="selectedPhysicalResource?.id === resource.id"
+          (click)="selectPhysicalResource(resource)"
+        >
+          <td>{{ resource.code }}</td>
+          <td>{{ resource.name }}</td>
+          <td>{{ getKindLabel(resource.kind!) }}</td>
+          <td>{{ resource.description }}</td>
+          <td>
+            <span [ngClass]="'status-' + resource.status?.toLowerCase()">
+              {{ getStatusLabel(resource.status!) }}
+            </span>
+          </td>
+          <td>{{ resource.operationalCapacity }}</td>
+          <td>{{ resource.assignedArea || 'N/A' }}</td>
+          <td>{{ resource.qualificationCode || 'None' }}</td>
+          <td>
+            <button
+              (click)="selectPhysicalResource(resource); $event.stopPropagation()"
+              class="btn-select"
+              [class.selected]="selectedPhysicalResource?.id === resource.id"
+            >
+              {{ selectedPhysicalResource?.id === resource.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Message when no results are found -->
+    <div *ngIf="filteredPhysicalResources.length === 0 && !isLoading" class="no-results">
+      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No physical resources found.' }}</p>
+    </div>
+  </div>
+
+  <!-- Information of selected physical resource -->
+  <div *ngIf="selectedPhysicalResource" class="selected-info">
+    <h3>Selected Physical Resource:</h3>
+    <div class="info-card">
+      <div class="info-row">
+        <div class="info-col">
+          <p><strong>Code:</strong> {{ selectedPhysicalResource.code }}</p>
+          <p><strong>Name:</strong> {{ selectedPhysicalResource.name }}</p>
+          <p><strong>Kind:</strong> {{ getKindLabel(selectedPhysicalResource.kind!) }}</p>
+          <p><strong>Status:</strong>
+            <span [ngClass]="'status-' + selectedPhysicalResource.status?.toLowerCase()">
+              {{ getStatusLabel(selectedPhysicalResource.status!) }}
+            </span>
+          </p>
+        </div>
+        <div class="info-col">
+          <p><strong>Operational Capacity:</strong> {{ selectedPhysicalResource.operationalCapacity }}</p>
+          <p><strong>Setup Time:</strong> {{ selectedPhysicalResource.setupTimeMinutes || 0 }} minutes</p>
+          <p><strong>Assigned Area:</strong> {{ selectedPhysicalResource.assignedArea || 'None' }}</p>
+          <p><strong>Qualification:</strong> {{ selectedPhysicalResource.qualificationCode || 'None' }}</p>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-col-full">
+          <p><strong>Description:</strong> {{ selectedPhysicalResource.description }}</p>
+          <p *ngIf="selectedPhysicalResource.operationalWindow">
+            <strong>Operational Window:</strong>
+            {{ getDayLabel(selectedPhysicalResource.operationalWindow.startDay!) }} -
+            {{ getDayLabel(selectedPhysicalResource.operationalWindow.endDay!) }},
+            {{ selectedPhysicalResource.operationalWindow.startTime }} -
+            {{ selectedPhysicalResource.operationalWindow.endTime }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Physical Resource Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Physical Resource</h2>
+      <button class="close-button" (click)="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error message display -->
+      <div *ngIf="modalErrorMessage" class="alert alert-danger">
+        {{ modalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveNewPhysicalResource()" #resourceForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="code">Code *</label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              [(ngModel)]="newPhysicalResource.code"
+              required
+              class="form-input"
+              [class.error]="hasFieldError('code')"
+              placeholder="Enter resource code"
+            >
+            <div *ngIf="hasFieldError('code')" class="field-error">
+              {{ getFieldError('code') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="name">Name *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="newPhysicalResource.name"
+              required
+              class="form-input"
+              [class.error]="hasFieldError('name')"
+              placeholder="Enter resource name"
+            >
+            <div *ngIf="hasFieldError('name')" class="field-error">
+              {{ getFieldError('name') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="newPhysicalResource.description"
+            required
+            class="form-textarea"
+            [class.error]="hasFieldError('description')"
+            placeholder="Enter resource description"
+            rows="3"
+          ></textarea>
+          <div *ngIf="hasFieldError('description')" class="field-error">
+            {{ getFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="kind">Kind *</label>
+            <select
+              id="kind"
+              name="kind"
+              [(ngModel)]="newPhysicalResource.kind"
+              (ngModelChange)="onKindChange()"
+              required
+              class="form-select"
+              [class.error]="hasFieldError('kind')"
+            >
+              <option value="">Select kind</option>
+              <option *ngFor="let kind of PHYSICAL_RESOURCE_KINDS" [value]="kind.value">
+                {{ kind.label }}
+              </option>
+            </select>
+            <div *ngIf="hasFieldError('kind')" class="field-error">
+              {{ getFieldError('kind') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="statusInfo">Status</label>
+            <input
+              type="text"
+              id="statusInfo"
+              name="statusInfo"
+              value="Available (Default)"
+              readonly
+              class="form-input readonly"
+              placeholder="Resource will be created as Available"
+            >
+            <small class="form-help">New resources are automatically set to Available status</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="operationalCapacity">Operational Capacity *</label>
+            <input
+              type="number"
+              id="operationalCapacity"
+              name="operationalCapacity"
+              [(ngModel)]="newPhysicalResource.operationalCapacity"
+              required
+              min="1"
+              class="form-input"
+              [class.error]="hasFieldError('operationalCapacity')"
+              placeholder="Enter capacity"
+            >
+            <div *ngIf="hasFieldError('operationalCapacity')" class="field-error">
+              {{ getFieldError('operationalCapacity') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="setupTimeMinutes">Setup Time (minutes)</label>
+            <input
+              type="number"
+              id="setupTimeMinutes"
+              name="setupTimeMinutes"
+              [(ngModel)]="newPhysicalResource.setupTimeMinutes"
+              min="0"
+              class="form-input"
+              [class.error]="hasFieldError('setupTimeMinutes')"
+              placeholder="Enter setup time"
+            >
+            <div *ngIf="hasFieldError('setupTimeMinutes')" class="field-error">
+              {{ getFieldError('setupTimeMinutes') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" *ngIf="shouldShowAreaDropdown()">
+            <label for="assignedArea">{{ getAreaLabel() }}</label>
+            <select
+              id="assignedArea"
+              name="assignedArea"
+              [(ngModel)]="newPhysicalResource.assignedArea"
+              [required]="isAreaRequired()"
+              class="form-select"
+              [class.error]="hasFieldError('assignedArea')"
+            >
+              <option value="">{{ getAreaPlaceholder() }}</option>
+              <!-- Docks for STS Crane -->
+              <ng-container *ngIf="newPhysicalResource.kind === PhysicalResourceKind.STSCrane">
+                <option *ngFor="let dock of availableDocks" [value]="dock.name">
+                  {{ dock.name }} - {{ dock.location }} ({{ dock.length }}m x {{ dock.depth }}m)
+                </option>
+              </ng-container>
+              <!-- Storage Areas for Truck -->
+              <ng-container *ngIf="newPhysicalResource.kind === PhysicalResourceKind.Truck">
+                <option *ngFor="let area of availableStorageAreas" [value]="area.code">
+                  {{ area.code }} - {{ area.location }} ({{ area.storageAreaType }})
+                </option>
+              </ng-container>
+              <!-- All areas for Mobile Crane -->
+              <ng-container *ngIf="newPhysicalResource.kind === PhysicalResourceKind.MobileCrane">
+                <optgroup label="Docks">
+                  <option *ngFor="let dock of availableDocks" [value]="dock.name">
+                    {{ dock.name }} - {{ dock.location }} ({{ dock.length }}m x {{ dock.depth }}m)
+                  </option>
+                </optgroup>
+                <optgroup label="Storage Areas">
+                  <option *ngFor="let area of availableStorageAreas" [value]="area.code">
+                    {{ area.code }} - {{ area.location }} ({{ area.storageAreaType }})
+                  </option>
+                </optgroup>
+              </ng-container>
+            </select>
+            <div *ngIf="!isAreaRequired()" class="form-help-text">This field is optional for this resource type</div>
+            <div *ngIf="hasFieldError('assignedArea')" class="field-error">
+              {{ getFieldError('assignedArea') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="qualificationCode">Qualification *</label>
+            <select
+              id="qualificationCode"
+              name="qualificationCode"
+              [(ngModel)]="newPhysicalResource.qualificationCode"
+              required
+              class="form-select"
+              [class.error]="hasFieldError('qualificationCode')"
+            >
+              <option value="">Select a qualification</option>
+              <option *ngFor="let qual of availableQualifications" [value]="qual.code">
+                {{ qual.code }} - {{ qual.name }}
+              </option>
+            </select>
+            <div *ngIf="hasFieldError('qualificationCode')" class="field-error">
+              {{ getFieldError('qualificationCode') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Operational Window -->
+        <div class="form-section">
+          <h4>Operational Window *</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDay">Start Day *</label>
+              <select
+                id="startDay"
+                name="startDay"
+                [(ngModel)]="newPhysicalResource.operationalWindow!.startDay"
+                required
+                class="form-select"
+                [class.error]="hasFieldError('startDay')"
+              >
+                <option *ngFor="let day of DAYS_OF_WEEK" [value]="day.value">
+                  {{ day.label }}
+                </option>
+              </select>
+              <div *ngIf="hasFieldError('startDay')" class="field-error">
+                {{ getFieldError('startDay') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endDay">End Day *</label>
+              <select
+                id="endDay"
+                name="endDay"
+                [(ngModel)]="newPhysicalResource.operationalWindow!.endDay"
+                required
+                class="form-select"
+                [class.error]="hasFieldError('endDay')"
+              >
+                <option *ngFor="let day of DAYS_OF_WEEK" [value]="day.value">
+                  {{ day.label }}
+                </option>
+              </select>
+              <div *ngIf="hasFieldError('endDay')" class="field-error">
+                {{ getFieldError('endDay') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startTime">Start Time *</label>
+              <input
+                type="time"
+                id="startTime"
+                name="startTime"
+                [(ngModel)]="newPhysicalResource.operationalWindow!.startTime"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('startTime')"
+              >
+              <div *ngIf="hasFieldError('startTime')" class="field-error">
+                {{ getFieldError('startTime') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endTime">End Time *</label>
+              <input
+                type="time"
+                id="endTime"
+                name="endTime"
+                [(ngModel)]="newPhysicalResource.operationalWindow!.endTime"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('endTime')"
+              >
+              <div *ngIf="hasFieldError('endTime')" class="field-error">
+                {{ getFieldError('endTime') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeCreateModal()"
+            class="btn btn-secondary"
+            [disabled]="isCreating"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isCreating || !resourceForm.form.valid"
+          >
+            {{ isCreating ? 'Creating...' : 'Create Physical Resource' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Physical Resource Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Physical Resource</h2>
+      <button class="close-button" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error message display -->
+      <div *ngIf="editModalErrorMessage" class="alert alert-danger">
+        {{ editModalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveEditPhysicalResource()" #editResourceForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editCode">Code (Read-only)</label>
+            <input
+              type="text"
+              id="editCode"
+              name="editCode"
+              [value]="editPhysicalResource.code"
+              readonly
+              class="form-input readonly"
+              placeholder="Resource code"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="editName">Name *</label>
+            <input
+              type="text"
+              id="editName"
+              name="editName"
+              [(ngModel)]="editPhysicalResource.name"
+              required
+              class="form-input"
+              [class.error]="hasEditFieldError('name')"
+              placeholder="Enter resource name"
+            >
+            <div *ngIf="hasEditFieldError('name')" class="field-error">
+              {{ getEditFieldError('name') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription">Description *</label>
+          <textarea
+            id="editDescription"
+            name="editDescription"
+            [(ngModel)]="editPhysicalResource.description"
+            required
+            class="form-textarea"
+            [class.error]="hasEditFieldError('description')"
+            placeholder="Enter resource description"
+            rows="3"
+          ></textarea>
+          <div *ngIf="hasEditFieldError('description')" class="field-error">
+            {{ getEditFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editKind">Kind (Read-only)</label>
+            <input
+              type="text"
+              id="editKind"
+              name="editKind"
+              [value]="getKindLabel(editPhysicalResource.kind!)"
+              readonly
+              class="form-input readonly"
+              placeholder="Resource kind"
+            >
+            <small class="form-help">Kind cannot be changed after creation</small>
+          </div>
+
+          <div class="form-group">
+            <label for="editStatus">Status *</label>
+            <select
+              id="editStatus"
+              name="editStatus"
+              [(ngModel)]="editPhysicalResource.status"
+              required
+              class="form-select"
+              [class.error]="hasEditFieldError('status')"
+            >
+              <option *ngFor="let status of RESOURCE_STATUSES" [value]="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+            <div *ngIf="hasEditFieldError('status')" class="field-error">
+              {{ getEditFieldError('status') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editOperationalCapacity">Operational Capacity *</label>
+            <input
+              type="number"
+              id="editOperationalCapacity"
+              name="editOperationalCapacity"
+              [(ngModel)]="editPhysicalResource.operationalCapacity"
+              required
+              min="1"
+              class="form-input"
+              [class.error]="hasEditFieldError('operationalCapacity')"
+              placeholder="Enter capacity"
+            >
+            <div *ngIf="hasEditFieldError('operationalCapacity')" class="field-error">
+              {{ getEditFieldError('operationalCapacity') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="editSetupTimeMinutes">Setup Time (minutes)</label>
+            <input
+              type="number"
+              id="editSetupTimeMinutes"
+              name="editSetupTimeMinutes"
+              [(ngModel)]="editPhysicalResource.setupTimeMinutes"
+              min="0"
+              class="form-input"
+              [class.error]="hasEditFieldError('setupTimeMinutes')"
+              placeholder="Enter setup time"
+            >
+            <div *ngIf="hasEditFieldError('setupTimeMinutes')" class="field-error">
+              {{ getEditFieldError('setupTimeMinutes') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" *ngIf="shouldShowAreaDropdown()">
+            <label for="editAssignedArea">{{ getAreaLabel() }}</label>
+            <select
+              id="editAssignedArea"
+              name="editAssignedArea"
+              [(ngModel)]="editPhysicalResource.assignedArea"
+              [required]="isAreaRequired()"
+              class="form-select"
+              [class.error]="hasEditFieldError('assignedArea')"
+            >
+              <option value="">{{ getAreaPlaceholder() }}</option>
+              <!-- Docks for STS Crane -->
+              <ng-container *ngIf="editPhysicalResource.kind === PhysicalResourceKind.STSCrane">
+                <option *ngFor="let dock of availableDocks" [value]="dock.name">
+                  {{ dock.name }} - {{ dock.location }} ({{ dock.length }}m x {{ dock.depth }}m)
+                </option>
+              </ng-container>
+              <!-- Storage Areas for Truck -->
+              <ng-container *ngIf="editPhysicalResource.kind === PhysicalResourceKind.Truck">
+                <option *ngFor="let area of availableStorageAreas" [value]="area.code">
+                  {{ area.code }} - {{ area.location }} ({{ area.storageAreaType }})
+                </option>
+              </ng-container>
+              <!-- All areas for Mobile Crane -->
+              <ng-container *ngIf="editPhysicalResource.kind === PhysicalResourceKind.MobileCrane">
+                <optgroup label="Docks">
+                  <option *ngFor="let dock of availableDocks" [value]="dock.name">
+                    {{ dock.name }} - {{ dock.location }} ({{ dock.length }}m x {{ dock.depth }}m)
+                  </option>
+                </optgroup>
+                <optgroup label="Storage Areas">
+                  <option *ngFor="let area of availableStorageAreas" [value]="area.code">
+                    {{ area.code }} - {{ area.location }} ({{ area.storageAreaType }})
+                  </option>
+                </optgroup>
+              </ng-container>
+            </select>
+            <div *ngIf="!isAreaRequired()" class="form-help-text">This field is optional for this resource type</div>
+            <div *ngIf="hasEditFieldError('assignedArea')" class="field-error">
+              {{ getEditFieldError('assignedArea') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="editQualificationCode">Qualification *</label>
+            <select
+              id="editQualificationCode"
+              name="editQualificationCode"
+              [(ngModel)]="editPhysicalResource.qualificationCode"
+              required
+              class="form-select"
+              [class.error]="hasEditFieldError('qualificationCode')"
+            >
+              <option value="">Select a qualification</option>
+              <option *ngFor="let qual of availableQualifications" [value]="qual.code">
+                {{ qual.code }} - {{ qual.name }}
+              </option>
+            </select>
+            <div *ngIf="hasEditFieldError('qualificationCode')" class="field-error">
+              {{ getEditFieldError('qualificationCode') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Operational Window -->
+        <div class="form-section">
+          <h4>Operational Window *</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editStartDay">Start Day *</label>
+              <select
+                id="editStartDay"
+                name="editStartDay"
+                [(ngModel)]="editPhysicalResource.operationalWindow!.startDay"
+                required
+                class="form-select"
+                [class.error]="hasEditFieldError('startDay')"
+              >
+                <option *ngFor="let day of DAYS_OF_WEEK" [value]="day.value">
+                  {{ day.label }}
+                </option>
+              </select>
+              <div *ngIf="hasEditFieldError('startDay')" class="field-error">
+                {{ getEditFieldError('startDay') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="editEndDay">End Day *</label>
+              <select
+                id="editEndDay"
+                name="editEndDay"
+                [(ngModel)]="editPhysicalResource.operationalWindow!.endDay"
+                required
+                class="form-select"
+                [class.error]="hasEditFieldError('endDay')"
+              >
+                <option *ngFor="let day of DAYS_OF_WEEK" [value]="day.value">
+                  {{ day.label }}
+                </option>
+              </select>
+              <div *ngIf="hasEditFieldError('endDay')" class="field-error">
+                {{ getEditFieldError('endDay') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editStartTime">Start Time *</label>
+              <input
+                type="time"
+                id="editStartTime"
+                name="editStartTime"
+                [(ngModel)]="editPhysicalResource.operationalWindow!.startTime"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('startTime')"
+              >
+              <div *ngIf="hasEditFieldError('startTime')" class="field-error">
+                {{ getEditFieldError('startTime') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="editEndTime">End Time *</label>
+              <input
+                type="time"
+                id="editEndTime"
+                name="editEndTime"
+                [(ngModel)]="editPhysicalResource.operationalWindow!.endTime"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('endTime')"
+              >
+              <div *ngIf="hasEditFieldError('endTime')" class="field-error">
+                {{ getEditFieldError('endTime') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeEditModal()"
+            class="btn btn-secondary"
+            [disabled]="isEditing"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isEditing || !editResourceForm.form.valid || !isEditDirty()"
+          >
+            {{ isEditing ? 'Updating...' : 'Update Physical Resource' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
