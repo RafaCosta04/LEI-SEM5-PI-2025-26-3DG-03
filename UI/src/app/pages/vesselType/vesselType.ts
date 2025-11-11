@@ -54,6 +54,7 @@ export class VesselType implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
+  private searchClearTimer: any = null;
 
   constructor(
     private vesselTypeService: VesselTypeService,
@@ -78,6 +79,7 @@ export class VesselType implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
+        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -161,6 +163,19 @@ export class VesselType implements OnInit, OnDestroy {
   clearSearch() {
     this.searchTerm = '';
     this.filteredVesselTypes = [...this.vesselTypes];
+    // Trigger the search pipeline so the same hide/error behavior runs as when the user clears input
+    this.searchSubject$.next(this.searchTerm);
+  }
+
+  // When the user clears the search input completely, hide any error message after a short delay
+  // and avoid stacking timers.
+  private handleSearchTermChange(term: string) {
+    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
+    if (!term || !term.trim()) {
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
+      }
+    }
   }
 
   selectVesselType(vesselType: VesselTypeModel) {

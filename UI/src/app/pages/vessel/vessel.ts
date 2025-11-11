@@ -56,6 +56,7 @@ export class Vessel implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
+  private searchClearTimer: any = null;
 
   constructor(
     private vesselService: VesselService,
@@ -82,6 +83,7 @@ export class Vessel implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
+        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -178,6 +180,17 @@ export class Vessel implements OnInit, OnDestroy {
   clearSearch() {
     this.searchTerm = '';
     this.filteredVesselRecords = [...this.vesselRecords];
+    this.searchSubject$.next(this.searchTerm);
+  }
+
+  
+  private handleSearchTermChange(term: string) {
+    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
+    if (!term || !term.trim()) {
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
+      }
+    }
   }
 
   selectVesselRecord(vesselRecord: VesselRecordModel) {

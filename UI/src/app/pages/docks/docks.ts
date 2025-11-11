@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { DocksService } from '../../services/docks.service';
 import { DocksModel } from '../../models/docks.model';
 
@@ -18,8 +18,10 @@ export class Docks implements OnInit, OnDestroy {
   selectedDock: DocksModel | null = null;
   searchTerm: string = '';
   isLoading: boolean = false;
-  errorMessage: string = '';
-
+  
+  statusMessage: string = '';
+  statusMessageType: 'success' | 'error' | '' = '';
+  statusHiding: boolean = false;
   // Modal properties
   showCreateModal: boolean = false;
   isCreating: boolean = false;
@@ -47,6 +49,8 @@ export class Docks implements OnInit, OnDestroy {
   };
   editModalErrorMessage: string = '';
   editFieldErrors: { [key: string]: string } = {};
+  originalEditDock: DocksModel | null = null;
+
 
   // Vessel types input helpers
   vesselTypesInput: string = '';
@@ -54,6 +58,7 @@ export class Docks implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
+  private searchClearTimer: any = null;
 
   constructor(
     private docksService: DocksService,
@@ -78,13 +83,13 @@ export class Docks implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
+        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
 
   loadDocks() {
     this.isLoading = true;
-    this.errorMessage = '';
     this.docksService.getAllDocks()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -94,7 +99,9 @@ export class Docks implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.errorMessage = 'Error loading docks. Please check your connection.';
+          this.statusHiding = false;
+          this.statusMessage = 'Error loading docks. Please check your connection.';
+          this.statusMessageType = 'error';  
           console.error('Error loading docks:', error);
           this.isLoading = false;
         }
@@ -125,7 +132,6 @@ export class Docks implements OnInit, OnDestroy {
 
   searchByName(name: string) {
     this.isLoading = true;
-    this.errorMessage = '';
     this.docksService.getDocksByName(name)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -134,7 +140,9 @@ export class Docks implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.errorMessage = 'Error searching for docks. Please try again.';
+          this.statusHiding = false;
+          this.statusMessage = 'Error searching for docks. Please try again.';
+          this.statusMessageType = 'error';   
           console.error('Error searching docks:', error);
           this.filteredDocks = [];
           this.isLoading = false;
@@ -142,9 +150,29 @@ export class Docks implements OnInit, OnDestroy {
       });
   }
 
+  clearStatusMessage() {
+    if (!this.statusMessage) return;
+    this.statusHiding = true;
+    setTimeout(() => {
+      this.statusMessage = '';
+      this.statusMessageType = '';
+      this.statusHiding = false;
+    }, 220);
+  }
+
   clearSearch() {
     this.searchTerm = '';
     this.filteredDocks = [...this.docks];
+    this.searchSubject$.next(this.searchTerm);
+  }
+
+  private handleSearchTermChange(term: string) {
+    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
+    if (!term || !term.trim()) {
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
+      }
+    }
   }
 
   selectDock(dock: DocksModel) {
@@ -322,7 +350,6 @@ export class Docks implements OnInit, OnDestroy {
     this.resetEditDock();
     this.isEditing = false;
   }
-
   onSaveEditDock() {
     this.editModalErrorMessage = '';
     this.editFieldErrors = {};
@@ -344,6 +371,11 @@ export class Docks implements OnInit, OnDestroy {
 
     if (!this.selectedDock?.id) {
       this.editModalErrorMessage = 'No dock selected for editing.';
+      return;
+    }
+
+    if (!this.isEditDirty()) {
+      this.editModalErrorMessage = 'No changes to save.';
       return;
     }
 
@@ -421,6 +453,21 @@ export class Docks implements OnInit, OnDestroy {
               this.editDock.length && this.editDock.length > 0 &&
               this.editDock.depth && this.editDock.depth > 0 &&
               this.editDock.maxDraft && this.editDock.maxDraft > 0);
+  }
+
+  isEditDirty(): boolean {
+    if (!this.originalEditDock) return false;
+    const orig = this.originalEditDock;
+    const curr = this.editDock;
+    const nameChanged = (orig.name || '').trim() !== (curr.name || '').trim();
+    const locationChanged = (orig.location || '').trim() !== (curr.location || '').trim();
+    const lengthChanged = (orig.length || 0) !== (curr.length || 0);
+    const depthChanged = (orig.depth || 0) !== (curr.depth || 0);
+    const maxDraftChanged = (orig.maxDraft || 0) !== (curr.maxDraft || 0);
+    const vesselTypesOrig = (orig.vesselTypes || []).slice().sort().join(',');
+    const vesselTypesCurr = (curr.vesselTypes || []).slice().sort().join(',');
+    const vesselTypesChanged = vesselTypesOrig !== vesselTypesCurr;
+    return nameChanged || locationChanged || lengthChanged || depthChanged || maxDraftChanged || vesselTypesChanged;
   }
 
   hasEditFieldError(fieldName: string): boolean {

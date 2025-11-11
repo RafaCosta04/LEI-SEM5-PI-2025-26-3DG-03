@@ -58,6 +58,7 @@ export class StorageArea implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
+  private searchClearTimer: any = null;
 
   constructor(
     private storageAreaService: StorageAreaService,
@@ -82,6 +83,7 @@ export class StorageArea implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
+        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -166,6 +168,17 @@ export class StorageArea implements OnInit, OnDestroy {
   clearSearch() {
     this.searchTerm = '';
     this.filteredStorageAreas = [...this.storageAreas];
+    this.searchSubject$.next(this.searchTerm);
+  }
+
+  
+  private handleSearchTermChange(term: string) {
+    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
+    if (!term || !term.trim()) {
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
+      }
+    }
   }
 
   selectStorageArea(storageArea: StorageAreaModel) {
