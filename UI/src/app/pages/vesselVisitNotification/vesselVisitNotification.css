@@ -271,15 +271,15 @@
 }
 
 .success-message {
-  background-color: #d1edff;
-  color: #0f5132;
-  border: 1px solid #a7e5ff;
+  background: #1f6d24;
+  border: 1px solid #18531c;
+  color: #e6ffed;
 }
 
 .error-message {
-  background-color: #f8d7da;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
   color: #721c24;
-  border: 1px solid #f1aeb5;
 }
 
 @keyframes statusSlideIn {
@@ -361,6 +361,18 @@
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f1aeb5;
+}
+
+.alert-success {
+  background: #1f6d24;
+  border: 1px solid #18531c;
+  color: #e6ffed;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Dark mode styles */
@@ -476,9 +488,24 @@
 }
 
 :host-context([data-coreui-theme="dark"]) .alert-danger {
-  background-color: #3c2e1f;
-  color: #fbbf24;
-  border-color: #5a4635;
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+:host-context([data-coreui-theme="dark"]) .error-message {
+  background: #f8d7da !important;
+  border: 1px solid #f5c6cb !important;
+  color: #721c24 !important;
+}
+
+/* And provide a dark-mode override for success alerts if needed */
+:host-context([data-coreui-theme="dark"]) .alert-success,
+:host-context([data-coreui-theme="dark"]) .success-message {
+  /* Keep the same green in dark mode (if desired) or adjust later */
+  background: #1f6d24 !important;
+  border: 1px solid #18531c !important;
+  color: #e6ffed !important;
 }
 
 /* Responsive styles */

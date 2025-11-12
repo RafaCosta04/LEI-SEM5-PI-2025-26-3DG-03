@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { QualificationService } from '../../services/qualification.service';
 import { QualificationModel } from '../../models/qualification.model';
 
@@ -49,7 +49,6 @@ export class Qualification implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
 
   constructor(
     private qualificationService: QualificationService,
@@ -73,7 +72,7 @@ export class Qualification implements OnInit, OnDestroy {
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(searchTerm => { this.handleSearchTermChange(searchTerm); this.performSearch(searchTerm); });
+      .subscribe(searchTerm => { this.performSearch(searchTerm); });
   }
 
   loadQualifications() {
@@ -103,6 +102,10 @@ export class Qualification implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredQualifications = [...this.qualifications];
+      // If the user cleared the search, hide any top error message immediately (same behavior as Representative)
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
@@ -114,6 +117,9 @@ export class Qualification implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredQualifications = localResults;
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
     } else {
       this.searchByName(searchTerm);
     }
@@ -126,6 +132,17 @@ export class Qualification implements OnInit, OnDestroy {
       .subscribe({
         next: (qualifications) => {
           this.filteredQualifications = qualifications;
+          // If remote search returned results, clear any previous error message
+          if (qualifications && qualifications.length > 0) {
+            if (this.statusMessage && this.statusMessageType === 'error') {
+              this.clearStatusMessage();
+            }
+          } else {
+            // No results from remote search -> show top error banner
+            this.statusHiding = false;
+            this.statusMessage = `No results found for "${name}"`;
+            this.statusMessageType = 'error';
+          }
           this.isLoading = false;
         },
         error: (error) => {
@@ -151,25 +168,11 @@ export class Qualification implements OnInit, OnDestroy {
     }, 220);
   }
 
-  clearSearch() {
-    this.searchTerm = '';
-    this.filteredQualifications = [...this.qualifications];
-  }
+  clearSearch() { this.clearSearchAndNotify(); }
 
   // When clearing programmatically (e.g. clicking the clear button) ensure the
   // search pipeline and error-hide behavior run as if the user emptied the input.
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredQualifications = [...this.qualifications]; this.searchSubject$.next(this.searchTerm); }
-
-  // When the user clears the search input completely, hide any error message after 3s
-  // and avoid stacking timers.
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
-      }
-    }
-  }
 
   selectQualification(qualification: QualificationModel) {
     if (this.selectedQualification?.id === qualification.id) {

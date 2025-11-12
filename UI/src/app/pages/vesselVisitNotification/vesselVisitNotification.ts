@@ -77,7 +77,7 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private vesselVisitNotificationService: VesselVisitNotificationService,
@@ -101,10 +101,7 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
-        this.performSearch(searchTerm);
-      });
+      .subscribe(searchTerm => { this.performSearch(searchTerm); });
   }
 
   loadVesselVisitNotifications() {
@@ -134,6 +131,7 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredNotifications = [...this.vesselVisitNotifications];
+      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
       return;
     }
 
@@ -144,6 +142,14 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
       notification.cargoType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       notification.visitStatus?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    if (this.filteredNotifications.length === 0) {
+      this.statusHiding = false;
+      this.statusMessage = `No results found for "${searchTerm}"`;
+      this.statusMessageType = 'error';
+    } else {
+      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
+    }
   }
 
   clearStatusMessage() {
@@ -157,8 +163,7 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
   }
 
   clearSearch() {
-    this.searchTerm = '';
-    this.filteredNotifications = [...this.vesselVisitNotifications];
+    this.clearSearchAndNotify();
   }
 
   clearSearchAndNotify() {
@@ -167,20 +172,6 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
     this.searchSubject$.next(this.searchTerm);
   }
 
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) {
-      clearTimeout(this.searchClearTimer);
-      this.searchClearTimer = null;
-    }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => {
-          this.clearStatusMessage();
-          this.searchClearTimer = null;
-        }, 2000);
-      }
-    }
-  }
 
   selectNotification(notification: VesselVisitNotificationModel) {
     if (this.selectedNotification?.id === notification.id) {

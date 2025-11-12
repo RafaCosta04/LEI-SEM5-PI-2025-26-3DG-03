@@ -56,7 +56,7 @@ export class Vessel implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private vesselService: VesselService,
@@ -83,7 +83,6 @@ export class Vessel implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -128,6 +127,9 @@ export class Vessel implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredVesselRecords = [...this.vesselRecords];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
@@ -140,6 +142,9 @@ export class Vessel implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredVesselRecords = localResults;
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
     } else {
       this.searchByVesselName(searchTerm);
     }
@@ -151,12 +156,22 @@ export class Vessel implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (vesselRecord) => {
-          this.filteredVesselRecords = [vesselRecord];
+          if (vesselRecord) {
+            this.filteredVesselRecords = [vesselRecord];
+            if (this.statusMessage && this.statusMessageType === 'error') {
+              this.clearStatusMessage();
+            }
+          } else {
+            this.filteredVesselRecords = [];
+            this.statusHiding = false;
+            this.statusMessage = `No results found for "${name}"`;
+            this.statusMessageType = 'error';
+          }
           this.isLoading = false;
         },
         error: (error) => {
-            this.statusHiding = false;
-            this.statusMessage = 'Error searching for vessel records. Please try again.';
+          this.statusHiding = false;
+          this.statusMessage = 'Error searching for vessel records. Please try again.';
           this.statusMessageType = 'error';
           console.error('Error searching vessel records:', error);
           this.filteredVesselRecords = [];
@@ -177,21 +192,12 @@ export class Vessel implements OnInit, OnDestroy {
     }, 220);
   }
 
-  clearSearch() {
-    this.searchTerm = '';
-    this.filteredVesselRecords = [...this.vesselRecords];
-    this.searchSubject$.next(this.searchTerm);
-  }
+  clearSearch() { this.clearSearchAndNotify(); }
+
+  clearSearchAndNotify() { this.searchTerm = ''; this.filteredVesselRecords = [...this.vesselRecords]; this.searchSubject$.next(this.searchTerm); }
 
   
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
-      }
-    }
-  }
+  // Removed timer-based hide: errors are cleared immediately when results arrive or search is cleared.
 
   selectVesselRecord(vesselRecord: VesselRecordModel) {
     if (this.selectedVesselRecord?.id === vesselRecord.id) {

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { StorageAreaService } from '../../services/storageArea.service';
 import { StorageAreaModel, StorageAreaType, StorageAreaDockModel } from '../../models/storageArea.model';
 
@@ -58,7 +58,7 @@ export class StorageArea implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private storageAreaService: StorageAreaService,
@@ -82,10 +82,7 @@ export class StorageArea implements OnInit, OnDestroy {
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
-        this.performSearch(searchTerm);
-      });
+      .subscribe(searchTerm => { this.performSearch(searchTerm); });
   }
 
   loadStorageAreas() {
@@ -115,6 +112,9 @@ export class StorageArea implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredStorageAreas = [...this.storageAreas];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
@@ -128,6 +128,9 @@ export class StorageArea implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredStorageAreas = localResults;
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
     } else {
       this.searchByLocation(searchTerm);
     }
@@ -139,12 +142,22 @@ export class StorageArea implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (storageArea) => {
-          this.filteredStorageAreas = [storageArea];
+          if (storageArea) {
+            this.filteredStorageAreas = [storageArea];
+            if (this.statusMessage && this.statusMessageType === 'error') {
+              this.clearStatusMessage();
+            }
+          } else {
+            this.filteredStorageAreas = [];
+            this.statusHiding = false;
+            this.statusMessage = `No results found for "${location}"`;
+            this.statusMessageType = 'error';
+          }
           this.isLoading = false;
         },
         error: (error) => {
-            this.statusHiding = false;
-            this.statusMessage = 'Error searching for storage areas. Please try again.';
+          this.statusHiding = false;
+          this.statusMessage = 'Error searching for storage areas. Please try again.';
           this.statusMessageType = 'error';
           console.error('Error searching storage areas:', error);
           this.filteredStorageAreas = [];
@@ -165,21 +178,11 @@ export class StorageArea implements OnInit, OnDestroy {
     }, 220);
   }
 
-  clearSearch() {
-    this.searchTerm = '';
-    this.filteredStorageAreas = [...this.storageAreas];
-    this.searchSubject$.next(this.searchTerm);
-  }
+  clearSearch() { this.clearSearchAndNotify(); }
 
-  
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
-      }
-    }
-  }
+  // When clearing programmatically (e.g. clicking the clear button) ensure the
+  // search pipeline and error-hide behavior run as if the user emptied the input.
+  clearSearchAndNotify() { this.searchTerm = ''; this.filteredStorageAreas = [...this.storageAreas]; this.searchSubject$.next(this.searchTerm); }
 
   selectStorageArea(storageArea: StorageAreaModel) {
     if (this.selectedStorageArea?.id === storageArea.id) {

@@ -58,7 +58,7 @@ export class Docks implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private docksService: DocksService,
@@ -83,7 +83,6 @@ export class Docks implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -115,6 +114,9 @@ export class Docks implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredDocks = [...this.docks];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
@@ -125,6 +127,9 @@ export class Docks implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredDocks = localResults;
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
     } else {
       this.searchByName(searchTerm);
     }
@@ -137,6 +142,15 @@ export class Docks implements OnInit, OnDestroy {
       .subscribe({
         next: (docks) => {
           this.filteredDocks = docks;
+          if (docks && docks.length > 0) {
+            if (this.statusMessage && this.statusMessageType === 'error') {
+              this.clearStatusMessage();
+            }
+          } else {
+            this.statusHiding = false;
+            this.statusMessage = `No results found for "${name}"`;
+            this.statusMessageType = 'error';
+          }
           this.isLoading = false;
         },
         error: (error) => {
@@ -161,19 +175,11 @@ export class Docks implements OnInit, OnDestroy {
   }
 
   clearSearch() {
-    this.searchTerm = '';
-    this.filteredDocks = [...this.docks];
-    this.searchSubject$.next(this.searchTerm);
+    this.clearSearchAndNotify();
   }
 
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
-      }
-    }
-  }
+
+  clearSearchAndNotify() { this.searchTerm = ''; this.filteredDocks = [...this.docks]; this.searchSubject$.next(this.searchTerm); }
 
   selectDock(dock: DocksModel) {
     if (this.selectedDock?.id === dock.id) {

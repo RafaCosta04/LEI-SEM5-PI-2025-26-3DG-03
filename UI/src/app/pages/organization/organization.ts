@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { OrganizationService } from '../../services/organization.service';
 import { ShippingAgentOrganizationModel, ShippingAgentOrganizationWithRepresentativeModel, RepresentativeModel } from '../../models/organization.model';
 
@@ -127,16 +127,31 @@ export class Organization implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredOrganizations = [...this.organizations];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
-    this.filteredOrganizations = this.organizations.filter(org =>
+    const localResults = this.organizations.filter(org =>
       org.legalName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.alternativeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.representativeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.address?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    this.filteredOrganizations = localResults;
+
+    if (localResults.length === 0) {
+      this.statusHiding = false;
+      this.statusMessage = `No results found for "${searchTerm}"`;
+      this.statusMessageType = 'error';
+    } else {
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
+    }
   }
 
   clearStatusMessage() {

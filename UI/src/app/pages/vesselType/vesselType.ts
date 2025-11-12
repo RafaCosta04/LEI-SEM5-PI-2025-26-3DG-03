@@ -54,7 +54,7 @@ export class VesselType implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private vesselTypeService: VesselTypeService,
@@ -79,7 +79,6 @@ export class VesselType implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -111,6 +110,9 @@ export class VesselType implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredVesselTypes = [...this.vesselTypes];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
@@ -125,6 +127,9 @@ export class VesselType implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredVesselTypes = localResults;
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
     } else {
       this.searchByName(searchTerm);
     }
@@ -137,6 +142,15 @@ export class VesselType implements OnInit, OnDestroy {
       .subscribe({
         next: (vesselTypes) => {
           this.filteredVesselTypes = vesselTypes;
+          if (vesselTypes && vesselTypes.length > 0) {
+            if (this.statusMessage && this.statusMessageType === 'error') {
+              this.clearStatusMessage();
+            }
+          } else {
+            this.statusHiding = false;
+            this.statusMessage = `No results found for "${name}"`;
+            this.statusMessageType = 'error';
+          }
           this.isLoading = false;
         },
         error: (error) => {
@@ -161,22 +175,12 @@ export class VesselType implements OnInit, OnDestroy {
   }
 
   clearSearch() {
-    this.searchTerm = '';
-    this.filteredVesselTypes = [...this.vesselTypes];
-    // Trigger the search pipeline so the same hide/error behavior runs as when the user clears input
-    this.searchSubject$.next(this.searchTerm);
+    this.clearSearchAndNotify();
   }
 
-  // When the user clears the search input completely, hide any error message after a short delay
-  // and avoid stacking timers.
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
-      }
-    }
-  }
+  // Removed timer-based hide: we clear errors immediately when results arrive or search is cleared.
+
+  clearSearchAndNotify() { this.searchTerm = ''; this.filteredVesselTypes = [...this.vesselTypes]; this.searchSubject$.next(this.searchTerm); }
 
   selectVesselType(vesselType: VesselTypeModel) {
     if (this.selectedVesselType?.id === vesselType.id) {

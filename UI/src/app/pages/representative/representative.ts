@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { RepresentativeService } from '../../services/representative.service';
 import { RepresentativeModel } from '../../models/representative.model';
 
@@ -111,10 +111,13 @@ export class Representative implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredRepresentatives = [...this.representatives];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
-    this.filteredRepresentatives = this.representatives.filter(rep =>
+    const localResults = this.representatives.filter(rep =>
       rep.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rep.organizationName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rep.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -122,6 +125,18 @@ export class Representative implements OnInit, OnDestroy {
       rep.nationality?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rep.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    this.filteredRepresentatives = localResults;
+
+    if (localResults.length === 0) {
+      this.statusHiding = false;
+      this.statusMessage = `No results found for "${searchTerm}"`;
+      this.statusMessageType = 'error';
+    } else {
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
+    }
   }
 
   clearStatusMessage() {
@@ -137,6 +152,7 @@ export class Representative implements OnInit, OnDestroy {
   clearSearch() {
     this.searchTerm = '';
     this.filteredRepresentatives = [...this.representatives];
+    this.searchSubject$.next(this.searchTerm);
   }
 
   clearSearchAndNotify() {
@@ -326,8 +342,7 @@ export class Representative implements OnInit, OnDestroy {
           this.isEditing = false;
         }
       });
-  }
-
+    }
   isEditDirty(): boolean {
     if (!this.originalEditRepresentative) return false;
 

@@ -66,7 +66,7 @@ export class PhysicalResources implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private physicalResourcesService: PhysicalResourcesService,
@@ -115,7 +115,6 @@ export class PhysicalResources implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
         this.performSearch(searchTerm);
       });
   }
@@ -209,6 +208,10 @@ export class PhysicalResources implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredPhysicalResources = [...this.physicalResources];
+      // If the user cleared the search, hide any top error message immediately
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
 
@@ -222,6 +225,10 @@ export class PhysicalResources implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredPhysicalResources = localResults;
+      // Clear any previous error immediately when we have local results
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
     } else {
       this.searchByDescription(searchTerm);
     }
@@ -234,6 +241,17 @@ export class PhysicalResources implements OnInit, OnDestroy {
       .subscribe({
         next: (resources) => {
           this.filteredPhysicalResources = resources;
+          if (resources && resources.length > 0) {
+            // Remote returned results -> clear any previous error immediately
+            if (this.statusMessage && this.statusMessageType === 'error') {
+              this.clearStatusMessage();
+            }
+          } else {
+            // No results from remote search -> show top error banner
+            this.statusHiding = false;
+            this.statusMessage = `No results found for "${description}"`;
+            this.statusMessageType = 'error';
+          }
           this.isLoading = false;
         },
         error: (error) => {
@@ -258,8 +276,7 @@ export class PhysicalResources implements OnInit, OnDestroy {
   }
 
   clearSearch() {
-    this.searchTerm = '';
-    this.filteredPhysicalResources = [...this.physicalResources];
+    this.clearSearchAndNotify();
   }
 
   clearSearchAndNotify() {
@@ -268,20 +285,6 @@ export class PhysicalResources implements OnInit, OnDestroy {
     this.searchSubject$.next(this.searchTerm);
   }
 
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) {
-      clearTimeout(this.searchClearTimer);
-      this.searchClearTimer = null;
-    }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => {
-          this.clearStatusMessage();
-          this.searchClearTimer = null;
-        }, 2000);
-      }
-    }
-  }
 
   selectPhysicalResource(resource: PhysicalResourceModel) {
     if (this.selectedPhysicalResource?.id === resource.id) {

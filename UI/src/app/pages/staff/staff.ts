@@ -44,7 +44,7 @@ export class Staff implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(private staffService: StaffService, private qualificationService: QualificationService) {}
 
@@ -57,13 +57,12 @@ export class Staff implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
   }
 
   private setupSearch() {
     this.searchSubject$
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(term => { this.handleSearchTermChange(term); this.performSearch(term); });
+      .subscribe(term => { this.performSearch(term); });
   }
 
   loadStaffs() {
@@ -93,19 +92,13 @@ export class Staff implements OnInit, OnDestroy {
 
   onSearch() { this.searchSubject$.next(this.searchTerm); }
 
-  // When the user clears the search input completely, hide any error message after 3s
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) { clearTimeout(this.searchClearTimer); this.searchClearTimer = null; }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => { this.clearStatusMessage(); this.searchClearTimer = null; }, 2000);
-      }
-    }
-  }
 
   private performSearch(term: string) {
     if (!term.trim()) {
       this.filteredStaffs = [...this.staffs];
+      if (this.statusMessage && this.statusMessageType === 'error') {
+        this.clearStatusMessage();
+      }
       return;
     }
     const local = this.staffs.filter(s =>
@@ -113,14 +106,36 @@ export class Staff implements OnInit, OnDestroy {
       s.email?.toLowerCase().includes(term.toLowerCase()) ||
       s.phone?.toLowerCase().includes(term.toLowerCase())
     );
-    if (local.length) this.filteredStaffs = local; else this.searchByName(term);
+    if (local.length) {
+      this.filteredStaffs = local;
+      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
+    } else {
+      this.searchByName(term);
+    }
   }
 
   searchByName(name: string) {
     this.isLoading = true;
     this.staffService.getStaffByName(name).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => { this.filteredStaffs = res || []; this.isLoading = false; },
-      error: (err) => { this.statusHiding = false; this.statusMessage = 'Error searching staff.'; this.statusMessageType = 'error'; console.error(err); this.filteredStaffs = []; this.isLoading = false; }
+      next: (res) => {
+        this.filteredStaffs = res || [];
+        if (res && res.length > 0) {
+          if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
+        } else {
+          this.statusHiding = false;
+          this.statusMessage = `No results found for "${name}"`;
+          this.statusMessageType = 'error';
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.statusHiding = false;
+        this.statusMessage = 'Error searching staff.';
+        this.statusMessageType = 'error';
+        console.error(err);
+        this.filteredStaffs = [];
+        this.isLoading = false;
+      }
     });
   }
 
@@ -130,8 +145,8 @@ export class Staff implements OnInit, OnDestroy {
     setTimeout(() => { this.statusMessage = ''; this.statusMessageType = ''; this.statusHiding = false; }, 220);
   }
 
-  clearSearch() { this.searchTerm = ''; this.filteredStaffs = [...this.staffs]; }
-  
+  clearSearch() { this.clearSearchAndNotify(); }
+
   // When clearing programmatically (e.g. clicking the clear button) ensure the
   // search pipeline and error-hide behavior run as if the user emptied the input.
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredStaffs = [...this.staffs]; this.searchSubject$.next(this.searchTerm); }

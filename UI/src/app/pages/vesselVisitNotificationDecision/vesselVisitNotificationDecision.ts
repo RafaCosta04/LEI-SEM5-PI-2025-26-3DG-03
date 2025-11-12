@@ -46,7 +46,7 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  private searchClearTimer: any = null;
+  
 
   constructor(
     private decisionService: VesselVisitNotificationDecisionService,
@@ -72,10 +72,7 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(searchTerm => {
-        this.handleSearchTermChange(searchTerm);
-        this.performSearch(searchTerm);
-      });
+      .subscribe(searchTerm => { this.performSearch(searchTerm); });
   }
 
   loadDecisions() {
@@ -118,6 +115,7 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredDecisions = [...this.decisions];
+      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
       return;
     }
 
@@ -127,6 +125,14 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
       decision.responseMessage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       decision.officerId?.toString().includes(searchTerm.toLowerCase())
     );
+
+    if (this.filteredDecisions.length === 0) {
+      this.statusHiding = false;
+      this.statusMessage = `No results found for "${searchTerm}"`;
+      this.statusMessageType = 'error';
+    } else {
+      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
+    }
   }
 
   clearStatusMessage() {
@@ -140,8 +146,7 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
   }
 
   clearSearch() {
-    this.searchTerm = '';
-    this.filteredDecisions = [...this.decisions];
+    this.clearSearchAndNotify();
   }
 
   clearSearchAndNotify() {
@@ -150,20 +155,6 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
     this.searchSubject$.next(this.searchTerm);
   }
 
-  private handleSearchTermChange(term: string) {
-    if (this.searchClearTimer) {
-      clearTimeout(this.searchClearTimer);
-      this.searchClearTimer = null;
-    }
-    if (!term || !term.trim()) {
-      if (this.statusMessage && this.statusMessageType === 'error') {
-        this.searchClearTimer = setTimeout(() => {
-          this.clearStatusMessage();
-          this.searchClearTimer = null;
-        }, 2000);
-      }
-    }
-  }
 
   selectDecision(decision: VesselVisitNotificationDecisionModel) {
     if (this.selectedDecision?.id === decision.id) {
