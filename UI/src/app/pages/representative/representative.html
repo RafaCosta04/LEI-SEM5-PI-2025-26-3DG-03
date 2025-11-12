@@ -1,0 +1,378 @@
+<div class="page-container">
+  <h1 class="page-title">Representatives</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search for representatives..."
+        class="search-input"
+      >
+      <button
+        *ngIf="searchTerm"
+        (click)="clearSearchAndNotify()"
+        class="clear-button"
+        title="Clean search"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        (click)="onCreateNew()"
+        class="btn btn-primary"
+        title="Create new representative"
+      >
+        New Representative
+      </button>
+      <button
+        (click)="onUpdate()"
+        class="btn btn-secondary"
+        [disabled]="!selectedRepresentative"
+        title="Edit selected representative"
+      >
+        Edit Representative
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading Representatives...
+  </div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Organization</th>
+          <th>Citizen ID</th>
+          <th>Nationality</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let representative of filteredRepresentatives"
+          [class.selected]="selectedRepresentative?.id === representative.id"
+          (click)="selectRepresentative(representative)"
+        >
+          <td>{{ representative.name }}</td>
+          <td>{{ representative.organizationName }}</td>
+          <td>{{ representative.citizenId }}</td>
+          <td>{{ representative.nationality }}</td>
+          <td>{{ representative.email }}</td>
+          <td>{{ representative.phoneNumber }}</td>
+          <td>
+            <button
+              (click)="selectRepresentative(representative); $event.stopPropagation()"
+              class="btn-select"
+              [class.selected]="selectedRepresentative?.id === representative.id"
+            >
+              {{ selectedRepresentative?.id === representative.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredRepresentatives.length === 0 && !isLoading" class="no-results">
+      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No representatives found.' }}</p>
+    </div>
+  </div>
+
+  <!-- Information of selected representative -->
+  <div *ngIf="selectedRepresentative" class="selected-info">
+    <h3>Selected Representative:</h3>
+    <div class="info-card">
+      <p><strong>Name:</strong> {{ selectedRepresentative.name }}</p>
+      <p><strong>Organization:</strong> {{ selectedRepresentative.organizationName }}</p>
+      <p><strong>Citizen ID:</strong> {{ selectedRepresentative.citizenId }}</p>
+      <p><strong>Nationality:</strong> {{ selectedRepresentative.nationality }}</p>
+      <p><strong>Email:</strong> {{ selectedRepresentative.email }}</p>
+      <p><strong>Phone Number:</strong> {{ selectedRepresentative.phoneNumber }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Create Representative Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Representative</h2>
+      <button class="close-button" (click)="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="modalErrorMessage" class="alert alert-danger">
+        {{ modalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveNewRepresentative()" #representativeForm="ngForm">
+        <div class="form-group">
+          <label for="organizationName">Organization Name *</label>
+          <input
+            type="text"
+            id="organizationName"
+            name="organizationName"
+            [(ngModel)]="newRepresentative.organizationName"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('organizationName')"
+            placeholder="Enter organization name"
+          >
+          <div *ngIf="hasFieldError('organizationName')" class="field-error">
+            {{ getFieldError('organizationName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Name *</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="newRepresentative.name"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('name')"
+            placeholder="Enter representative name"
+          >
+          <div *ngIf="hasFieldError('name')" class="field-error">
+            {{ getFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="citizenId">Citizen ID *</label>
+          <input
+            type="text"
+            id="citizenId"
+            name="citizenId"
+            [(ngModel)]="newRepresentative.citizenId"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('citizenId')"
+            placeholder="Enter citizen ID"
+          >
+          <div *ngIf="hasFieldError('citizenId')" class="field-error">
+            {{ getFieldError('citizenId') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nationality">Nationality *</label>
+          <input
+            type="text"
+            id="nationality"
+            name="nationality"
+            [(ngModel)]="newRepresentative.nationality"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('nationality')"
+            placeholder="Enter nationality"
+          >
+          <div *ngIf="hasFieldError('nationality')" class="field-error">
+            {{ getFieldError('nationality') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="newRepresentative.email"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('email')"
+            placeholder="Enter email address"
+          >
+          <div *ngIf="hasFieldError('email')" class="field-error">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number *</label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            name="phoneNumber"
+            [(ngModel)]="newRepresentative.phoneNumber"
+            required
+            class="form-input"
+            [class.error]="hasFieldError('phoneNumber')"
+            placeholder="Enter phone number"
+          >
+          <div *ngIf="hasFieldError('phoneNumber')" class="field-error">
+            {{ getFieldError('phoneNumber') }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeCreateModal()"
+            class="btn btn-secondary"
+            [disabled]="isCreating"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isCreating"
+          >
+            {{ isCreating ? 'Creating...' : 'Create Representative' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Representative Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Representative</h2>
+      <button class="close-button" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="editModalErrorMessage" class="alert alert-danger">
+        {{ editModalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveEditRepresentative()" #editRepresentativeForm="ngForm">
+        <div class="form-group">
+          <label for="editOrganizationName">Organization Name *</label>
+          <input
+            type="text"
+            id="editOrganizationName"
+            name="editOrganizationName"
+            [(ngModel)]="editRepresentative.organizationName"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('organizationName')"
+            placeholder="Enter organization name"
+          >
+          <div *ngIf="hasEditFieldError('organizationName')" class="field-error">
+            {{ getEditFieldError('organizationName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editName">Name *</label>
+          <input
+            type="text"
+            id="editName"
+            name="editName"
+            [(ngModel)]="editRepresentative.name"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('name')"
+            placeholder="Enter representative name"
+          >
+          <div *ngIf="hasEditFieldError('name')" class="field-error">
+            {{ getEditFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editCitizenId">Citizen ID (Read-only)</label>
+          <input
+            type="text"
+            id="editCitizenId"
+            name="editCitizenId"
+            [value]="editRepresentative.citizenId"
+            readonly
+            class="form-input readonly"
+            placeholder="Citizen ID"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="editNationality">Nationality *</label>
+          <input
+            type="text"
+            id="editNationality"
+            name="editNationality"
+            [(ngModel)]="editRepresentative.nationality"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('nationality')"
+            placeholder="Enter nationality"
+          >
+          <div *ngIf="hasEditFieldError('nationality')" class="field-error">
+            {{ getEditFieldError('nationality') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editEmail">Email *</label>
+          <input
+            type="email"
+            id="editEmail"
+            name="editEmail"
+            [(ngModel)]="editRepresentative.email"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('email')"
+            placeholder="Enter email address"
+          >
+          <div *ngIf="hasEditFieldError('email')" class="field-error">
+            {{ getEditFieldError('email') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editPhoneNumber">Phone Number *</label>
+          <input
+            type="tel"
+            id="editPhoneNumber"
+            name="editPhoneNumber"
+            [(ngModel)]="editRepresentative.phoneNumber"
+            required
+            class="form-input"
+            [class.error]="hasEditFieldError('phoneNumber')"
+            placeholder="Enter phone number"
+          >
+          <div *ngIf="hasEditFieldError('phoneNumber')" class="field-error">
+            {{ getEditFieldError('phoneNumber') }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeEditModal()"
+            class="btn btn-secondary"
+            [disabled]="isEditing"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isEditing || !isEditDirty()"
+          >
+            {{ isEditing ? 'Updating...' : 'Update Representative' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

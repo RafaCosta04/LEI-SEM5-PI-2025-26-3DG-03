@@ -46,6 +46,10 @@ export const routes: Routes = [
       {
         path: 'organization',
         loadChildren: () => import('./routing/organization.routes').then((m) => m.routes)
+      },
+      {
+        path: 'representative',
+        loadChildren: () => import('./routing/representative.routes').then((m) => m.routes)
       }
     ],
   },
