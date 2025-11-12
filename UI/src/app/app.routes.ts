@@ -50,6 +50,14 @@ export const routes: Routes = [
       {
         path: 'representative',
         loadChildren: () => import('./routing/representative.routes').then((m) => m.routes)
+      },
+      {
+        path: 'vvncreate',
+        loadChildren: () => import('./routing/vesselVisitNotification.routes').then((m) => m.routes)
+      },
+      {
+        path: 'vvndecision',
+        loadChildren: () => import('./routing/vesselVisitNotificationDecision.routes').then((m) => m.routes)
       }
     ],
   },

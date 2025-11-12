@@ -1,0 +1,239 @@
+<div class="page-container">
+  <h1 class="page-title">Vessel Visit Notification Decisions</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search decisions..."
+        class="search-input"
+      >
+      <button
+        *ngIf="searchTerm"
+        (click)="clearSearchAndNotify()"
+        class="clear-button"
+        title="Clean search"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        (click)="onCreateNew()"
+        class="btn btn-primary"
+        title="Create new decision"
+      >
+        New Decision
+      </button>
+      <button
+        (click)="refreshList()"
+        class="btn btn-secondary"
+        title="Refresh list"
+      >
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading Decisions...
+  </div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Notification Code</th>
+          <th>Status</th>
+          <th>Officer ID</th>
+          <th>Response Message</th>
+          <th>Decision Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let decision of filteredDecisions"
+          [class.selected]="selectedDecision?.id === decision.id"
+          (click)="selectDecision(decision)"
+        >
+          <td>{{ decision.id }}</td>
+          <td>{{ decision.vesselVisitNotificationCode }}</td>
+          <td>
+            <span class="decision-status" [class]="'status-' + decision.status.toLowerCase()">
+              {{ decision.status }}
+            </span>
+          </td>
+          <td>{{ decision.officerId }}</td>
+          <td class="response-cell">{{ decision.responseMessage }}</td>
+          <td>{{ formatDateForDisplay(decision.decisionDate) }}</td>
+          <td>
+            <button
+              (click)="selectDecision(decision); $event.stopPropagation()"
+              class="btn-select"
+              [class.selected]="selectedDecision?.id === decision.id"
+            >
+              {{ selectedDecision?.id === decision.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredDecisions.length === 0 && !isLoading" class="no-results">
+      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No decisions found.' }}</p>
+    </div>
+  </div>
+
+  <!-- Information of selected decision -->
+  <div *ngIf="selectedDecision" class="selected-info">
+    <h3>Selected Decision:</h3>
+    <div class="info-card">
+      <div class="info-section">
+        <h4>Decision Details</h4>
+        <p><strong>ID:</strong> {{ selectedDecision.id }}</p>
+        <p><strong>Notification Code:</strong> {{ selectedDecision.vesselVisitNotificationCode }}</p>
+        <p><strong>Status:</strong> <span class="decision-status" [class]="'status-' + selectedDecision.status.toLowerCase()">{{ selectedDecision.status }}</span></p>
+        <p><strong>Officer ID:</strong> {{ selectedDecision.officerId }}</p>
+        <p><strong>Response Message:</strong> {{ selectedDecision.responseMessage }}</p>
+        <p *ngIf="selectedDecision.decisionDate"><strong>Decision Date:</strong> {{ formatDateForDisplay(selectedDecision.decisionDate) }}</p>
+      </div>
+
+      <!-- Related Notification Info -->
+      <div *ngIf="getNotificationDetails(selectedDecision.vesselVisitNotificationCode) as notification" class="info-section">
+        <h4>Related Notification Details</h4>
+        <p><strong>Vessel IMO:</strong> {{ notification.vesselIMO }}</p>
+        <p><strong>Representative:</strong> {{ notification.representativeCitizenID }}</p>
+        <p><strong>ETA:</strong> {{ formatDateForDisplay(notification.eta) }}</p>
+        <p><strong>ETD:</strong> {{ formatDateForDisplay(notification.etd) }}</p>
+        <p><strong>Cargo Type:</strong> {{ notification.cargoType }}</p>
+        <p><strong>Volume:</strong> {{ notification.volume }}</p>
+        <p><strong>Crew Members:</strong> {{ notification.numberOfCrewMembers }}</p>
+        <p><strong>Visit Status:</strong> {{ notification.visitStatus }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Decision Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Create New Decision</h3>
+      <button type="button" class="close-btn" (click)="closeCreateModal()">×</button>
+    </div>
+
+    <form (ngSubmit)="onSaveNewDecision()" #createForm="ngForm">
+      <div class="modal-body">
+        <div *ngIf="modalErrorMessage" class="error-message">
+          {{ modalErrorMessage }}
+        </div>
+
+        <div class="form-section">
+          <h4>Decision Information</h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="notificationCode">Vessel Visit Notification Code *</label>
+              <select
+                id="notificationCode"
+                name="notificationCode"
+                [(ngModel)]="newDecision.vesselVisitNotificationCode"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('vesselVisitNotificationCode')"
+              >
+                <option value="">Select a notification</option>
+                <option
+                  *ngFor="let notification of getAvailableNotifications()"
+                  [value]="notification.code"
+                >
+                  {{ notification.code }} - {{ notification.vesselIMO }} ({{ notification.visitStatus }})
+                </option>
+              </select>
+              <div *ngIf="hasFieldError('vesselVisitNotificationCode')" class="field-error">
+                {{ getFieldError('vesselVisitNotificationCode') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="status">Decision Status *</label>
+              <select
+                id="status"
+                name="status"
+                [(ngModel)]="newDecision.status"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('status')"
+              >
+                <option *ngFor="let status of getDecisionStatuses()" [value]="status">
+                  {{ status }}
+                </option>
+              </select>
+              <div *ngIf="hasFieldError('status')" class="field-error">
+                {{ getFieldError('status') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="officerId">Officer ID *</label>
+              <input
+                type="number"
+                id="officerId"
+                name="officerId"
+                [(ngModel)]="newDecision.officerId"
+                required
+                min="1"
+                class="form-input"
+                [class.error]="hasFieldError('officerId')"
+              >
+              <div *ngIf="hasFieldError('officerId')" class="field-error">
+                {{ getFieldError('officerId') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="responseMessage">Response Message *</label>
+              <textarea
+                id="responseMessage"
+                name="responseMessage"
+                [(ngModel)]="newDecision.responseMessage"
+                required
+                rows="4"
+                class="form-input"
+                [class.error]="hasFieldError('responseMessage')"
+                [placeholder]="newDecision.status === 'Approved' ? 'Provide the assigned temporary dock...' : 'Provide the reason for rejection...'"
+              ></textarea>
+              <div *ngIf="hasFieldError('responseMessage')" class="field-error">
+                {{ getFieldError('responseMessage') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeCreateModal()" class="btn btn-secondary" [disabled]="isCreating">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isCreating">
+          <span *ngIf="isCreating" class="btn-spinner"></span>
+          {{ isCreating ? 'Creating...' : 'Create Decision' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { VesselVisitNotificationModel, VisitStatus } from '../models/vesselVisitNotification.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class VesselVisitNotificationService {
+  private apiUrl = 'http://141.253.198.138:5000/api/VesselVisitNotification';
+
+  constructor(private http: HttpClient) { }
+
+  getAllVesselVisitNotifications(): Observable<VesselVisitNotificationModel[]> {
+    return this.http.get<VesselVisitNotificationModel[]>(this.apiUrl)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationById(id: number): Observable<VesselVisitNotificationModel> {
+    return this.http.get<VesselVisitNotificationModel>(`${this.apiUrl}/ById/${id}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationByCode(code: string): Observable<VesselVisitNotificationModel> {
+    return this.http.get<VesselVisitNotificationModel>(`${this.apiUrl}/ByCode/${code}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationsByOrg(orgCode: string): Observable<VesselVisitNotificationModel[]> {
+    return this.http.get<VesselVisitNotificationModel[]>(`${this.apiUrl}/ByOrg/${orgCode}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationsByVesselIMO_Org(vesselIMO: string, orgCode: string): Observable<VesselVisitNotificationModel[]> {
+    return this.http.get<VesselVisitNotificationModel[]>(`${this.apiUrl}/ByVesselIMO_Org/${vesselIMO}/${orgCode}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationsByDateRange_Org(startDate: string, endDate: string, orgCode: string): Observable<VesselVisitNotificationModel[]> {
+    return this.http.get<VesselVisitNotificationModel[]>(`${this.apiUrl}/ByDateRange_Org/${startDate}/${endDate}/${orgCode}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationsByRepresentative(citizenId: string): Observable<VesselVisitNotificationModel[]> {
+    return this.http.get<VesselVisitNotificationModel[]>(`${this.apiUrl}/ByRepresentative/${citizenId}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getVesselVisitNotificationsByStatus_Org(status: VisitStatus, orgCode: string): Observable<VesselVisitNotificationModel[]> {
+    return this.http.get<VesselVisitNotificationModel[]>(`${this.apiUrl}/ByStatus_Org/${status}/${orgCode}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  createVesselVisitNotification(notification: VesselVisitNotificationModel): Observable<VesselVisitNotificationModel> {
+    return this.http.post<VesselVisitNotificationModel>(this.apiUrl, notification)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updateVesselVisitNotification(visitCode: string, notification: VesselVisitNotificationModel): Observable<any> {
+    return this.http.put(`${this.apiUrl}/Update/${visitCode}`, notification)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'An unknown error occurred!';
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      if (error.status === 400) {
+        if (Array.isArray(error.error)) {
+          errorMessage = error.error.join('; ');
+        } else {
+          errorMessage = error.error?.message || 'Bad request';
+        }
+      } else if (error.status === 404) {
+        errorMessage = 'Vessel Visit Notification not found';
+      } else if (error.status === 409) {
+        errorMessage = error.error?.message || 'Conflict occurred';
+      } else if (error.status === 500) {
+        errorMessage = 'Internal server error occurred';
+      } else {
+        errorMessage = `Server returned code: ${error.status}, error message is: ${error.message}`;
+      }
+    }
+
+    return throwError(() => new Error(errorMessage));
+  }
+}

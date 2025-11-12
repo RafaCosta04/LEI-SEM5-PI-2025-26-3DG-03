@@ -38,9 +38,21 @@ export const navItems: INavData[] = [
     url: '/storageArea'
   },
   {
-    name: 'Vessel Visit Notification',
+    name: 'Visit Notification',
     url: '/vvn',
     icon: 'nav-img nav-img-vvn',
+    children: [
+      {
+        name: 'Notification Create/Edit',
+        url: '/vvncreate',
+        icon: 'nav-img nav-img-vvn'
+      },
+      {
+        name: 'Notification Decision',
+        url: '/vvndecision',
+        icon: 'nav-img nav-img-vvn'
+      }
+    ]
   },
   {
     name: 'Staff',

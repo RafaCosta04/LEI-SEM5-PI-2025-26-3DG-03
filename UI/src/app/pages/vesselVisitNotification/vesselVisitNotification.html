@@ -1,0 +1,554 @@
+<div class="page-container">
+  <h1 class="page-title">Vessel Visit Notifications</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search for vessel visit notifications..."
+        class="search-input"
+      >
+      <button
+        *ngIf="searchTerm"
+        (click)="clearSearchAndNotify()"
+        class="clear-button"
+        title="Clean search"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        (click)="onCreateNew()"
+        class="btn btn-primary"
+        title="Create new vessel visit notification"
+      >
+        New Notification
+      </button>
+      <button
+        (click)="onUpdate()"
+        class="btn btn-secondary"
+        [disabled]="!selectedNotification"
+        title="Edit selected notification"
+      >
+        Edit Notification
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading Vessel Visit Notifications...
+  </div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Vessel IMO</th>
+          <th>Representative</th>
+          <th>ETA</th>
+          <th>ETD</th>
+          <th>Cargo Type</th>
+          <th>Volume</th>
+          <th>Status</th>
+          <th>Crew Members</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let notification of filteredNotifications"
+          [class.selected]="selectedNotification?.id === notification.id"
+          (click)="selectNotification(notification)"
+        >
+          <td>{{ notification.code }}</td>
+          <td>{{ notification.vesselIMO }}</td>
+          <td>{{ notification.representativeCitizenID }}</td>
+          <td>{{ formatDateForDisplay(notification.eta) }}</td>
+          <td>{{ formatDateForDisplay(notification.etd) }}</td>
+          <td>{{ notification.cargoType }}</td>
+          <td>{{ notification.volume }}</td>
+          <td>
+            <span [class]="'status-badge status-' + notification.visitStatus?.toLowerCase()">
+              {{ notification.visitStatus }}
+            </span>
+          </td>
+          <td>{{ notification.numberOfCrewMembers }}</td>
+          <td>
+            <button
+              (click)="selectNotification(notification); $event.stopPropagation()"
+              class="btn-select"
+              [class.selected]="selectedNotification?.id === notification.id"
+            >
+              {{ selectedNotification?.id === notification.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredNotifications.length === 0 && !isLoading" class="no-results">
+      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No vessel visit notifications found.' }}</p>
+    </div>
+  </div>
+
+  <!-- Information of selected notification -->
+  <div *ngIf="selectedNotification" class="selected-info">
+    <h3>Selected Vessel Visit Notification:</h3>
+    <div class="info-card">
+      <div class="info-section">
+        <h4>Basic Information</h4>
+        <p><strong>Code:</strong> {{ selectedNotification.code }}</p>
+        <p><strong>Vessel IMO:</strong> {{ selectedNotification.vesselIMO }}</p>
+        <p><strong>Representative Citizen ID:</strong> {{ selectedNotification.representativeCitizenID }}</p>
+        <p><strong>ETA:</strong> {{ formatDateForDisplay(selectedNotification.eta) }}</p>
+        <p><strong>ETD:</strong> {{ formatDateForDisplay(selectedNotification.etd) }}</p>
+        <p><strong>Status:</strong>
+          <span [class]="'status-badge status-' + selectedNotification.visitStatus?.toLowerCase()">
+            {{ selectedNotification.visitStatus }}
+          </span>
+        </p>
+        <p><strong>Last Modified:</strong> {{ formatDateForDisplay(selectedNotification.lastModifiedAt) }}</p>
+      </div>
+
+      <div class="info-section">
+        <h4>Cargo Information</h4>
+        <p><strong>Cargo Type:</strong> {{ selectedNotification.cargoType }}</p>
+        <p><strong>Volume:</strong> {{ selectedNotification.volume }}</p>
+      </div>
+
+      <div class="info-section">
+        <h4>Crew Information</h4>
+        <p><strong>Number of Crew Members:</strong> {{ selectedNotification.numberOfCrewMembers }}</p>
+        <div *ngIf="selectedNotification.crewMembers && selectedNotification.crewMembers.length > 0" class="crew-list">
+          <p><strong>Crew Members:</strong></p>
+          <ul>
+            <li *ngFor="let crew of selectedNotification.crewMembers">
+              {{ crew.name }} ({{ crew.rank }}) - {{ crew.nationality }} - {{ crew.citizenID }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-section" *ngIf="selectedNotification.cargoManifests && selectedNotification.cargoManifests.length > 0">
+        <h4>Cargo Manifests</h4>
+        <div *ngFor="let manifest of selectedNotification.cargoManifests; let i = index" class="manifest-info">
+          <p><strong>Manifest {{ i + 1 }}:</strong> {{ manifest.manifestType }}</p>
+          <div *ngIf="manifest.entries && manifest.entries.length > 0">
+            <p><strong>Entries ({{ manifest.entries.length }}):</strong></p>
+            <ul class="manifest-entries">
+              <li *ngFor="let entry of manifest.entries">
+                Container: {{ entry.containerNumber }} |
+                Row: {{ entry.row }} |
+                Bay: {{ entry.bay }} |
+                Tier: {{ entry.tier }} |
+                Storage Area: {{ entry.storageAreaCode }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Notification Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Vessel Visit Notification</h2>
+      <button class="close-button" (click)="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="modalErrorMessage" class="alert alert-danger">
+        {{ modalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveNewNotification()" #notificationForm="ngForm">
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3>Basic Information</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vesselIMO">Vessel IMO *</label>
+              <input
+                type="text"
+                id="vesselIMO"
+                name="vesselIMO"
+                [(ngModel)]="newNotification.vesselIMO"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('vesselIMO')"
+                placeholder="Enter vessel IMO number"
+              >
+              <div *ngIf="hasFieldError('vesselIMO')" class="field-error">
+                {{ getFieldError('vesselIMO') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="representativeCitizenID">Representative Citizen ID *</label>
+              <input
+                type="text"
+                id="representativeCitizenID"
+                name="representativeCitizenID"
+                [(ngModel)]="newNotification.representativeCitizenID"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('representativeCitizenID')"
+                placeholder="Enter representative citizen ID"
+              >
+              <div *ngIf="hasFieldError('representativeCitizenID')" class="field-error">
+                {{ getFieldError('representativeCitizenID') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eta">ETA *</label>
+              <input
+                type="datetime-local"
+                id="eta"
+                name="eta"
+                [value]="formatDate(newNotification.eta)"
+                (input)="updateNewNotificationEta($event)"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('eta')"
+              >
+              <div *ngIf="hasFieldError('eta')" class="field-error">
+                {{ getFieldError('eta') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="etd">ETD *</label>
+              <input
+                type="datetime-local"
+                id="etd"
+                name="etd"
+                [value]="formatDate(newNotification.etd)"
+                (input)="updateNewNotificationEtd($event)"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('etd')"
+              >
+              <div *ngIf="hasFieldError('etd')" class="field-error">
+                {{ getFieldError('etd') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cargo Information Section -->
+        <div class="form-section">
+          <h3>Cargo Information</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cargoType">Cargo Type *</label>
+              <select
+                id="cargoType"
+                name="cargoType"
+                [(ngModel)]="newNotification.cargoType"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('cargoType')"
+              >
+                <option value="">Select cargo type</option>
+                <option *ngFor="let type of getCargoTypes()" [value]="type">{{ type }}</option>
+              </select>
+              <div *ngIf="hasFieldError('cargoType')" class="field-error">
+                {{ getFieldError('cargoType') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="volume">Volume *</label>
+              <input
+                type="number"
+                id="volume"
+                name="volume"
+                [(ngModel)]="newNotification.volume"
+                required
+                min="0"
+                step="0.01"
+                class="form-input"
+                [class.error]="hasFieldError('volume')"
+                placeholder="Enter cargo volume"
+              >
+              <div *ngIf="hasFieldError('volume')" class="field-error">
+                {{ getFieldError('volume') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crew Information Section -->
+        <div class="form-section">
+          <h3>Crew Information</h3>
+
+          <div class="form-group">
+            <label for="numberOfCrewMembers">Number of Crew Members *</label>
+            <input
+              type="number"
+              id="numberOfCrewMembers"
+              name="numberOfCrewMembers"
+              [(ngModel)]="newNotification.numberOfCrewMembers"
+              required
+              min="0"
+              class="form-input"
+              [class.error]="hasFieldError('numberOfCrewMembers')"
+              placeholder="Enter number of crew members"
+            >
+            <div *ngIf="hasFieldError('numberOfCrewMembers')" class="field-error">
+              {{ getFieldError('numberOfCrewMembers') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeCreateModal()"
+            class="btn btn-secondary"
+            [disabled]="isCreating"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isCreating"
+          >
+            {{ isCreating ? 'Creating...' : 'Create Notification' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Notification Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Vessel Visit Notification</h2>
+      <button class="close-button" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="editModalErrorMessage" class="alert alert-danger">
+        {{ editModalErrorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSaveEditNotification()" #editNotificationForm="ngForm">
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3>Basic Information</h3>
+
+          <div class="form-group">
+            <label for="editCode">Code (Read-only)</label>
+            <input
+              type="text"
+              id="editCode"
+              name="editCode"
+              [value]="editNotification.code"
+              readonly
+              class="form-input readonly"
+              placeholder="Notification code"
+            >
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editVesselIMO">Vessel IMO *</label>
+              <input
+                type="text"
+                id="editVesselIMO"
+                name="editVesselIMO"
+                [(ngModel)]="editNotification.vesselIMO"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('vesselIMO')"
+                placeholder="Enter vessel IMO number"
+              >
+              <div *ngIf="hasEditFieldError('vesselIMO')" class="field-error">
+                {{ getEditFieldError('vesselIMO') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="editRepresentativeCitizenID">Representative Citizen ID *</label>
+              <input
+                type="text"
+                id="editRepresentativeCitizenID"
+                name="editRepresentativeCitizenID"
+                [(ngModel)]="editNotification.representativeCitizenID"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('representativeCitizenID')"
+                placeholder="Enter representative citizen ID"
+              >
+              <div *ngIf="hasEditFieldError('representativeCitizenID')" class="field-error">
+                {{ getEditFieldError('representativeCitizenID') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editEta">ETA *</label>
+              <input
+                type="datetime-local"
+                id="editEta"
+                name="editEta"
+                [value]="formatDate(editNotification.eta)"
+                (input)="updateEditNotificationEta($event)"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('eta')"
+              >
+              <div *ngIf="hasEditFieldError('eta')" class="field-error">
+                {{ getEditFieldError('eta') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="editEtd">ETD *</label>
+              <input
+                type="datetime-local"
+                id="editEtd"
+                name="editEtd"
+                [value]="formatDate(editNotification.etd)"
+                (input)="updateEditNotificationEtd($event)"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('etd')"
+              >
+              <div *ngIf="hasEditFieldError('etd')" class="field-error">
+                {{ getEditFieldError('etd') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="editVisitStatus">Visit Status *</label>
+            <select
+              id="editVisitStatus"
+              name="editVisitStatus"
+              [(ngModel)]="editNotification.visitStatus"
+              required
+              class="form-input"
+              [class.error]="hasEditFieldError('visitStatus')"
+            >
+              <option value="">Select status</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Submitted">Submitted</option>
+            </select>
+            <div *ngIf="hasEditFieldError('visitStatus')" class="field-error">
+              {{ getEditFieldError('visitStatus') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Cargo Information Section -->
+        <div class="form-section">
+          <h3>Cargo Information</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editCargoType">Cargo Type *</label>
+              <select
+                id="editCargoType"
+                name="editCargoType"
+                [(ngModel)]="editNotification.cargoType"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('cargoType')"
+              >
+                <option value="">Select cargo type</option>
+                <option *ngFor="let type of getCargoTypes()" [value]="type">{{ type }}</option>
+              </select>
+              <div *ngIf="hasEditFieldError('cargoType')" class="field-error">
+                {{ getEditFieldError('cargoType') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="editVolume">Volume *</label>
+              <input
+                type="number"
+                id="editVolume"
+                name="editVolume"
+                [(ngModel)]="editNotification.volume"
+                required
+                min="0"
+                step="0.01"
+                class="form-input"
+                [class.error]="hasEditFieldError('volume')"
+                placeholder="Enter cargo volume"
+              >
+              <div *ngIf="hasEditFieldError('volume')" class="field-error">
+                {{ getEditFieldError('volume') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crew Information Section -->
+        <div class="form-section">
+          <h3>Crew Information</h3>
+
+          <div class="form-group">
+            <label for="editNumberOfCrewMembers">Number of Crew Members *</label>
+            <input
+              type="number"
+              id="editNumberOfCrewMembers"
+              name="editNumberOfCrewMembers"
+              [(ngModel)]="editNotification.numberOfCrewMembers"
+              required
+              min="0"
+              class="form-input"
+              [class.error]="hasEditFieldError('numberOfCrewMembers')"
+              placeholder="Enter number of crew members"
+            >
+            <div *ngIf="hasEditFieldError('numberOfCrewMembers')" class="field-error">
+              {{ getEditFieldError('numberOfCrewMembers') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            (click)="closeEditModal()"
+            class="btn btn-secondary"
+            [disabled]="isEditing"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isEditing || !isEditDirty()"
+          >
+            {{ isEditing ? 'Updating...' : 'Update Notification' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
