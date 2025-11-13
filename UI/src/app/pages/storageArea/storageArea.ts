@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { StorageAreaService } from '../../services/storageArea.service';
+import { DocksService } from '../../services/docks.service';
 import { StorageAreaModel, StorageAreaType, StorageAreaDockModel } from '../../models/storageArea.model';
+import { DocksModel } from '../../models/docks.model';
 
 @Component({
   selector: 'app-storage-area',
@@ -31,12 +33,17 @@ export class StorageArea implements OnInit, OnDestroy {
     code: '',
     location: '',
     storageAreaType: StorageAreaType.Yard,
-    maxCapacity: 0,
+    maxCapacity: 1,
     currentCapacity: 0,
     storageAreaDocks: []
   };
   modalErrorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
+
+  // Available docks for selection (should be loaded from service)
+  availableDocks: DocksModel[] = [];
+  newDockAssociation = { dockName: '', distance: 0 };
+  isLoadingDocks: boolean = false;
 
   // Edit Modal properties
   showEditModal: boolean = false;
@@ -53,26 +60,66 @@ export class StorageArea implements OnInit, OnDestroy {
   editFieldErrors: { [key: string]: string } = {};
   originalEditStorageArea: StorageAreaModel | null = null;
 
+  // Edit dock association
+  editDockAssociation = { dockName: '', distance: 0 };
+
   // Enum reference for template
   StorageAreaType = StorageAreaType;
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  
+
+
+  // Helper methods for validation
+  onMaxCapacityChange() {
+    // Ensure current capacity doesn't exceed max capacity
+    if (this.newStorageArea.maxCapacity !== undefined &&
+        this.newStorageArea.currentCapacity !== undefined &&
+        this.newStorageArea.currentCapacity > this.newStorageArea.maxCapacity) {
+      this.newStorageArea.currentCapacity = this.newStorageArea.maxCapacity;
+    }
+  }
+
+  onEditMaxCapacityChange() {
+    // Ensure current capacity doesn't exceed max capacity in edit mode
+    if (this.editStorageArea.maxCapacity !== undefined &&
+        this.editStorageArea.currentCapacity !== undefined &&
+        this.editStorageArea.currentCapacity > this.editStorageArea.maxCapacity) {
+      this.editStorageArea.currentCapacity = this.editStorageArea.maxCapacity;
+    }
+  }
 
   constructor(
     private storageAreaService: StorageAreaService,
+    private docksService: DocksService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.loadStorageAreas();
     this.setupSearch();
+    this.loadAvailableDocks();
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private loadAvailableDocks() {
+    this.isLoadingDocks = true;
+    this.docksService.getAllDocks()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (docks) => {
+          this.availableDocks = docks;
+          this.isLoadingDocks = false;
+        },
+        error: (error) => {
+          console.error('Error loading docks:', error);
+          this.isLoadingDocks = false;
+        }
+      });
   }
 
   private setupSearch() {
@@ -202,9 +249,15 @@ export class StorageArea implements OnInit, OnDestroy {
     if (this.selectedStorageArea) {
       this.showEditModal = true;
       this.resetEditStorageArea();
-      this.editStorageArea = { ...this.selectedStorageArea };
+      this.editStorageArea = {
+        ...this.selectedStorageArea,
+        storageAreaDocks: this.selectedStorageArea.storageAreaDocks?.map(dock => ({ ...dock })) || []
+      };
 
-      this.originalEditStorageArea = { ...this.editStorageArea };
+      this.originalEditStorageArea = {
+        ...this.editStorageArea,
+        storageAreaDocks: this.editStorageArea.storageAreaDocks?.map(dock => ({ ...dock })) || []
+      };
       console.log('Opening edit storage area modal for:', this.selectedStorageArea);
     } else {
       alert('Please select a storage area to update.');
@@ -223,12 +276,96 @@ export class StorageArea implements OnInit, OnDestroy {
       code: '',
       location: '',
       storageAreaType: StorageAreaType.Yard,
-      maxCapacity: 0,
+      maxCapacity: 1,
       currentCapacity: 0,
       storageAreaDocks: []
     };
     this.modalErrorMessage = '';
     this.fieldErrors = {};
+    this.newDockAssociation = { dockName: '', distance: 0 };
+  }
+
+  // Dock association methods
+  addDockAssociation() {
+    if (this.newDockAssociation.dockName && this.newDockAssociation.distance >= 0) {
+      // Check if dock exists in available docks
+      const selectedDock = this.availableDocks.find(dock => dock.name === this.newDockAssociation.dockName);
+      if (!selectedDock) {
+        alert('Selected dock does not exist. Please choose from the dropdown.');
+        return;
+      }
+
+      // Check if dock is already associated
+      const exists = this.newStorageArea.storageAreaDocks?.some(dock =>
+        dock.dockName === this.newDockAssociation.dockName);
+
+      if (exists) {
+        alert('This dock is already associated with this storage area.');
+        return;
+      }
+
+      this.newStorageArea.storageAreaDocks?.push({
+        dockName: this.newDockAssociation.dockName,
+        distance: this.newDockAssociation.distance
+      });
+      this.newDockAssociation = { dockName: '', distance: 0 };
+    }
+  }
+
+  removeDockAssociation(index: number) {
+    this.newStorageArea.storageAreaDocks?.splice(index, 1);
+  }
+
+  // Helper method to get available dock names that aren't already associated
+  getAvailableDockNames(): string[] {
+    const associatedDockNames = this.newStorageArea.storageAreaDocks?.map(dock => dock.dockName) || [];
+    return this.availableDocks
+      .filter(dock => dock.name && !associatedDockNames.includes(dock.name))
+      .map(dock => dock.name!)
+      .sort();
+  }
+
+  // Edit modal dock methods
+  getAvailableDockNamesForEdit(): string[] {
+    const associatedDockNames = this.editStorageArea.storageAreaDocks?.map(dock => dock.dockName) || [];
+    return this.availableDocks
+      .filter(dock => dock.name && !associatedDockNames.includes(dock.name))
+      .map(dock => dock.name!)
+      .sort();
+  }
+
+  addDockAssociationToEdit() {
+    if (this.editDockAssociation.dockName && this.editDockAssociation.distance >= 0) {
+      // Check if dock exists in available docks
+      const selectedDock = this.availableDocks.find(dock => dock.name === this.editDockAssociation.dockName);
+      if (!selectedDock) {
+        alert('Selected dock does not exist. Please choose from the dropdown.');
+        return;
+      }
+
+      // Check if dock is already associated
+      const exists = this.editStorageArea.storageAreaDocks?.some(dock =>
+        dock.dockName === this.editDockAssociation.dockName);
+
+      if (exists) {
+        alert('This dock is already associated with this storage area.');
+        return;
+      }
+
+      if (!this.editStorageArea.storageAreaDocks) {
+        this.editStorageArea.storageAreaDocks = [];
+      }
+
+      this.editStorageArea.storageAreaDocks.push({
+        dockName: this.editDockAssociation.dockName,
+        distance: this.editDockAssociation.distance
+      });
+      this.editDockAssociation = { dockName: '', distance: 0 };
+    }
+  }
+
+  removeDockAssociationFromEdit(index: number) {
+    this.editStorageArea.storageAreaDocks?.splice(index, 1);
   }
 
   closeCreateModal() {
@@ -243,7 +380,9 @@ export class StorageArea implements OnInit, OnDestroy {
     this.fieldErrors = {};
 
     if (!this.isValidStorageArea()) {
-      this.modalErrorMessage = 'Please fill in all required fields (code, location, max capacity).';
+      if (Object.keys(this.fieldErrors).length === 0) {
+        this.modalErrorMessage = 'Please fill in all required fields (code, location, max capacity).';
+      }
       return;
     }
 
@@ -327,11 +466,43 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   private isValidStorageArea(): boolean {
-    return !!(this.newStorageArea.code?.trim() &&
-              this.newStorageArea.location?.trim() &&
-              this.newStorageArea.maxCapacity !== undefined && this.newStorageArea.maxCapacity > 0 &&
-              this.newStorageArea.currentCapacity !== undefined && this.newStorageArea.currentCapacity >= 0 &&
-              this.newStorageArea.currentCapacity <= this.newStorageArea.maxCapacity);
+    // Reset field errors
+    this.fieldErrors = {};
+
+    let isValid = true;
+
+    // Validate code
+    if (!this.newStorageArea.code?.trim()) {
+      this.fieldErrors['code'] = 'Storage area code cannot be empty.';
+      isValid = false;
+    } else if (!/^[a-zA-Z0-9]+$/.test(this.newStorageArea.code.trim())) {
+      this.fieldErrors['code'] = 'Storage area code must be alphanumeric (letters and digits only).';
+      isValid = false;
+    }
+
+    // Validate location
+    if (!this.newStorageArea.location?.trim()) {
+      this.fieldErrors['location'] = 'Storage area location cannot be empty.';
+      isValid = false;
+    }
+
+    // Validate max capacity
+    if (this.newStorageArea.maxCapacity === undefined || this.newStorageArea.maxCapacity <= 0) {
+      this.fieldErrors['maxcapacity'] = 'Max capacity must be greater than zero.';
+      isValid = false;
+    }
+
+    // Validate current capacity
+    if (this.newStorageArea.currentCapacity === undefined || this.newStorageArea.currentCapacity < 0) {
+      this.fieldErrors['currentcapacity'] = 'Current capacity cannot be negative.';
+      isValid = false;
+    } else if (this.newStorageArea.maxCapacity !== undefined &&
+               this.newStorageArea.currentCapacity > this.newStorageArea.maxCapacity) {
+      this.fieldErrors['currentcapacity'] = 'Current capacity cannot exceed max capacity.';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   hasFieldError(fieldName: string): boolean {
@@ -348,13 +519,14 @@ export class StorageArea implements OnInit, OnDestroy {
       code: '',
       location: '',
       storageAreaType: StorageAreaType.Yard,
-      maxCapacity: 0,
+      maxCapacity: 1,
       currentCapacity: 0,
       storageAreaDocks: []
     };
     this.editModalErrorMessage = '';
     this.editFieldErrors = {};
     this.originalEditStorageArea = null;
+    this.editDockAssociation = { dockName: '', distance: 0 };
   }
 
   closeEditModal() {
@@ -368,7 +540,9 @@ export class StorageArea implements OnInit, OnDestroy {
     this.editFieldErrors = {};
 
     if (!this.isValidEditStorageArea()) {
-      this.editModalErrorMessage = 'Please fill in all required fields (location, max capacity).';
+      if (Object.keys(this.editFieldErrors).length === 0) {
+        this.editModalErrorMessage = 'Please fill in all required fields (location, max capacity).';
+      }
       return;
     }
 
@@ -408,10 +582,15 @@ export class StorageArea implements OnInit, OnDestroy {
     const orig = this.originalEditStorageArea;
     const curr = this.editStorageArea;
     const locationChanged = (orig.location || '').trim() !== (curr.location || '').trim();
-    const typeChanged = orig.storageAreaType !== curr.storageAreaType;
     const maxCapacityChanged = (orig.maxCapacity || 0) !== (curr.maxCapacity || 0);
     const currentCapacityChanged = (orig.currentCapacity || 0) !== (curr.currentCapacity || 0);
-    return locationChanged || typeChanged || maxCapacityChanged || currentCapacityChanged;
+
+    // Check if dock associations changed
+    const origDocks = orig.storageAreaDocks || [];
+    const currDocks = curr.storageAreaDocks || [];
+    const docksChanged = JSON.stringify(origDocks) !== JSON.stringify(currDocks);
+
+    return locationChanged || maxCapacityChanged || currentCapacityChanged || docksChanged;
   }
 
   private handleEditError(error: any) {
@@ -465,10 +644,34 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   private isValidEditStorageArea(): boolean {
-    return !!(this.editStorageArea.location?.trim() &&
-              this.editStorageArea.maxCapacity !== undefined && this.editStorageArea.maxCapacity > 0 &&
-              this.editStorageArea.currentCapacity !== undefined && this.editStorageArea.currentCapacity >= 0 &&
-              this.editStorageArea.currentCapacity <= this.editStorageArea.maxCapacity);
+    // Reset field errors
+    this.editFieldErrors = {};
+
+    let isValid = true;
+
+    // Validate location
+    if (!this.editStorageArea.location?.trim()) {
+      this.editFieldErrors['location'] = 'Storage area location cannot be empty.';
+      isValid = false;
+    }
+
+    // Validate max capacity
+    if (this.editStorageArea.maxCapacity === undefined || this.editStorageArea.maxCapacity <= 0) {
+      this.editFieldErrors['maxcapacity'] = 'Max capacity must be greater than zero.';
+      isValid = false;
+    }
+
+    // Validate current capacity
+    if (this.editStorageArea.currentCapacity === undefined || this.editStorageArea.currentCapacity < 0) {
+      this.editFieldErrors['currentcapacity'] = 'Current capacity cannot be negative.';
+      isValid = false;
+    } else if (this.editStorageArea.maxCapacity !== undefined &&
+               this.editStorageArea.currentCapacity > this.editStorageArea.maxCapacity) {
+      this.editFieldErrors['currentcapacity'] = 'Current capacity cannot exceed max capacity.';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   hasEditFieldError(fieldName: string): boolean {

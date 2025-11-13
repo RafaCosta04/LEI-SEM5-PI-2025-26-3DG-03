@@ -154,6 +154,7 @@
             name="code"
             [(ngModel)]="newStorageArea.code"
             required
+            pattern="^[a-zA-Z0-9]+$"
             class="form-input"
             [class.error]="hasFieldError('code')"
             placeholder="Enter storage area code (alphanumeric)"
@@ -205,6 +206,7 @@
             id="maxCapacity"
             name="maxCapacity"
             [(ngModel)]="newStorageArea.maxCapacity"
+            (ngModelChange)="onMaxCapacityChange()"
             required
             min="1"
             class="form-input"
@@ -231,6 +233,67 @@
           >
           <div *ngIf="hasFieldError('currentCapacity')" class="field-error">
             {{ getFieldError('currentCapacity') }}
+          </div>
+        </div>
+
+        <!-- Associated Docks Section -->
+        <div class="form-group">
+          <label>Associated Docks (Optional)</label>
+          <div class="dock-association-section">
+            <div class="dock-input-row">
+              <select
+                [(ngModel)]="newDockAssociation.dockName"
+                class="form-input dock-name-input"
+                name="newDockName"
+                [disabled]="isLoadingDocks"
+              >
+                <option value="">{{ isLoadingDocks ? 'Loading docks...' : 'Select a dock' }}</option>
+                <option
+                  *ngFor="let dockName of getAvailableDockNames()"
+                  [value]="dockName"
+                >
+                  {{ dockName }}
+                </option>
+              </select>
+              <input
+                type="number"
+                [(ngModel)]="newDockAssociation.distance"
+                placeholder="Distance (km)"
+                min="0"
+                step="0.1"
+                class="form-input dock-distance-input"
+                name="newDockDistance"
+              >
+              <button
+                type="button"
+                (click)="addDockAssociation()"
+                class="btn btn-sm btn-secondary"
+                [disabled]="!newDockAssociation.dockName || newDockAssociation.distance < 0 || isLoadingDocks"
+              >
+                Add Dock
+              </button>
+            </div>
+
+            <div *ngIf="newStorageArea.storageAreaDocks && newStorageArea.storageAreaDocks.length > 0" class="dock-list">
+              <h4>Associated Docks:</h4>
+              <ul class="dock-associations">
+                <li *ngFor="let dock of newStorageArea.storageAreaDocks; let i = index" class="dock-item">
+                  <span>{{ dock.dockName }} ({{ dock.distance }}km)</span>
+                  <button
+                    type="button"
+                    (click)="removeDockAssociation(i)"
+                    class="btn-remove"
+                    title="Remove dock association"
+                  >
+                    ✕
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div *ngIf="availableDocks.length === 0 && !isLoadingDocks" class="no-docks-message">
+              <small class="text-muted">No docks available. Create docks first to associate them with storage areas.</small>
+            </div>
           </div>
         </div>
 
@@ -302,14 +365,13 @@
         </div>
 
         <div class="form-group">
-          <label for="editStorageAreaType">Type *</label>
+          <label for="editStorageAreaType">Type (Read-only)</label>
           <select
             id="editStorageAreaType"
             name="editStorageAreaType"
-            [(ngModel)]="editStorageArea.storageAreaType"
-            required
-            class="form-input"
-            [class.error]="hasEditFieldError('storageAreaType')"
+            [value]="editStorageArea.storageAreaType"
+            disabled
+            class="form-input readonly"
           >
             <option [value]="StorageAreaType.Yard">Yard</option>
             <option [value]="StorageAreaType.Warehouse">Warehouse</option>
@@ -326,6 +388,7 @@
             id="editMaxCapacity"
             name="editMaxCapacity"
             [(ngModel)]="editStorageArea.maxCapacity"
+            (ngModelChange)="onEditMaxCapacityChange()"
             required
             min="1"
             class="form-input"
@@ -352,6 +415,67 @@
           >
           <div *ngIf="hasEditFieldError('currentCapacity')" class="field-error">
             {{ getEditFieldError('currentCapacity') }}
+          </div>
+        </div>
+
+        <!-- Associated Docks Section for Edit -->
+        <div class="form-group">
+          <label>Associated Docks (Optional)</label>
+          <div class="dock-association-section">
+            <div class="dock-input-row">
+              <select
+                [(ngModel)]="editDockAssociation.dockName"
+                class="form-input dock-name-input"
+                name="editDockName"
+                [disabled]="isLoadingDocks"
+              >
+                <option value="">{{ isLoadingDocks ? 'Loading docks...' : 'Select a dock' }}</option>
+                <option
+                  *ngFor="let dockName of getAvailableDockNamesForEdit()"
+                  [value]="dockName"
+                >
+                  {{ dockName }}
+                </option>
+              </select>
+              <input
+                type="number"
+                [(ngModel)]="editDockAssociation.distance"
+                placeholder="Distance (km)"
+                min="0"
+                step="0.1"
+                class="form-input dock-distance-input"
+                name="editDockDistance"
+              >
+              <button
+                type="button"
+                (click)="addDockAssociationToEdit()"
+                class="btn btn-sm btn-secondary"
+                [disabled]="!editDockAssociation.dockName || editDockAssociation.distance < 0 || isLoadingDocks"
+              >
+                Add Dock
+              </button>
+            </div>
+
+            <div *ngIf="editStorageArea.storageAreaDocks && editStorageArea.storageAreaDocks.length > 0" class="dock-list">
+              <h4>Associated Docks:</h4>
+              <ul class="dock-associations">
+                <li *ngFor="let dock of editStorageArea.storageAreaDocks; let i = index" class="dock-item">
+                  <span>{{ dock.dockName }} ({{ dock.distance }}km)</span>
+                  <button
+                    type="button"
+                    (click)="removeDockAssociationFromEdit(i)"
+                    class="btn-remove"
+                    title="Remove dock association"
+                  >
+                    ✕
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div *ngIf="availableDocks.length === 0 && !isLoadingDocks" class="no-docks-message">
+              <small class="text-muted">No docks available. Create docks first to associate them with storage areas.</small>
+            </div>
           </div>
         </div>
 

@@ -19,7 +19,7 @@ export class StorageAreaService {
   }
 
   getStorageAreaById(id: number): Observable<StorageAreaModel> {
-    return this.apiService.get<StorageAreaModel>(`/StorageArea/ByID/${id}`);
+    return this.apiService.get<StorageAreaModel>(`/StorageArea/ById/${id}`);
   }
 
   getStorageAreaByLocation(location: string): Observable<StorageAreaModel> {

@@ -500,3 +500,131 @@
     padding: 20px 16px !important;
   }
 }
+
+/* Dock Association Styles */
+.dock-association-section {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 15px;
+  margin-top: 10px;
+  background-color: #f8f9fa;
+}
+
+:host-context([data-coreui-theme="dark"]) .dock-association-section {
+  background-color: #2d3748;
+  border-color: #4a5568;
+}
+
+.dock-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.dock-name-input {
+  flex: 2;
+  min-width: 120px;
+}
+
+.dock-distance-input {
+  flex: 1;
+  min-width: 80px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dock-list {
+  margin-top: 15px;
+}
+
+.dock-list h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #495057;
+}
+
+:host-context([data-coreui-theme="dark"]) .dock-list h4 {
+  color: #e2e8f0;
+}
+
+.dock-associations {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dock-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  margin: 5px 0;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+:host-context([data-coreui-theme="dark"]) .dock-item {
+  background-color: #4a5568;
+  border-color: #718096;
+  color: #e2e8f0;
+}
+
+.btn-remove {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.btn-remove:hover {
+  background: #c82333;
+}
+
+.no-docks-message {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  text-align: center;
+}
+
+:host-context([data-coreui-theme="dark"]) .no-docks-message {
+  background-color: #4a5568;
+  border-color: #718096;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+:host-context([data-coreui-theme="dark"]) .text-muted {
+  color: #a0aec0;
+}
+
+@media (max-width: 576px) {
+  .dock-input-row {
+    flex-direction: column;
+  }
+
+  .dock-name-input,
+  .dock-distance-input {
+    width: 100%;
+    min-width: unset;
+  }
+}
