@@ -43,7 +43,7 @@ namespace DataModel.Repository
             if (!string.IsNullOrWhiteSpace(code)) query = query.Where(p => p.Code!.Contains(code));
             if (!string.IsNullOrWhiteSpace(name)) query = query.Where(p => p.Name!.Contains(name));
             if (!string.IsNullOrWhiteSpace(description)) query = query.Where(p => p.Description!.Contains(description));
-            if(!string.IsNullOrWhiteSpace(assignedDock)) query = query.Where(p => p.AssignedDockName!.Contains(assignedDock));
+            if (!string.IsNullOrWhiteSpace(assignedDock)) query = query.Where(p => p.AssignedDockName!.Contains(assignedDock));
             if (kind.HasValue) query = query.Where(p => p.Kind == kind.Value);
             if (status.HasValue)
             {

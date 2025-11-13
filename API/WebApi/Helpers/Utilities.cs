@@ -398,8 +398,8 @@ public static class Utilities
         var cm5 = new List<CargoManifestDataModel>();
         AddContainers(cm5, storageAreas, 20, 15);
         n5.CargoManifests = cm5;
-        
-        
+
+
         var n6 = new VesselVisitNotificationDataModel
         {
             Code = $"{now.Year}-PA-{6.ToString("D6")}",
@@ -644,17 +644,19 @@ public static class Utilities
 
 
 
-        private static void AddContainers(List<CargoManifestDataModel> cargoManifest, List<StorageAreaDataModel> storageAreas, int numberOfContainersLoading, int numberOfContainersUnloading)
-        {
+    private static void AddContainers(List<CargoManifestDataModel> cargoManifest, List<StorageAreaDataModel> storageAreas, int numberOfContainersLoading, int numberOfContainersUnloading)
+    {
         var random = new Random();
         string GenerateContainerCode()
         {
             const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             var sb = new StringBuilder();
-            for (int i = 0; i < 4; i++){
+            for (int i = 0; i < 4; i++)
+            {
                 sb.Append(letters[random.Next(letters.Length)]);
-            }  
-            for (int i = 0; i < 7; i++){
+            }
+            for (int i = 0; i < 7; i++)
+            {
                 sb.Append(random.Next(0, 9));
             }
             return sb.ToString();
@@ -668,9 +670,9 @@ public static class Utilities
                 entries.Add(new CargoManifestEntryDataModel
                 {
                     Container = GenerateContainerCode(),
-                    Row = random.Next(1, 6),  
-                    Bay = random.Next(1, 10), 
-                    Tier = random.Next(1, 4), 
+                    Row = random.Next(1, 6),
+                    Bay = random.Next(1, 10),
+                    Tier = random.Next(1, 4),
                     StorageArea = storageAreas[0],
                     StorageAreaId = storageAreas[0].Id
                 });

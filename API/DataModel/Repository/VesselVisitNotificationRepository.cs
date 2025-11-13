@@ -237,7 +237,7 @@ public class VesselVisitNotificationRepository : GenericRepository<VesselVisitNo
                     .ThenInclude(cm => cm.Entries)
                         .ThenInclude(e => e.StorageArea)
                 .Include(vvn => vvn.CrewMembers)!
-                .Where(vvn => vvn.ETA >= targetDay && vvn.ETA <= endDate && vvn.VisitStatus == status.ToString()) 
+                .Where(vvn => vvn.ETA >= targetDay && vvn.ETA <= endDate && vvn.VisitStatus == status.ToString())
                 .ToListAsync();
 
             IEnumerable<VesselVisitNotification> vesselVisits = vesselVisitDMs.Select(vvn => _vesselVisitNotificationMapper.ToDomain(vvn));

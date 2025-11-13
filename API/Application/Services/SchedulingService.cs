@@ -12,7 +12,8 @@ using Domain.Factory;
 using Domain.Model.Resources;
 using Microsoft.Extensions.Configuration;
 
-public class SchedulingService {
+public class SchedulingService
+{
 
     private readonly IVesselVisitNotificationRepository _vesselVisitNotificationRepository;
     private readonly IStorageAreaRepository _storageAreaRepository;
@@ -74,8 +75,8 @@ public class SchedulingService {
         }
 
         DataScheduleDTO dataScheduleDTO = new DataScheduleDTO(notificationDTOs.ToList(), fastestCraneDTO);
-        
-        
+
+
         string endpoint = _configuration["Scheduling:Endpoint"] ?? "http://localhost:6000/api/scheduling/compute";
         try
         {

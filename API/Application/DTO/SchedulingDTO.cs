@@ -5,10 +5,10 @@ public class SchedulingDTO
 {
     public String VesselName { get; set; }
 
-    public DateTime StartTime { get; set;  }
-    public DateTime EndTime { get; set;  }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
 
-    public List<String> AssignedCranes { get; set;  }
+    public List<String> AssignedCranes { get; set; }
 
     public List<String> StaffNames { get; set; }
 
