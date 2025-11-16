@@ -74,15 +74,21 @@
         <div class="form-group"><label for="phone">Phone *</label><input id="phone" name="phone" [(ngModel)]="newStaff.phone" required class="form-input" placeholder="Enter phone"></div>
         <div class="form-group">
           <label>Qualifications *</label>
-          <div class="qual-toggle-row">
-            <button type="button" class="btn btn-secondary" (click)="toggleQualificationsPanelForNew()">{{ showQualificationsForNew ? 'Hide qualifications' : 'Select qualifications' }}</button>
-            <small class="form-text">(select at least one qualification)</small>
-          </div>
-          <div *ngIf="showQualificationsForNew" class="qual-list">
-            <div *ngFor="let q of qualifications" class="qual-item">
-              <label><input type="checkbox" [checked]="isQualificationSelectedForNew(q.code || '')" (change)="toggleQualificationForNew(q.code || '')"> {{ q.code }} - {{ q.name }}</label>
+          <div class="custom-select-wrapper">
+            <div class="custom-select" [class.open]="isQualificationDropdownOpenNew" (click)="toggleQualificationDropdownNew()">
+              <div class="custom-select-trigger">
+                <span>{{ getQualificationDisplayNewText() }}</span>
+                <div class="arrow"></div>
+              </div>
+              <div class="custom-options" *ngIf="isQualificationDropdownOpenNew">
+                <div *ngFor="let q of qualifications" class="custom-option" [class.selected]="isQualificationSelectedInNew(q.code || '')" (click)="selectQualificationForNew(q.code || '', $event)">
+                  {{ q.code }} - {{ q.name }}
+                  <span *ngIf="isQualificationSelectedInNew(q.code || '')" class="checkmark">✓</span>
+                </div>
+              </div>
             </div>
           </div>
+          <small class="form-hint">Click to toggle selection (multiple selections allowed)</small>
         </div>
         <div class="op-grid">
           <div class="form-group">
@@ -134,15 +140,21 @@
         <div class="form-group"><label for="editPhone">Phone *</label><input id="editPhone" name="editPhone" [(ngModel)]="editStaff.phone" required class="form-input"></div>
         <div class="form-group">
           <label>Qualifications</label>
-          <div class="qual-toggle-row">
-            <button type="button" class="btn btn-secondary" (click)="toggleQualificationsPanelForEdit()">{{ showQualificationsForEdit ? 'Hide qualifications' : 'Edit qualifications' }}</button>
-            <small class="form-text">(optional)</small>
-          </div>
-          <div *ngIf="showQualificationsForEdit" class="qual-list">
-            <div *ngFor="let q of qualifications" class="qual-item">
-              <label><input type="checkbox" [checked]="isQualificationSelectedForEdit(q.code || '')" (change)="toggleQualificationForEdit(q.code || '')"> {{ q.code }} - {{ q.name }}</label>
+          <div class="custom-select-wrapper">
+            <div class="custom-select" [class.open]="isQualificationDropdownOpenEdit" (click)="toggleQualificationDropdownEdit()">
+              <div class="custom-select-trigger">
+                <span>{{ getQualificationDisplayEditText() }}</span>
+                <div class="arrow"></div>
+              </div>
+              <div class="custom-options" *ngIf="isQualificationDropdownOpenEdit">
+                <div *ngFor="let q of qualifications" class="custom-option" [class.selected]="isQualificationSelectedInEdit(q.code || '')" (click)="selectQualificationForEdit(q.code || '', $event)">
+                  {{ q.code }} - {{ q.name }}
+                  <span *ngIf="isQualificationSelectedInEdit(q.code || '')" class="checkmark">✓</span>
+                </div>
+              </div>
             </div>
           </div>
+          <small class="form-hint">Click to toggle selection (multiple selections allowed)</small>
         </div>
         <div class="op-grid">
           <div class="form-group">

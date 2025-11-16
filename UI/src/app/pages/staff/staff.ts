@@ -31,7 +31,10 @@ export class Staff implements OnInit, OnDestroy {
   newStaff: StaffModel = { name: '', qualificationCodes: [], email: '', phone: '', operationalWindow: null, status: 0 };
   modalErrorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
-  showQualificationsForNew: boolean = false;
+  // Qualification dropdown (create)
+  selectedQualificationsNew: string[] = [];
+  selectedQualificationDisplayNew: string = '';
+  isQualificationDropdownOpenNew: boolean = false;
 
   // Edit modal
   showEditModal: boolean = false;
@@ -40,11 +43,14 @@ export class Staff implements OnInit, OnDestroy {
   editModalErrorMessage: string = '';
   editFieldErrors: { [key: string]: string } = {};
   originalEditStaff: StaffModel | null = null;
-  showQualificationsForEdit: boolean = false;
+  // Qualification dropdown (edit)
+  selectedQualificationsEdit: string[] = [];
+  selectedQualificationDisplayEdit: string = '';
+  isQualificationDropdownOpenEdit: boolean = false;
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  
+
 
   constructor(private staffService: StaffService, private qualificationService: QualificationService) {}
 
@@ -52,6 +58,7 @@ export class Staff implements OnInit, OnDestroy {
     this.loadStaffs();
     this.loadQualifications();
     this.setupSearch();
+    this.setupClickOutsideListener();
   }
 
   ngOnDestroy() {
@@ -147,17 +154,16 @@ export class Staff implements OnInit, OnDestroy {
 
   clearSearch() { this.clearSearchAndNotify(); }
 
-  // When clearing programmatically (e.g. clicking the clear button) ensure the
-  // search pipeline and error-hide behavior run as if the user emptied the input.
+
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredStaffs = [...this.staffs]; this.searchSubject$.next(this.searchTerm); }
 
   selectStaff(s: StaffModel) {
-    // Toggle: if already selected, deselect
+
     if (this.selectedStaff?.id === s.id) {
       this.selectedStaff = null;
       return;
     }
-    // Otherwise fetch latest details from server to avoid stale data
+
     if (s.id != null) {
       this.staffService.getStaffById(s.id).pipe(takeUntil(this.destroy$)).subscribe({
         next: (full) => { this.selectedStaff = full || s; },
@@ -171,15 +177,17 @@ export class Staff implements OnInit, OnDestroy {
   // Create
   onCreateNew() { this.showCreateModal = true; this.resetNewStaff(); }
 
-  resetNewStaff() { this.newStaff = { name: '', qualificationCodes: [], email: '', phone: '', operationalWindow: { startDay: 1, endDay: 5, startTime: '09:00', endTime: '17:00' }, status: 0 }; this.modalErrorMessage = ''; this.fieldErrors = {}; this.showQualificationsForNew = false; }
+  resetNewStaff() { this.newStaff = { name: '', qualificationCodes: [], email: '', phone: '', operationalWindow: { startDay: 1, endDay: 5, startTime: '09:00', endTime: '17:00' }, status: 0 }; this.modalErrorMessage = ''; this.fieldErrors = {}; this.selectedQualificationsNew = []; this.isQualificationDropdownOpenNew = false; }
   closeCreateModal() { this.showCreateModal = false; this.resetNewStaff(); this.isCreating = false; }
 
   onSaveNewStaff() {
     this.modalErrorMessage = ''; this.fieldErrors = {};
+    // sync selected qualifications into model
+    this.newStaff.qualificationCodes = [...(this.selectedQualificationsNew || this.newStaff.qualificationCodes || [])];
     if (!this.newStaff.name?.trim() || !this.newStaff.email?.trim() || !this.newStaff.phone?.trim()) {
       this.modalErrorMessage = 'Please fill required fields: name, email and phone.'; return;
     }
-    // Require at least one qualification on create
+
     if (!(this.newStaff.qualificationCodes && this.newStaff.qualificationCodes.length)) {
       this.modalErrorMessage = 'Please select at least one qualification.'; return;
     }
@@ -201,11 +209,14 @@ export class Staff implements OnInit, OnDestroy {
   // Edit
   onUpdate() {
     if (!this.selectedStaff) { alert('Please select a staff to edit.'); return; }
-    this.showEditModal = true; this.resetEditStaff(); this.editStaff = { ...(this.selectedStaff as StaffModel) }; this.originalEditStaff = { ...(this.editStaff) }; this.showQualificationsForEdit = false;
+    this.showEditModal = true; this.resetEditStaff(); this.editStaff = { ...(this.selectedStaff as StaffModel) }; this.originalEditStaff = { ...(this.editStaff) };
+    // initialize edit selected qualifications from the staff
+    this.selectedQualificationsEdit = this.editStaff.qualificationCodes ? [...this.editStaff.qualificationCodes] : [];
+    this.selectedQualificationDisplayEdit = '';
   }
 
-  resetEditStaff() { this.editStaff = { name: '', qualificationCodes: [], email: '', phone: '', operationalWindow: { startDay: 1, endDay: 5, startTime: '09:00', endTime: '17:00' }, status: 0 }; this.editModalErrorMessage = ''; this.editFieldErrors = {}; this.originalEditStaff = null; }
-  closeEditModal() { this.showEditModal = false; this.resetEditStaff(); this.isEditing = false; this.showQualificationsForEdit = false; }
+  resetEditStaff() { this.editStaff = { name: '', qualificationCodes: [], email: '', phone: '', operationalWindow: { startDay: 1, endDay: 5, startTime: '09:00', endTime: '17:00' }, status: 0 }; this.editModalErrorMessage = ''; this.editFieldErrors = {}; this.originalEditStaff = null; this.selectedQualificationsEdit = []; this.isQualificationDropdownOpenEdit = false; }
+  closeEditModal() { this.showEditModal = false; this.resetEditStaff(); this.isEditing = false; }
 
   isEditDirty(): boolean {
     if (!this.originalEditStaff) return false;
@@ -214,11 +225,11 @@ export class Staff implements OnInit, OnDestroy {
     const emailChanged = (o.email||'').trim() !== (c.email||'').trim();
     const phoneChanged = (o.phone||'').trim() !== (c.phone||'').trim();
     const qualsChanged = JSON.stringify(o.qualificationCodes || []) !== JSON.stringify(c.qualificationCodes || []);
-    // operational window comparison
+
     const owO = o.operationalWindow || { startDay: null, endDay: null, startTime: null, endTime: null };
     const owC = c.operationalWindow || { startDay: null, endDay: null, startTime: null, endTime: null };
     const owChanged = (owO.startDay !== owC.startDay) || (owO.endDay !== owC.endDay) || (String(owO.startTime) !== String(owC.startTime)) || (String(owO.endTime) !== String(owC.endTime));
-    // status comparison
+
     const statusChanged = (o.status || 0) !== (c.status || 0);
 
     return nameChanged || emailChanged || phoneChanged || qualsChanged || owChanged || statusChanged;
@@ -226,6 +237,8 @@ export class Staff implements OnInit, OnDestroy {
 
   onSaveEditStaff() {
     this.editModalErrorMessage = ''; this.editFieldErrors = {};
+    // sync selected qualifications into model
+    this.editStaff.qualificationCodes = [...(this.selectedQualificationsEdit || this.editStaff.qualificationCodes || [])];
     if (!this.editStaff.name?.trim() || !this.editStaff.email?.trim() || !this.editStaff.phone?.trim()) { this.editModalErrorMessage = 'Please fill in required fields.'; return; }
     if (!this.selectedStaff?.id) { this.editModalErrorMessage = 'No staff selected.'; return; }
     if (!this.isEditDirty()) { this.editModalErrorMessage = 'No changes to save.'; return; }
@@ -234,14 +247,14 @@ export class Staff implements OnInit, OnDestroy {
     this.staffService.updateStaff(staffId, this.editStaff).pipe(takeUntil(this.destroy$)).subscribe({
       next: (updated) => {
         console.log('Staff updated:', updated);
-        // Use returned updated staff if available to refresh selection
+
         if (updated) {
           this.selectedStaff = (updated as StaffModel);
         }
         this.closeEditModal();
-        // Refresh list and ensure selected staff is up-to-date
+
         this.loadStaffs();
-        // If server didn't return the updated entity, fetch it explicitly
+
         if (!updated) {
           this.staffService.getStaffById(staffId).pipe(takeUntil(this.destroy$)).subscribe({ next: (fresh) => { this.selectedStaff = fresh || this.selectedStaff; }, error: () => {} });
         }
@@ -256,32 +269,82 @@ export class Staff implements OnInit, OnDestroy {
     });
   }
 
-  // Qualification helpers for template checkboxes
+
   isQualificationSelectedForNew(code: string) {
-    return (this.newStaff.qualificationCodes || []).includes(code);
+    return (this.selectedQualificationsNew || []).includes(code);
   }
 
   toggleQualificationForNew(code: string) {
-    const arr = this.newStaff.qualificationCodes || [];
-    if (arr.includes(code)) this.newStaff.qualificationCodes = arr.filter(c => c !== code);
-    else this.newStaff.qualificationCodes = [...arr, code];
+    // toggle in selectedQualificationsNew and sync model
+    const arr = this.selectedQualificationsNew || [];
+    if (arr.includes(code)) this.selectedQualificationsNew = arr.filter(c => c !== code);
+    else this.selectedQualificationsNew = [...arr, code];
+    this.newStaff.qualificationCodes = [...this.selectedQualificationsNew];
   }
 
   isQualificationSelectedForEdit(code: string) {
-    return (this.editStaff.qualificationCodes || []).includes(code);
+    return (this.selectedQualificationsEdit || []).includes(code);
   }
 
   toggleQualificationForEdit(code: string) {
-    const arr = this.editStaff.qualificationCodes || [];
-    if (arr.includes(code)) this.editStaff.qualificationCodes = arr.filter(c => c !== code);
-    else this.editStaff.qualificationCodes = [...arr, code];
+    const arr = this.selectedQualificationsEdit || [];
+    if (arr.includes(code)) this.selectedQualificationsEdit = arr.filter(c => c !== code);
+    else this.selectedQualificationsEdit = [...arr, code];
+    this.editStaff.qualificationCodes = [...this.selectedQualificationsEdit];
   }
 
-  // Toggle qualification panels
-  toggleQualificationsPanelForNew() { this.showQualificationsForNew = !this.showQualificationsForNew; }
-  toggleQualificationsPanelForEdit() { this.showQualificationsForEdit = !this.showQualificationsForEdit; }
 
-  // Template helper: parse a comma-separated string into trimmed, non-empty codes
+  private setupClickOutsideListener() {
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.custom-select-wrapper')) {
+        this.isQualificationDropdownOpenNew = false;
+        this.isQualificationDropdownOpenEdit = false;
+      }
+    });
+  }
+
+
+  toggleQualificationDropdownNew() { this.isQualificationDropdownOpenNew = !this.isQualificationDropdownOpenNew; }
+  toggleQualificationDropdownEdit() { this.isQualificationDropdownOpenEdit = !this.isQualificationDropdownOpenEdit; }
+
+
+  selectQualificationForNew(code: string, event: Event) {
+    event.stopPropagation();
+    const arr = this.selectedQualificationsNew || [];
+    if (arr.includes(code)) this.selectedQualificationsNew = arr.filter(c => c !== code);
+    else this.selectedQualificationsNew = [...arr, code];
+    this.newStaff.qualificationCodes = [...this.selectedQualificationsNew];
+  }
+
+  isQualificationSelectedInNew(code: string): boolean { return (this.selectedQualificationsNew || []).includes(code); }
+
+
+  selectQualificationForEdit(code: string, event: Event) {
+    event.stopPropagation();
+    const arr = this.selectedQualificationsEdit || [];
+    if (arr.includes(code)) this.selectedQualificationsEdit = arr.filter(c => c !== code);
+    else this.selectedQualificationsEdit = [...arr, code];
+    this.editStaff.qualificationCodes = [...this.selectedQualificationsEdit];
+  }
+
+  isQualificationSelectedInEdit(code: string): boolean { return (this.selectedQualificationsEdit || []).includes(code); }
+
+
+
+  getQualificationDisplayNewText(): string {
+    if (!this.selectedQualificationsNew || this.selectedQualificationsNew.length === 0) return 'Select qualifications';
+    if (this.selectedQualificationsNew.length === 1) return this.selectedQualificationsNew[0];
+    return `${this.selectedQualificationsNew.length} qualifications selected`;
+  }
+
+  getQualificationDisplayEditText(): string {
+    if (!this.selectedQualificationsEdit || this.selectedQualificationsEdit.length === 0) return 'Select qualifications';
+    if (this.selectedQualificationsEdit.length === 1) return this.selectedQualificationsEdit[0];
+    return `${this.selectedQualificationsEdit.length} qualifications selected`;
+  }
+
+
   parseQualificationCodes(value: string): string[] {
     if (!value) return [];
     return value
@@ -290,20 +353,20 @@ export class Staff implements OnInit, OnDestroy {
       .filter(s => !!s);
   }
 
-  // Extract a friendly error message from server errors and strip internal prefixes
+
   extractErrorMessage(err: any): string {
     const raw = err?.error?.message || err?.message || err?.error || (typeof err === 'string' ? err : null);
     if (!raw) return '';
-    // Clean a few known prefixes that leak from backend (case-insensitive)
+
     let msg = String(raw);
-    // remove 'Error updating Staff properties:' prefix
+
     msg = msg.replace(/error updating staff properties:\s*/i, '');
-    // remove 'invalid time:' prefix which can appear in create errors
+
     msg = msg.replace(/invalid time:\s*/i, '');
     return msg.trim();
   }
 
-  // Map numeric status to human-readable label
+
   getStatusLabel(status?: number | null): string {
     switch (status) {
       case 1:
@@ -314,7 +377,7 @@ export class Staff implements OnInit, OnDestroy {
     }
   }
 
-  // Format the operational window for display
+
   formatOperationalWindow(ow: any): string {
     if (!ow) return '—';
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -325,7 +388,7 @@ export class Staff implements OnInit, OnDestroy {
     return `${sd} ${st} — ${ed} ${et}`;
   }
 
-  // Helpers
+
   hasFieldError(field: string) { return !!this.fieldErrors[field.toLowerCase()]; }
   getFieldError(field: string) { return this.fieldErrors[field.toLowerCase()] || ''; }
   hasEditFieldError(field: string) { return !!this.editFieldErrors[field.toLowerCase()]; }
