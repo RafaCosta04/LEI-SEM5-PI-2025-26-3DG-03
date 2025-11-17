@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import { createCrane } from "./crane";
 
 export function createScene() {
 
@@ -26,8 +25,8 @@ export function createScene() {
     portStructure: THREE.Group,
     sea: THREE.Mesh,
     seaBed: THREE.Mesh,
-    objects: THREE.Object3D[],
-    docks: THREE.Group[]
+    vessel: THREE.Object3D[],
+    objects: THREE.Object3D[]
   ) {
 
     // Remove todos os objetos (menos as luzes)
@@ -41,16 +40,9 @@ export function createScene() {
     // Adiciona estruturas base
     scene.add(portStructure);
     scene.add(sea);
+    scene.add(...vessel);
+
     objects.forEach(obj => scene.add(obj));
-
-    // Adiciona as docas ao cenário
-    // Adiciona as docas ao cenário
-    docks.forEach((dock, index) => {
-      scene.add(dock);
-      console.log(`✅ Dock adicionada [${index}]:`, dock.name || '(sem nome)', dock.position);
-    });
-
-
 
 
     // Plano para sombras

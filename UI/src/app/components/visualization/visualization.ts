@@ -5,8 +5,10 @@ import { createSea } from '../../threejs/sea';
 import { createSeaBed } from '../../threejs/seaBed';
 import { createVessel } from '../../threejs/vessel';
 import { createDock } from '../../threejs/dock';
+import { createWarehouse } from '../../threejs/warehouse';
+import { createYard } from '../../threejs/yard';
+
 import { PortLayoutService } from '../../services/portLayout.service';
-import { createCrane } from '../../threejs/crane';
 
 @Component({
   selector: 'app-visualization',
@@ -23,7 +25,7 @@ export class PortVisualizationComponent implements AfterViewInit, OnDestroy {
     
     const scene = createScene();
 
-    const { dockPositions, warehousePositions } =
+    const { dockPositions, storageAreas  } =
       await this.portLayoutService.getLayout();
 
     const docks = await Promise.all(
@@ -34,13 +36,31 @@ export class PortVisualizationComponent implements AfterViewInit, OnDestroy {
       })
     );
 
+     const storageMeshes = await Promise.all(
+      storageAreas.map(async (area) => {
+        let mesh;
+
+        if (area.type === 'Warehouse') {
+          mesh = await createWarehouse();
+        } else {
+          mesh = await createYard();
+        }
+
+        //mesh.position.set(area.x, area.y, area.z);
+        return mesh;
+      })
+    );
+
 
     const portStructure = createPortStructure();
     const sea = createSea();
     const seaBed = createSeaBed();
     const vessel = await createVessel();
 
-    scene.initialize(portStructure, sea, seaBed , [vessel], docks);
+    const allObjects = [...docks, ...storageMeshes];
+
+
+    scene.initialize(portStructure, sea, seaBed, [vessel], allObjects);
     scene.start();
 
     this.scene = scene;

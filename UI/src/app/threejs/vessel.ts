@@ -17,8 +17,8 @@ export async function createVessel(): Promise<THREE.Group> {
       objLoader.load(
         'ship-cargo-a.obj',
         (object) => {
-          object.scale.set(10, 10, 10); // ajusta escala conforme necessário
-          object.position.set(10, 10, 110);
+          object.scale.set(11, 11, 11); // ajusta escala conforme necessário
+          object.position.set(11, 15, 110);
           resolve(object);
         },
         (xhr) => {

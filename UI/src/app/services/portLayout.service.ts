@@ -2,31 +2,36 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
 import { DocksService } from './docks.service';
+import { StorageAreaService } from './storageArea.service';
+import { StorageAreaType } from '../models/storageArea.model';
 
 @Injectable({ providedIn: 'root' })
 export class PortLayoutService {  
   constructor(
     private apiService: ApiService,
-    private docksService: DocksService
+    private docksService: DocksService,
+    private storageAreaService: StorageAreaService
   ) {}
 
   async getLayout(): Promise<{
     dockPositions: any[];
-    warehousePositions: any[];
+    storageAreas: {
+      x: number; y: number; z: number;
+      type: StorageAreaType;
+      data: any;
+    }[];
   }> {
     try {
-      // 1️⃣ Buscar layout base (com placeholders)
+      // 1️⃣ Buscar layout base
       const layout = await firstValueFrom(
         this.apiService.get<any>('/PortLayout/Layout')
-    );
-
-
+      );
 
       // 2️⃣ Buscar dados reais do backend
       const docks = await firstValueFrom(this.docksService.getAllDocks());
-      // (Poderias também ter um WarehousesService para warehouses)
+      const storageAreas = await firstValueFrom(this.storageAreaService.getAllStorageAreas());
 
-      // 3️⃣ Mapear docas apenas até ao limite de slots
+      // 3️⃣ DOCAS → mapear até ao limite dos slots
       const dockPositions = layout.dockSlots
         .slice(0, docks.length)
         .map((slot: any, index: number) => ({
@@ -34,18 +39,26 @@ export class PortLayoutService {
           name: docks[index]?.name || `Dock ${index + 1}`
         }));
 
-      // 4️⃣ Warehouses (exemplo vazio por agora)
-      const warehousePositions = layout.warehouseSlots.slice(0, 0); // ainda sem dados reais
+      // 4️⃣ STORAGE AREAS → mapear para slots
+      const storageAreaPositions = storageAreas.map((area: any, index: number) => {
+        const slot = layout.warehouseSlots[index];
+        if (!slot) return null;
 
-      console.log('Layout:', layout);
-      console.log('Docks do backend:', docks);
-      console.log('DockPositions finais:', dockPositions);
+        return {
+          x: slot.x,
+          y: slot.y,
+          z: slot.z,
+          type: area.storageAreaType,
+          data: area
+        };
+      }).filter(x => x !== null);
 
+      console.log("📦 Storage areas:", storageAreaPositions);
 
-      return { dockPositions, warehousePositions };
+      return { dockPositions, storageAreas: storageAreaPositions };
     } catch (error) {
       console.error('❌ Erro a carregar layout:', error);
-      return { dockPositions: [], warehousePositions: [] };
+      return { dockPositions: [], storageAreas: [] };
     }
   }
 }
