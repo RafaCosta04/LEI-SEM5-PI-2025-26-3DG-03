@@ -11,6 +11,9 @@ import {
 } from '../../models/vesselVisitNotificationDecision.model';
 import { VesselVisitNotificationModel } from '../../models/vesselVisitNotification.model';
 
+import { DocksService } from '../../services/docks.service';
+import { DocksModel } from '../../models/docks.model';
+
 @Component({
   selector: 'app-vessel-visit-notification-decision',
   imports: [CommonModule, FormsModule],
@@ -46,18 +49,33 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  
+
+
+  docks: DocksModel[] = [];
 
   constructor(
     private decisionService: VesselVisitNotificationDecisionService,
     private notificationService: VesselVisitNotificationService,
+    private docksService: DocksService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.loadDecisions();
     this.loadNotifications();
+    this.loadDocks();
     this.setupSearch();
+  }
+
+  loadDocks() {
+    this.docksService.getAllDocks().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (docks) => {
+        this.docks = docks;
+      },
+      error: (error) => {
+        console.error('Error loading docks:', error);
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -112,26 +130,27 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
     this.searchSubject$.next(this.searchTerm);
   }
 
-  private performSearch(searchTerm: string) {
-    if (!searchTerm.trim()) {
-      this.filteredDecisions = [...this.decisions];
-      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
+  private performSearch(searchTerm: string): void {
+    const term = searchTerm ?? this.searchTerm;
+    if (!term || typeof term !== 'string' || !term.trim()) {
+      this.filteredDecisions = Array.isArray(this.decisions) ? [...this.decisions] : [];
+      if (typeof this.statusMessage === 'string' && this.statusMessageType === 'error') this.clearStatusMessage();
       return;
     }
 
-    this.filteredDecisions = this.decisions.filter(decision =>
-      decision.vesselVisitNotificationCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      decision.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      decision.responseMessage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      decision.officerId?.toString().includes(searchTerm.toLowerCase())
-    );
+    this.filteredDecisions = Array.isArray(this.decisions) ? this.decisions.filter((decision: VesselVisitNotificationDecisionModel) =>
+      (decision.vesselVisitNotificationCode?.toLowerCase().includes(term.toLowerCase()) ?? false) ||
+      (decision.status?.toLowerCase().includes(term.toLowerCase()) ?? false) ||
+      (decision.responseMessage?.toLowerCase().includes(term.toLowerCase()) ?? false) ||
+      (decision.officerId?.toString().includes(term.toLowerCase()) ?? false)
+    ) : [];
 
-    if (this.filteredDecisions.length === 0) {
+    if (Array.isArray(this.filteredDecisions) && this.filteredDecisions.length === 0) {
       this.statusHiding = false;
-      this.statusMessage = `No results found for "${searchTerm}"`;
+      this.statusMessage = `No results found for "${term}"`;
       this.statusMessageType = 'error';
     } else {
-      if (this.statusMessage && this.statusMessageType === 'error') this.clearStatusMessage();
+      if (typeof this.statusMessage === 'string' && this.statusMessageType === 'error') this.clearStatusMessage();
     }
   }
 
@@ -258,9 +277,8 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
   }
 
   getAvailableNotifications(): VesselVisitNotificationModel[] {
-    // Filter notifications that don't have decisions yet or are in 'Submitted' status
     return this.notifications.filter(notification =>
-      notification.visitStatus === 'Submitted' || notification.visitStatus === 'InProgress'
+      notification.visitStatus === 'Submitted'
     );
   }
 

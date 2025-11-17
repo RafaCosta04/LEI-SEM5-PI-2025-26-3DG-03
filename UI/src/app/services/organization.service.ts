@@ -26,15 +26,15 @@ export class OrganizationService {
       );
   }
 
-  createOrganization(organization: ShippingAgentOrganizationModel): Observable<ShippingAgentOrganizationModel> {
-    return this.http.post<ShippingAgentOrganizationModel>(this.apiUrl, organization)
+  createOrganization(organization: ShippingAgentOrganizationWithRepresentativeModel): Observable<ShippingAgentOrganizationWithRepresentativeModel> {
+    return this.http.post<ShippingAgentOrganizationWithRepresentativeModel>(this.apiUrl, organization)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   updateOrganization(id: number, organization: ShippingAgentOrganizationModel): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, organization)
+    return this.http.put(`${this.apiUrl}/Update/${id}`, organization)
       .pipe(
         catchError(this.handleError)
       );

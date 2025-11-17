@@ -1,30 +1,24 @@
 // Enums from backend
 export enum CargoType {
   Container = 'Container',
-  BulkCargo = 'BulkCargo',
-  GeneralCargo = 'GeneralCargo',
-  Passengers = 'Passengers'
+  Bulk = 'Bulk',
+  Liquid = 'Liquid',
+  General = 'General',
+  Refrigerated = 'Refrigerated',
+  Hazardous = 'Hazardous'
 }
 
 export enum VisitStatus {
-  InProgress = 'InProgress',
   Submitted = 'Submitted',
   Approved = 'Approved',
-  Rejected = 'Rejected'
+  Rejected = 'Rejected',
+  InProgress = 'InProgress'
 }
 
 export enum CrewRank {
   Captain = 'Captain',
-  ChiefOfficer = 'ChiefOfficer',
-  SecondOfficer = 'SecondOfficer',
-  ThirdOfficer = 'ThirdOfficer',
-  ChiefEngineer = 'ChiefEngineer',
-  SecondEngineer = 'SecondEngineer',
-  ThirdEngineer = 'ThirdEngineer',
-  Radio = 'Radio',
-  Cook = 'Cook',
-  AbleBodiedSeaman = 'AbleBodiedSeaman',
-  OrdinarySeaman = 'OrdinarySeaman'
+  SafetyOfficer = 'SafetyOfficer',
+  Officer = 'Officer'
 }
 
 export enum ManifestType {

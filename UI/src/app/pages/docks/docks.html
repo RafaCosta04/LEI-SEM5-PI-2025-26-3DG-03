@@ -66,7 +66,7 @@
           [class.selected]="selectedDock?.id === dock.id"
           (click)="selectDock(dock)"
         >
-          <td>{{ dock.name }}</td>
+          <td><span class="styled-field">{{ dock.name }}</span></td>
           <td>{{ dock.location }}</td>
           <td>{{ dock.length }}</td>
           <td>{{ dock.depth }}</td>

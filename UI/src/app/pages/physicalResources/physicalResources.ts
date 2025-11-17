@@ -66,7 +66,7 @@ export class PhysicalResources implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  
+
 
   constructor(
     private physicalResourcesService: PhysicalResourcesService,
@@ -208,7 +208,6 @@ export class PhysicalResources implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredPhysicalResources = [...this.physicalResources];
-      // If the user cleared the search, hide any top error message immediately
       if (this.statusMessage && this.statusMessageType === 'error') {
         this.clearStatusMessage();
       }
@@ -225,7 +224,6 @@ export class PhysicalResources implements OnInit, OnDestroy {
 
     if (localResults.length > 0) {
       this.filteredPhysicalResources = localResults;
-      // Clear any previous error immediately when we have local results
       if (this.statusMessage && this.statusMessageType === 'error') {
         this.clearStatusMessage();
       }
@@ -242,12 +240,10 @@ export class PhysicalResources implements OnInit, OnDestroy {
         next: (resources) => {
           this.filteredPhysicalResources = resources;
           if (resources && resources.length > 0) {
-            // Remote returned results -> clear any previous error immediately
             if (this.statusMessage && this.statusMessageType === 'error') {
               this.clearStatusMessage();
             }
           } else {
-            // No results from remote search -> show top error banner
             this.statusHiding = false;
             this.statusMessage = `No results found for "${description}"`;
             this.statusMessageType = 'error';
@@ -426,7 +422,7 @@ export class PhysicalResources implements OnInit, OnDestroy {
               resource.operationalWindow?.startTime?.trim() &&
               resource.operationalWindow?.endTime?.trim());
 
-    // Check if assigned area is required and provided
+
     if (resource.kind === PhysicalResourceKind.STSCrane || resource.kind === PhysicalResourceKind.Truck) {
       return basicValidation && !!resource.assignedArea?.trim();
     }

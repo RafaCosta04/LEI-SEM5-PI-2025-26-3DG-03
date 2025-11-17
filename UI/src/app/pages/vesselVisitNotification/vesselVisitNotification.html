@@ -70,15 +70,15 @@
           [class.selected]="selectedNotification?.id === notification.id"
           (click)="selectNotification(notification)"
         >
-          <td>{{ notification.code }}</td>
-          <td>{{ notification.vesselIMO }}</td>
-          <td>{{ notification.representativeCitizenID }}</td>
+          <td><span class="styled-field">{{ notification.code }}</span></td>
+          <td><span class="vessel-type">{{ notification.vesselIMO }}</span></td>
+          <td><span class="vessel-type">{{ notification.representativeCitizenID }}</span></td>
           <td>{{ formatDateForDisplay(notification.eta) }}</td>
           <td>{{ formatDateForDisplay(notification.etd) }}</td>
           <td>{{ notification.cargoType }}</td>
           <td>{{ notification.volume }}</td>
           <td>
-            <span [class]="'status-badge status-' + notification.visitStatus?.toLowerCase()">
+            <span [class]="'status-' + notification.visitStatus?.toLowerCase()">
               {{ notification.visitStatus }}
             </span>
           </td>
@@ -113,7 +113,7 @@
         <p><strong>ETA:</strong> {{ formatDateForDisplay(selectedNotification.eta) }}</p>
         <p><strong>ETD:</strong> {{ formatDateForDisplay(selectedNotification.etd) }}</p>
         <p><strong>Status:</strong>
-          <span [class]="'status-badge status-' + selectedNotification.visitStatus?.toLowerCase()">
+          <span [class]="'status-' + selectedNotification.visitStatus?.toLowerCase()">
             {{ selectedNotification.visitStatus }}
           </span>
         </p>
@@ -163,7 +163,7 @@
 
 <!-- Create Notification Modal -->
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
-  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Create New Vessel Visit Notification</h2>
       <button class="close-button" (click)="closeCreateModal()">✕</button>
@@ -182,16 +182,17 @@
           <div class="form-row">
             <div class="form-group">
               <label for="vesselIMO">Vessel IMO *</label>
-              <input
-                type="text"
+              <select
                 id="vesselIMO"
                 name="vesselIMO"
                 [(ngModel)]="newNotification.vesselIMO"
                 required
                 class="form-input"
                 [class.error]="hasFieldError('vesselIMO')"
-                placeholder="Enter vessel IMO number"
               >
+                <option value="" disabled selected>Select vessel</option>
+                <option *ngFor="let vessel of vessels" [value]="vessel.imoNumber">{{ vessel.imoNumber }} - {{ vessel.vesselName }}</option>
+              </select>
               <div *ngIf="hasFieldError('vesselIMO')" class="field-error">
                 {{ getFieldError('vesselIMO') }}
               </div>
@@ -199,16 +200,17 @@
 
             <div class="form-group">
               <label for="representativeCitizenID">Representative Citizen ID *</label>
-              <input
-                type="text"
+              <select
                 id="representativeCitizenID"
                 name="representativeCitizenID"
                 [(ngModel)]="newNotification.representativeCitizenID"
                 required
                 class="form-input"
                 [class.error]="hasFieldError('representativeCitizenID')"
-                placeholder="Enter representative citizen ID"
               >
+                <option value="" disabled selected>Select representative</option>
+                <option *ngFor="let rep of representatives" [value]="rep.citizenId">{{ rep.citizenId }} - {{ rep.name }}</option>
+              </select>
               <div *ngIf="hasFieldError('representativeCitizenID')" class="field-error">
                 {{ getFieldError('representativeCitizenID') }}
               </div>
@@ -300,21 +302,242 @@
         <div class="form-section">
           <h3>Crew Information</h3>
 
+          <div style="margin-top: 20px;">
+            <h4>Crew Members * (Required: 1 Captain{{ newNotification.cargoType === 'Hazardous' ? ' + 1 Safety Officer' : '' }})</h4>
+
+            <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="newCrewName">Name</label>
+                  <input
+                    type="text"
+                    id="newCrewName"
+                    name="newCrewName"
+                    [(ngModel)]="newCrewMember.name"
+                    class="form-input"
+                    placeholder="Enter crew member name"
+                  >
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="newCrewCitizenID">Citizen ID</label>
+                  <input
+                    type="text"
+                    id="newCrewCitizenID"
+                    name="newCrewCitizenID"
+                    [(ngModel)]="newCrewMember.citizenID"
+                    class="form-input"
+                    placeholder="Enter citizen ID"
+                  >
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="newCrewRank">Rank</label>
+                  <select
+                    id="newCrewRank"
+                    name="newCrewRank"
+                    [(ngModel)]="newCrewMember.rank"
+                    class="form-input"
+                  >
+                    <option *ngFor="let rank of getCrewRanks()" [value]="rank">{{ rank }}</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="newCrewNationality">Nationality</label>
+                  <select
+                    id="newCrewNationality"
+                    name="newCrewNationality"
+                    [(ngModel)]="newCrewMember.nationality"
+                    class="form-input"
+                  >
+                    <option value="" disabled selected>Select nationality</option>
+                    <option *ngFor="let country of countries" [value]="country.code">
+                      {{ country.code }} - {{ country.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="addCrewMember()"
+                style="margin-top: 15px; width: 100%;"
+              >
+                Add Crew Member
+              </button>
+            </div>
+
+            <!-- List of added crew members -->
+            <div *ngIf="additionalCrewMembers.length > 0" style="margin-top: 15px;">
+              <h5>Added Crew Members ({{ additionalCrewMembers.length }})</h5>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div
+                  *ngFor="let member of additionalCrewMembers; let i = index"
+                  style="background-color: var(--cui-body-bg); padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cui-border-color);"
+                >
+                  <div>
+                    <strong>{{ member.name }}</strong> ({{ member.rank }})
+                    <br>
+                    <small style="color: var(--cui-secondary-color);">
+                      ID: {{ member.citizenID }} | Nationality: {{ member.nationality }}
+                    </small>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="removeCrewMember(i)"
+                    style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cargo Manifest Section -->
+        <div class="form-section">
+          <h3>Cargo Manifest</h3>
+
+          <!-- Manifest Type Selector -->
           <div class="form-group">
-            <label for="numberOfCrewMembers">Number of Crew Members *</label>
-            <input
-              type="number"
-              id="numberOfCrewMembers"
-              name="numberOfCrewMembers"
-              [(ngModel)]="newNotification.numberOfCrewMembers"
-              required
-              min="0"
+            <label for="manifestType">Manifest Type</label>
+            <select
+              id="manifestType"
+              name="manifestType"
+              [(ngModel)]="currentManifestType"
               class="form-input"
-              [class.error]="hasFieldError('numberOfCrewMembers')"
-              placeholder="Enter number of crew members"
             >
-            <div *ngIf="hasFieldError('numberOfCrewMembers')" class="field-error">
-              {{ getFieldError('numberOfCrewMembers') }}
+              <option value="Loading">Loading</option>
+              <option value="Unloading">Unloading</option>
+            </select>
+          </div>
+
+          <!-- Add Manifest Entry Form -->
+          <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <h5>Add Container Entry ({{ currentManifestType }})</h5>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+              <div class="form-group">
+                <label>Container Number *</label>
+                <input
+                  type="text"
+                  name="containerNumber"
+                  [(ngModel)]="newManifestEntry.containerNumber"
+                  placeholder="e.g., MSCU1234567"
+                  class="form-input"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Storage Area Code *</label>
+                <input
+                  type="text"
+                  name="storageAreaCode"
+                  [(ngModel)]="newManifestEntry.storageAreaCode"
+                  placeholder="e.g., AREA-A1"
+                  class="form-input"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Row</label>
+                <input
+                  type="number"
+                  name="row"
+                  [(ngModel)]="newManifestEntry.row"
+                  placeholder="Row number"
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Tier</label>
+                <input
+                  type="number"
+                  name="tier"
+                  [(ngModel)]="newManifestEntry.tier"
+                  placeholder="Tier number"
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Bay</label>
+                <input
+                  type="number"
+                  name="bay"
+                  [(ngModel)]="newManifestEntry.bay"
+                  placeholder="Bay number"
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+              <button
+                type="button"
+                (click)="addManifestEntry()"
+                class="btn btn-secondary"
+              >
+                Add Container Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- Display Loading Manifest Entries -->
+          <div *ngIf="getManifestEntries(ManifestType.Loading).length > 0" style="margin-bottom: 15px;">
+            <h5>Loading Manifest ({{ getManifestEntries(ManifestType.Loading).length }} containers)</h5>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div
+                *ngFor="let entry of getManifestEntries(ManifestType.Loading); let i = index"
+                style="background-color: var(--cui-body-bg); padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cui-border-color);"
+              >
+                <div>
+                  <strong>{{ entry.containerNumber }}</strong>
+                  <br>
+                  <small style="color: var(--cui-secondary-color);">
+                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeManifestEntry(ManifestType.Loading, i)"
+                  style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Display Unloading Manifest Entries -->
+          <div *ngIf="getManifestEntries(ManifestType.Unloading).length > 0">
+            <h5>Unloading Manifest ({{ getManifestEntries(ManifestType.Unloading).length }} containers)</h5>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div
+                *ngFor="let entry of getManifestEntries(ManifestType.Unloading); let i = index"
+                style="background-color: var(--cui-body-bg); padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cui-border-color);"
+              >
+                <div>
+                  <strong>{{ entry.containerNumber }}</strong>
+                  <br>
+                  <small style="color: var(--cui-secondary-color);">
+                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeManifestEntry(ManifestType.Unloading, i)"
+                  style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -331,7 +554,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="isCreating"
+            [disabled]="isCreating || !notificationForm.form.valid"
           >
             {{ isCreating ? 'Creating...' : 'Create Notification' }}
           </button>
@@ -343,7 +566,7 @@
 
 <!-- Edit Notification Modal -->
 <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
-  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Edit Vessel Visit Notification</h2>
       <button class="close-button" (click)="closeEditModal()">✕</button>
@@ -375,36 +598,30 @@
           <div class="form-row">
             <div class="form-group">
               <label for="editVesselIMO">Vessel IMO *</label>
-              <input
-                type="text"
+              <select
                 id="editVesselIMO"
                 name="editVesselIMO"
                 [(ngModel)]="editNotification.vesselIMO"
                 required
                 class="form-input"
-                [class.error]="hasEditFieldError('vesselIMO')"
-                placeholder="Enter vessel IMO number"
               >
-              <div *ngIf="hasEditFieldError('vesselIMO')" class="field-error">
-                {{ getEditFieldError('vesselIMO') }}
-              </div>
+                <option value="" disabled selected>Select vessel</option>
+                <option *ngFor="let vessel of vessels" [value]="vessel.imoNumber">{{ vessel.imoNumber }} - {{ vessel.vesselName }}</option>
+              </select>
             </div>
 
             <div class="form-group">
               <label for="editRepresentativeCitizenID">Representative Citizen ID *</label>
-              <input
-                type="text"
+              <select
                 id="editRepresentativeCitizenID"
                 name="editRepresentativeCitizenID"
                 [(ngModel)]="editNotification.representativeCitizenID"
                 required
                 class="form-input"
-                [class.error]="hasEditFieldError('representativeCitizenID')"
-                placeholder="Enter representative citizen ID"
               >
-              <div *ngIf="hasEditFieldError('representativeCitizenID')" class="field-error">
-                {{ getEditFieldError('representativeCitizenID') }}
-              </div>
+                <option value="" disabled selected>Select representative</option>
+                <option *ngFor="let rep of representatives" [value]="rep.citizenId">{{ rep.citizenId }} - {{ rep.name }}</option>
+              </select>
             </div>
           </div>
 
@@ -442,24 +659,24 @@
                 {{ getEditFieldError('etd') }}
               </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="editVisitStatus">Visit Status *</label>
-            <select
-              id="editVisitStatus"
-              name="editVisitStatus"
-              [(ngModel)]="editNotification.visitStatus"
-              required
-              class="form-input"
-              [class.error]="hasEditFieldError('visitStatus')"
-            >
-              <option value="">Select status</option>
-              <option value="InProgress">In Progress</option>
-              <option value="Submitted">Submitted</option>
-            </select>
-            <div *ngIf="hasEditFieldError('visitStatus')" class="field-error">
-              {{ getEditFieldError('visitStatus') }}
+            <div class="form-group">
+              <label for="editVisitStatus">Visit Status *</label>
+              <select
+                id="editVisitStatus"
+                name="editVisitStatus"
+                [(ngModel)]="editNotification.visitStatus"
+                required
+                class="form-input"
+                [class.error]="hasEditFieldError('visitStatus')"
+              >
+                <option value="">Select status</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Submitted">Submitted</option>
+              </select>
+              <div *ngIf="hasEditFieldError('visitStatus')" class="field-error">
+                {{ getEditFieldError('visitStatus') }}
+              </div>
             </div>
           </div>
         </div>
@@ -512,21 +729,242 @@
         <div class="form-section">
           <h3>Crew Information</h3>
 
+          <div style="margin-top: 20px;">
+            <h4>Crew Members * (Required: 1 Captain{{ editNotification.cargoType === 'Hazardous' ? ' + 1 Safety Officer' : '' }})</h4>
+
+            <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editNewCrewName">Name</label>
+                  <input
+                    type="text"
+                    id="editNewCrewName"
+                    name="editNewCrewName"
+                    [(ngModel)]="editNewCrewMember.name"
+                    class="form-input"
+                    placeholder="Enter crew member name"
+                  >
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editNewCrewCitizenID">Citizen ID</label>
+                  <input
+                    type="text"
+                    id="editNewCrewCitizenID"
+                    name="editNewCrewCitizenID"
+                    [(ngModel)]="editNewCrewMember.citizenID"
+                    class="form-input"
+                    placeholder="Enter citizen ID"
+                  >
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editNewCrewRank">Rank</label>
+                  <select
+                    id="editNewCrewRank"
+                    name="editNewCrewRank"
+                    [(ngModel)]="editNewCrewMember.rank"
+                    class="form-input"
+                  >
+                    <option *ngFor="let rank of getCrewRanks()" [value]="rank">{{ rank }}</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editNewCrewNationality">Nationality</label>
+                  <select
+                    id="editNewCrewNationality"
+                    name="editNewCrewNationality"
+                    [(ngModel)]="editNewCrewMember.nationality"
+                    class="form-input"
+                  >
+                    <option value="" disabled selected>Select nationality</option>
+                    <option *ngFor="let country of countries" [value]="country.code">
+                      {{ country.code }} - {{ country.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="addEditCrewMember()"
+                style="margin-top: 15px; width: 100%;"
+              >
+                Add Crew Member
+              </button>
+            </div>
+
+            <!-- List of added crew members -->
+            <div *ngIf="editAdditionalCrewMembers.length > 0" style="margin-top: 15px;">
+              <h5>Crew Members ({{ editAdditionalCrewMembers.length }})</h5>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div
+                  *ngFor="let member of editAdditionalCrewMembers; let i = index"
+                  style="background-color: var(--cui-body-bg); padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cui-border-color);"
+                >
+                  <div>
+                    <strong>{{ member.name }}</strong> ({{ member.rank }})
+                    <br>
+                    <small style="color: var(--cui-secondary-color);">
+                      ID: {{ member.citizenID }} | Nationality: {{ member.nationality }}
+                    </small>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="removeEditCrewMember(i)"
+                    style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cargo Manifest Section -->
+        <div class="form-section">
+          <h3>Cargo Manifest</h3>
+
+          <!-- Manifest Type Selector -->
           <div class="form-group">
-            <label for="editNumberOfCrewMembers">Number of Crew Members *</label>
-            <input
-              type="number"
-              id="editNumberOfCrewMembers"
-              name="editNumberOfCrewMembers"
-              [(ngModel)]="editNotification.numberOfCrewMembers"
-              required
-              min="0"
+            <label for="editManifestType">Manifest Type</label>
+            <select
+              id="editManifestType"
+              name="editManifestType"
+              [(ngModel)]="editCurrentManifestType"
               class="form-input"
-              [class.error]="hasEditFieldError('numberOfCrewMembers')"
-              placeholder="Enter number of crew members"
             >
-            <div *ngIf="hasEditFieldError('numberOfCrewMembers')" class="field-error">
-              {{ getEditFieldError('numberOfCrewMembers') }}
+              <option value="Loading">Loading</option>
+              <option value="Unloading">Unloading</option>
+            </select>
+          </div>
+
+          <!-- Add Manifest Entry Form -->
+          <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <h5>Add Container Entry ({{ editCurrentManifestType }})</h5>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+              <div class="form-group">
+                <label>Container Number *</label>
+                <input
+                  type="text"
+                  name="editContainerNumber"
+                  [(ngModel)]="editNewManifestEntry.containerNumber"
+                  placeholder="e.g., MSCU1234567"
+                  class="form-input"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Storage Area Code *</label>
+                <input
+                  type="text"
+                  name="editStorageAreaCode"
+                  [(ngModel)]="editNewManifestEntry.storageAreaCode"
+                  placeholder="e.g., AREA-A1"
+                  class="form-input"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Row</label>
+                <input
+                  type="number"
+                  name="editRow"
+                  [(ngModel)]="editNewManifestEntry.row"
+                  placeholder="Row number"
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Tier</label>
+                <input
+                  type="number"
+                  name="editTier"
+                  [(ngModel)]="editNewManifestEntry.tier"
+                  placeholder="Tier number"
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Bay</label>
+                <input
+                  type="number"
+                  name="editBay"
+                  [(ngModel)]="editNewManifestEntry.bay"
+                  placeholder="Bay number"
+                  class="form-input"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+              <button
+                type="button"
+                (click)="addEditManifestEntry()"
+                class="btn btn-secondary"
+              >
+                Add Container Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- Display Loading Manifest Entries -->
+          <div *ngIf="getEditManifestEntries(ManifestType.Loading).length > 0" style="margin-bottom: 15px;">
+            <h5>Loading Manifest ({{ getEditManifestEntries(ManifestType.Loading).length }} containers)</h5>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div
+                *ngFor="let entry of getEditManifestEntries(ManifestType.Loading); let i = index"
+                style="background-color: var(--cui-body-bg); padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cui-border-color);"
+              >
+                <div>
+                  <strong>{{ entry.containerNumber }}</strong>
+                  <br>
+                  <small style="color: var(--cui-secondary-color);">
+                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeEditManifestEntry(ManifestType.Loading, i)"
+                  style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Display Unloading Manifest Entries -->
+          <div *ngIf="getEditManifestEntries(ManifestType.Unloading).length > 0">
+            <h5>Unloading Manifest ({{ getEditManifestEntries(ManifestType.Unloading).length }} containers)</h5>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div
+                *ngFor="let entry of getEditManifestEntries(ManifestType.Unloading); let i = index"
+                style="background-color: var(--cui-body-bg); padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cui-border-color);"
+              >
+                <div>
+                  <strong>{{ entry.containerNumber }}</strong>
+                  <br>
+                  <small style="color: var(--cui-secondary-color);">
+                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeEditManifestEntry(ManifestType.Unloading, i)"
+                  style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           </div>
         </div>

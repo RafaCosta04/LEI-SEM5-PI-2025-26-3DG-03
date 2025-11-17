@@ -20,13 +20,10 @@ export class Vessel implements OnInit, OnDestroy {
   selectedVesselRecord: VesselRecordModel | null = null;
   searchTerm: string = '';
   isLoading: boolean = false;
-
   // Vessel Types for dropdown
   vesselTypes: VesselTypeModel[] = [];
-
   statusMessage: string = '';
   statusMessageType: 'success' | 'error' | '' = '';
-  // Controls the hide animation when clearing the status message
   statusHiding: boolean = false;
 
   // Modal properties
@@ -56,7 +53,7 @@ export class Vessel implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  
+
 
   constructor(
     private vesselService: VesselService,
@@ -181,10 +178,8 @@ export class Vessel implements OnInit, OnDestroy {
   }
 
   clearStatusMessage() {
-    // Play hide animation before removing the node from DOM so the exit animation can be seen.
     if (!this.statusMessage) return;
     this.statusHiding = true;
-    // Give the CSS exit animation time to run (match to CSS animation duration: 200ms)
     setTimeout(() => {
       this.statusMessage = '';
       this.statusMessageType = '';
@@ -195,9 +190,6 @@ export class Vessel implements OnInit, OnDestroy {
   clearSearch() { this.clearSearchAndNotify(); }
 
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredVesselRecords = [...this.vesselRecords]; this.searchSubject$.next(this.searchTerm); }
-
-  
-  // Removed timer-based hide: errors are cleared immediately when results arrive or search is cleared.
 
   selectVesselRecord(vesselRecord: VesselRecordModel) {
     if (this.selectedVesselRecord?.id === vesselRecord.id) {

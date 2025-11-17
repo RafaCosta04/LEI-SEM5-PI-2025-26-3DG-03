@@ -33,9 +33,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let s of filteredStaffs" [class.selected]="selectedStaff?.id === s.id" (click)="selectStaff(s)">
-          <td>{{ s.name }}</td>
+          <td><span class="styled-field">{{ s.name }}</span></td>
           <td>{{ s.email }}</td>
-          <td>{{ (s.qualificationCodes || []).join(', ') }}</td>
+          <td><span class="vessel-type">{{ (s.qualificationCodes || []).join(', ') }}</span></td>
           <td>{{ getStatusLabel(s.status) }}</td>
           <td>
             <button (click)="selectStaff(s); $event.stopPropagation()" class="btn-select" [class.selected]="selectedStaff?.id === s.id">{{ selectedStaff?.id === s.id ? 'Unselect' : 'Select' }}</button>

@@ -66,7 +66,7 @@
           [class.selected]="selectedQualification?.id === qualification.id"
           (click)="selectQualification(qualification)"
         >
-          <td>{{ qualification.code }}</td>
+          <td><span class="styled-field">{{ qualification.code }}</span></td>
           <td>{{ qualification.name }}</td>
           <td>{{ qualification.description }}</td>
           <td>
@@ -108,7 +108,6 @@
     </div>
 
     <div class="modal-body">
-      <!-- Error message display -->
       <div *ngIf="modalErrorMessage" class="alert alert-danger">
         {{ modalErrorMessage }}
       </div>

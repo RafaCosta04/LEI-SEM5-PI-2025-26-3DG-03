@@ -23,7 +23,6 @@ export class StorageArea implements OnInit, OnDestroy {
 
   statusMessage: string = '';
   statusMessageType: 'success' | 'error' | '' = '';
-  // Controls the hide animation when clearing the status message
   statusHiding: boolean = false;
 
   // Modal properties
@@ -40,7 +39,7 @@ export class StorageArea implements OnInit, OnDestroy {
   modalErrorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
 
-  // Available docks for selection (should be loaded from service)
+  // Available docks for selection
   availableDocks: DocksModel[] = [];
   newDockAssociation = { dockName: '', distance: 0 };
   isLoadingDocks: boolean = false;
@@ -72,7 +71,6 @@ export class StorageArea implements OnInit, OnDestroy {
 
   // Helper methods for validation
   onMaxCapacityChange() {
-    // Ensure current capacity doesn't exceed max capacity
     if (this.newStorageArea.maxCapacity !== undefined &&
         this.newStorageArea.currentCapacity !== undefined &&
         this.newStorageArea.currentCapacity > this.newStorageArea.maxCapacity) {
@@ -81,7 +79,6 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   onEditMaxCapacityChange() {
-    // Ensure current capacity doesn't exceed max capacity in edit mode
     if (this.editStorageArea.maxCapacity !== undefined &&
         this.editStorageArea.currentCapacity !== undefined &&
         this.editStorageArea.currentCapacity > this.editStorageArea.maxCapacity) {
@@ -214,10 +211,8 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   clearStatusMessage() {
-    // Play hide animation before removing the node from DOM so the exit animation can be seen.
     if (!this.statusMessage) return;
     this.statusHiding = true;
-    // Give the CSS exit animation time to run (match to CSS animation duration: 200ms)
     setTimeout(() => {
       this.statusMessage = '';
       this.statusMessageType = '';
@@ -226,9 +221,6 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   clearSearch() { this.clearSearchAndNotify(); }
-
-  // When clearing programmatically (e.g. clicking the clear button) ensure the
-  // search pipeline and error-hide behavior run as if the user emptied the input.
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredStorageAreas = [...this.storageAreas]; this.searchSubject$.next(this.searchTerm); }
 
   selectStorageArea(storageArea: StorageAreaModel) {
@@ -288,14 +280,11 @@ export class StorageArea implements OnInit, OnDestroy {
   // Dock association methods
   addDockAssociation() {
     if (this.newDockAssociation.dockName && this.newDockAssociation.distance >= 0) {
-      // Check if dock exists in available docks
       const selectedDock = this.availableDocks.find(dock => dock.name === this.newDockAssociation.dockName);
       if (!selectedDock) {
         alert('Selected dock does not exist. Please choose from the dropdown.');
         return;
       }
-
-      // Check if dock is already associated
       const exists = this.newStorageArea.storageAreaDocks?.some(dock =>
         dock.dockName === this.newDockAssociation.dockName);
 
@@ -336,22 +325,17 @@ export class StorageArea implements OnInit, OnDestroy {
 
   addDockAssociationToEdit() {
     if (this.editDockAssociation.dockName && this.editDockAssociation.distance >= 0) {
-      // Check if dock exists in available docks
       const selectedDock = this.availableDocks.find(dock => dock.name === this.editDockAssociation.dockName);
       if (!selectedDock) {
         alert('Selected dock does not exist. Please choose from the dropdown.');
         return;
       }
-
-      // Check if dock is already associated
       const exists = this.editStorageArea.storageAreaDocks?.some(dock =>
         dock.dockName === this.editDockAssociation.dockName);
-
       if (exists) {
         alert('This dock is already associated with this storage area.');
         return;
       }
-
       if (!this.editStorageArea.storageAreaDocks) {
         this.editStorageArea.storageAreaDocks = [];
       }
@@ -409,26 +393,17 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   private handleCreateError(error: any) {
-
     this.fieldErrors = {};
-
     console.error('Full error in component:', error);
-
-
     let errorMessage = '';
-
     if (error.originalError && error.originalError.error) {
       const backendError = error.originalError.error;
       console.error('Backend error object:', backendError);
-
-
       if (Array.isArray(backendError)) {
         errorMessage = backendError.join('; ');
         this.modalErrorMessage = errorMessage;
         return;
       }
-
-
       if (backendError.errors && typeof backendError.errors === 'object') {
         for (const field in backendError.errors) {
           const fieldName = field.toLowerCase();
@@ -439,8 +414,6 @@ export class StorageArea implements OnInit, OnDestroy {
         this.modalErrorMessage = 'Please correct the validation errors below.';
         return;
       }
-
-
       if (backendError.message) {
         errorMessage = backendError.message;
       } else if (backendError.title) {
@@ -451,13 +424,9 @@ export class StorageArea implements OnInit, OnDestroy {
         errorMessage = backendError;
       }
     }
-
-
     if (!errorMessage && error.message) {
       errorMessage = error.message;
     }
-
-
     if (!errorMessage) {
       errorMessage = 'Error creating storage area. Please try again.';
     }
@@ -466,9 +435,7 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   private isValidStorageArea(): boolean {
-    // Reset field errors
     this.fieldErrors = {};
-
     let isValid = true;
 
     // Validate code
@@ -479,19 +446,16 @@ export class StorageArea implements OnInit, OnDestroy {
       this.fieldErrors['code'] = 'Storage area code must be alphanumeric (letters and digits only).';
       isValid = false;
     }
-
     // Validate location
     if (!this.newStorageArea.location?.trim()) {
       this.fieldErrors['location'] = 'Storage area location cannot be empty.';
       isValid = false;
     }
-
     // Validate max capacity
     if (this.newStorageArea.maxCapacity === undefined || this.newStorageArea.maxCapacity <= 0) {
       this.fieldErrors['maxcapacity'] = 'Max capacity must be greater than zero.';
       isValid = false;
     }
-
     // Validate current capacity
     if (this.newStorageArea.currentCapacity === undefined || this.newStorageArea.currentCapacity < 0) {
       this.fieldErrors['currentcapacity'] = 'Current capacity cannot be negative.';
@@ -545,17 +509,14 @@ export class StorageArea implements OnInit, OnDestroy {
       }
       return;
     }
-
     if (!this.selectedStorageArea?.id) {
       this.editModalErrorMessage = 'No storage area selected for editing.';
       return;
     }
-
     if (!this.isEditDirty()) {
       this.editModalErrorMessage = 'No changes to save.';
       return;
     }
-
     this.isEditing = true;
     this.storageAreaService.updateStorageArea(this.selectedStorageArea.id, this.editStorageArea)
       .pipe(takeUntil(this.destroy$))
@@ -584,8 +545,6 @@ export class StorageArea implements OnInit, OnDestroy {
     const locationChanged = (orig.location || '').trim() !== (curr.location || '').trim();
     const maxCapacityChanged = (orig.maxCapacity || 0) !== (curr.maxCapacity || 0);
     const currentCapacityChanged = (orig.currentCapacity || 0) !== (curr.currentCapacity || 0);
-
-    // Check if dock associations changed
     const origDocks = orig.storageAreaDocks || [];
     const currDocks = curr.storageAreaDocks || [];
     const docksChanged = JSON.stringify(origDocks) !== JSON.stringify(currDocks);
@@ -603,13 +562,11 @@ export class StorageArea implements OnInit, OnDestroy {
     if (error.originalError && error.originalError.error) {
       const backendError = error.originalError.error;
       console.error('Backend error object:', backendError);
-
       if (Array.isArray(backendError)) {
         errorMessage = backendError.join('; ');
         this.editModalErrorMessage = errorMessage;
         return;
       }
-
       if (backendError.errors && typeof backendError.errors === 'object') {
         for (const field in backendError.errors) {
           const fieldName = field.toLowerCase();
@@ -620,7 +577,6 @@ export class StorageArea implements OnInit, OnDestroy {
         this.editModalErrorMessage = 'Please correct the validation errors below.';
         return;
       }
-
       if (backendError.message) {
         errorMessage = backendError.message;
       } else if (backendError.title) {
@@ -631,11 +587,9 @@ export class StorageArea implements OnInit, OnDestroy {
         errorMessage = backendError;
       }
     }
-
     if (!errorMessage && error.message) {
       errorMessage = error.message;
     }
-
     if (!errorMessage) {
       errorMessage = 'Error updating storage area. Please try again.';
     }
@@ -644,9 +598,7 @@ export class StorageArea implements OnInit, OnDestroy {
   }
 
   private isValidEditStorageArea(): boolean {
-    // Reset field errors
     this.editFieldErrors = {};
-
     let isValid = true;
 
     // Validate location
@@ -654,13 +606,11 @@ export class StorageArea implements OnInit, OnDestroy {
       this.editFieldErrors['location'] = 'Storage area location cannot be empty.';
       isValid = false;
     }
-
     // Validate max capacity
     if (this.editStorageArea.maxCapacity === undefined || this.editStorageArea.maxCapacity <= 0) {
       this.editFieldErrors['maxcapacity'] = 'Max capacity must be greater than zero.';
       isValid = false;
     }
-
     // Validate current capacity
     if (this.editStorageArea.currentCapacity === undefined || this.editStorageArea.currentCapacity < 0) {
       this.editFieldErrors['currentcapacity'] = 'Current capacity cannot be negative.';

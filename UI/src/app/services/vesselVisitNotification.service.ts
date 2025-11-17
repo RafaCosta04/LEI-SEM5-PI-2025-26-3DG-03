@@ -83,6 +83,11 @@ export class VesselVisitNotificationService {
   }
 
   private handleError(error: HttpErrorResponse) {
+    console.log('Raw HTTP Error Response:', error);
+    console.log('Error status:', error.status);
+    console.log('Error body:', error.error);
+    console.log('Error headers:', error.headers);
+
     let errorMessage = 'An unknown error occurred!';
 
     if (error.error instanceof ErrorEvent) {
@@ -93,8 +98,18 @@ export class VesselVisitNotificationService {
       if (error.status === 400) {
         if (Array.isArray(error.error)) {
           errorMessage = error.error.join('; ');
+        } else if (error.error?.errors) {
+          // Handle validation errors from ASP.NET Core
+          const validationErrors: string[] = [];
+          for (const field in error.error.errors) {
+            const fieldErrors = error.error.errors[field];
+            if (Array.isArray(fieldErrors)) {
+              validationErrors.push(`${field}: ${fieldErrors.join(', ')}`);
+            }
+          }
+          errorMessage = validationErrors.length > 0 ? validationErrors.join('; ') : error.error.title || 'Bad request';
         } else {
-          errorMessage = error.error?.message || 'Bad request';
+          errorMessage = error.error?.message || error.error?.title || 'Bad request';
         }
       } else if (error.status === 404) {
         errorMessage = 'Vessel Visit Notification not found';

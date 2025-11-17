@@ -67,7 +67,7 @@
           [class.selected]="selectedStorageArea?.id === storageArea.id"
           (click)="selectStorageArea(storageArea)"
         >
-          <td>{{ storageArea.code }}</td>
+          <td><span class="styled-field">{{ storageArea.code }}</span></td>
           <td>{{ storageArea.location }}</td>
           <td>{{ storageArea.storageAreaType }}</td>
           <td>{{ storageArea.maxCapacity }}</td>

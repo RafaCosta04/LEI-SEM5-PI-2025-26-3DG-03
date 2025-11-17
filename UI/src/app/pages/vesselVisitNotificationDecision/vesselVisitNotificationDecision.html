@@ -67,9 +67,9 @@
           (click)="selectDecision(decision)"
         >
           <td>{{ decision.id }}</td>
-          <td>{{ decision.vesselVisitNotificationCode }}</td>
+          <td><span class="styled-field">{{ decision.vesselVisitNotificationCode }}</span></td>
           <td>
-            <span class="decision-status" [class]="'status-' + decision.status.toLowerCase()">
+            <span [class]="'status-' + decision.status.toLowerCase()">
               {{ decision.status }}
             </span>
           </td>
@@ -102,7 +102,7 @@
         <h4>Decision Details</h4>
         <p><strong>ID:</strong> {{ selectedDecision.id }}</p>
         <p><strong>Notification Code:</strong> {{ selectedDecision.vesselVisitNotificationCode }}</p>
-        <p><strong>Status:</strong> <span class="decision-status" [class]="'status-' + selectedDecision.status.toLowerCase()">{{ selectedDecision.status }}</span></p>
+        <p><strong>Status:</strong> <span [class]="'status-' + selectedDecision.status.toLowerCase()">{{ selectedDecision.status }}</span></p>
         <p><strong>Officer ID:</strong> {{ selectedDecision.officerId }}</p>
         <p><strong>Response Message:</strong> {{ selectedDecision.responseMessage }}</p>
         <p *ngIf="selectedDecision.decisionDate"><strong>Decision Date:</strong> {{ formatDateForDisplay(selectedDecision.decisionDate) }}</p>
@@ -205,7 +205,28 @@
           </div>
 
           <div class="form-row">
-            <div class="form-group full-width">
+            <!-- Show dock dropdown if status is Approved -->
+            <div class="form-group full-width" *ngIf="newDecision.status === 'Approved'">
+              <label for="dockSelect">Select Dock *</label>
+              <select
+                id="dockSelect"
+                name="responseMessage"
+                [(ngModel)]="newDecision.responseMessage"
+                required
+                class="form-input"
+                [class.error]="hasFieldError('responseMessage')"
+              >
+                <option value="">Select a dock</option>
+                <option *ngFor="let dock of docks" [value]="dock.name">
+                  {{ dock.name }} ({{ dock.location }})
+                </option>
+              </select>
+              <div *ngIf="hasFieldError('responseMessage')" class="field-error">
+                {{ getFieldError('responseMessage') }}
+              </div>
+            </div>
+            <!-- Show textarea if status is Rejected -->
+            <div class="form-group full-width" *ngIf="newDecision.status === 'Rejected'">
               <label for="responseMessage">Response Message *</label>
               <textarea
                 id="responseMessage"
@@ -215,7 +236,7 @@
                 rows="4"
                 class="form-input"
                 [class.error]="hasFieldError('responseMessage')"
-                [placeholder]="newDecision.status === 'Approved' ? 'Provide the assigned temporary dock...' : 'Provide the reason for rejection...'"
+                placeholder="Provide the reason for rejection..."
               ></textarea>
               <div *ngIf="hasFieldError('responseMessage')" class="field-error">
                 {{ getFieldError('responseMessage') }}

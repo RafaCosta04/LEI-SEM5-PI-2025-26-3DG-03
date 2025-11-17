@@ -31,7 +31,6 @@ export class Staff implements OnInit, OnDestroy {
   newStaff: StaffModel = { name: '', qualificationCodes: [], email: '', phone: '', operationalWindow: null, status: 0 };
   modalErrorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
-  // Qualification dropdown (create)
   selectedQualificationsNew: string[] = [];
   selectedQualificationDisplayNew: string = '';
   isQualificationDropdownOpenNew: boolean = false;
@@ -43,7 +42,6 @@ export class Staff implements OnInit, OnDestroy {
   editModalErrorMessage: string = '';
   editFieldErrors: { [key: string]: string } = {};
   originalEditStaff: StaffModel | null = null;
-  // Qualification dropdown (edit)
   selectedQualificationsEdit: string[] = [];
   selectedQualificationDisplayEdit: string = '';
   isQualificationDropdownOpenEdit: boolean = false;
@@ -182,7 +180,6 @@ export class Staff implements OnInit, OnDestroy {
 
   onSaveNewStaff() {
     this.modalErrorMessage = ''; this.fieldErrors = {};
-    // sync selected qualifications into model
     this.newStaff.qualificationCodes = [...(this.selectedQualificationsNew || this.newStaff.qualificationCodes || [])];
     if (!this.newStaff.name?.trim() || !this.newStaff.email?.trim() || !this.newStaff.phone?.trim()) {
       this.modalErrorMessage = 'Please fill required fields: name, email and phone.'; return;
@@ -210,7 +207,6 @@ export class Staff implements OnInit, OnDestroy {
   onUpdate() {
     if (!this.selectedStaff) { alert('Please select a staff to edit.'); return; }
     this.showEditModal = true; this.resetEditStaff(); this.editStaff = { ...(this.selectedStaff as StaffModel) }; this.originalEditStaff = { ...(this.editStaff) };
-    // initialize edit selected qualifications from the staff
     this.selectedQualificationsEdit = this.editStaff.qualificationCodes ? [...this.editStaff.qualificationCodes] : [];
     this.selectedQualificationDisplayEdit = '';
   }
@@ -237,7 +233,6 @@ export class Staff implements OnInit, OnDestroy {
 
   onSaveEditStaff() {
     this.editModalErrorMessage = ''; this.editFieldErrors = {};
-    // sync selected qualifications into model
     this.editStaff.qualificationCodes = [...(this.selectedQualificationsEdit || this.editStaff.qualificationCodes || [])];
     if (!this.editStaff.name?.trim() || !this.editStaff.email?.trim() || !this.editStaff.phone?.trim()) { this.editModalErrorMessage = 'Please fill in required fields.'; return; }
     if (!this.selectedStaff?.id) { this.editModalErrorMessage = 'No staff selected.'; return; }
@@ -275,7 +270,6 @@ export class Staff implements OnInit, OnDestroy {
   }
 
   toggleQualificationForNew(code: string) {
-    // toggle in selectedQualificationsNew and sync model
     const arr = this.selectedQualificationsNew || [];
     if (arr.includes(code)) this.selectedQualificationsNew = arr.filter(c => c !== code);
     else this.selectedQualificationsNew = [...arr, code];

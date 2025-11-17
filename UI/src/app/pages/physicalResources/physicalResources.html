@@ -71,7 +71,7 @@
           [class.selected]="selectedPhysicalResource?.id === resource.id"
           (click)="selectPhysicalResource(resource)"
         >
-          <td>{{ resource.code }}</td>
+          <td><span class="styled-field">{{ resource.code }}</span></td>
           <td>{{ resource.name }}</td>
           <td>{{ getKindLabel(resource.kind!) }}</td>
           <td>{{ resource.description }}</td>
@@ -81,8 +81,8 @@
             </span>
           </td>
           <td>{{ resource.operationalCapacity }}</td>
-          <td>{{ resource.assignedArea || 'N/A' }}</td>
-          <td>{{ resource.qualificationCode || 'None' }}</td>
+          <td><span class="vessel-type">{{ resource.assignedArea || 'N/A' }}</span></td>
+          <td><span class="vessel-type">{{ resource.qualificationCode || 'None' }}</span></td>
           <td>
             <button
               (click)="selectPhysicalResource(resource); $event.stopPropagation()"
@@ -106,36 +106,26 @@
   <div *ngIf="selectedPhysicalResource" class="selected-info">
     <h3>Selected Physical Resource:</h3>
     <div class="info-card">
-      <div class="info-row">
-        <div class="info-col">
-          <p><strong>Code:</strong> {{ selectedPhysicalResource.code }}</p>
-          <p><strong>Name:</strong> {{ selectedPhysicalResource.name }}</p>
-          <p><strong>Kind:</strong> {{ getKindLabel(selectedPhysicalResource.kind!) }}</p>
-          <p><strong>Status:</strong>
-            <span [ngClass]="'status-' + selectedPhysicalResource.status?.toLowerCase()">
-              {{ getStatusLabel(selectedPhysicalResource.status!) }}
-            </span>
-          </p>
-        </div>
-        <div class="info-col">
-          <p><strong>Operational Capacity:</strong> {{ selectedPhysicalResource.operationalCapacity }}</p>
-          <p><strong>Setup Time:</strong> {{ selectedPhysicalResource.setupTimeMinutes || 0 }} minutes</p>
-          <p><strong>Assigned Area:</strong> {{ selectedPhysicalResource.assignedArea || 'None' }}</p>
-          <p><strong>Qualification:</strong> {{ selectedPhysicalResource.qualificationCode || 'None' }}</p>
-        </div>
-      </div>
-      <div class="info-row">
-        <div class="info-col-full">
-          <p><strong>Description:</strong> {{ selectedPhysicalResource.description }}</p>
-          <p *ngIf="selectedPhysicalResource.operationalWindow">
-            <strong>Operational Window:</strong>
-            {{ getDayLabel(selectedPhysicalResource.operationalWindow.startDay!) }} -
-            {{ getDayLabel(selectedPhysicalResource.operationalWindow.endDay!) }},
-            {{ selectedPhysicalResource.operationalWindow.startTime }} -
-            {{ selectedPhysicalResource.operationalWindow.endTime }}
-          </p>
-        </div>
-      </div>
+      <p><strong>Code:</strong> {{ selectedPhysicalResource.code }}</p>
+      <p><strong>Name:</strong> {{ selectedPhysicalResource.name }}</p>
+      <p><strong>Kind:</strong> {{ getKindLabel(selectedPhysicalResource.kind!) }}</p>
+      <p><strong>Description:</strong> {{ selectedPhysicalResource.description }}</p>
+      <p><strong>Status:</strong>
+        <span [ngClass]="'status-' + selectedPhysicalResource.status?.toLowerCase()">
+          {{ getStatusLabel(selectedPhysicalResource.status!) }}
+        </span>
+      </p>
+      <p><strong>Operational Capacity:</strong> {{ selectedPhysicalResource.operationalCapacity }}</p>
+      <p><strong>Setup Time:</strong> {{ selectedPhysicalResource.setupTimeMinutes || 0 }} minutes</p>
+      <p><strong>Assigned Area:</strong> {{ selectedPhysicalResource.assignedArea || 'None' }}</p>
+      <p><strong>Qualification:</strong> {{ selectedPhysicalResource.qualificationCode || 'None' }}</p>
+      <p *ngIf="selectedPhysicalResource.operationalWindow">
+        <strong>Operational Window:</strong>
+        {{ getDayLabel(selectedPhysicalResource.operationalWindow.startDay!) }} -
+        {{ getDayLabel(selectedPhysicalResource.operationalWindow.endDay!) }},
+        {{ selectedPhysicalResource.operationalWindow.startTime }} -
+        {{ selectedPhysicalResource.operationalWindow.endTime }}
+      </p>
     </div>
   </div>
 </div>

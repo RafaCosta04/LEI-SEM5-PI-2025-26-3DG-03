@@ -67,8 +67,8 @@
           [class.selected]="selectedRepresentative?.id === representative.id"
           (click)="selectRepresentative(representative)"
         >
-          <td>{{ representative.name }}</td>
-          <td>{{ representative.organizationName }}</td>
+          <td><span class="styled-field">{{ representative.name }}</span></td>
+          <td><span class="vessel-type">{{ representative.organizationName }}</span></td>
           <td>{{ representative.citizenId }}</td>
           <td>{{ representative.nationality }}</td>
           <td>{{ representative.email }}</td>
@@ -121,16 +121,17 @@
       <form (ngSubmit)="onSaveNewRepresentative()" #representativeForm="ngForm">
         <div class="form-group">
           <label for="organizationName">Organization Name *</label>
-          <input
-            type="text"
+          <select
             id="organizationName"
             name="organizationName"
             [(ngModel)]="newRepresentative.organizationName"
             required
             class="form-input"
             [class.error]="hasFieldError('organizationName')"
-            placeholder="Enter organization name"
           >
+            <option value="" disabled selected>Select organization</option>
+            <option *ngFor="let org of organizations" [value]="org.legalName">{{ org.legalName }}</option>
+          </select>
           <div *ngIf="hasFieldError('organizationName')" class="field-error">
             {{ getFieldError('organizationName') }}
           </div>
@@ -172,16 +173,17 @@
 
         <div class="form-group">
           <label for="nationality">Nationality *</label>
-          <input
-            type="text"
+          <select
             id="nationality"
             name="nationality"
             [(ngModel)]="newRepresentative.nationality"
             required
             class="form-input"
             [class.error]="hasFieldError('nationality')"
-            placeholder="Enter nationality"
           >
+            <option value="" disabled selected>Select nationality</option>
+            <option *ngFor="let country of countries" [value]="country.code">{{ country.code }} - {{ country.name }}</option>
+          </select>
           <div *ngIf="hasFieldError('nationality')" class="field-error">
             {{ getFieldError('nationality') }}
           </div>
@@ -233,7 +235,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="isCreating"
+            [disabled]="isCreating || !representativeForm.form.valid"
           >
             {{ isCreating ? 'Creating...' : 'Create Representative' }}
           </button>
@@ -259,16 +261,17 @@
       <form (ngSubmit)="onSaveEditRepresentative()" #editRepresentativeForm="ngForm">
         <div class="form-group">
           <label for="editOrganizationName">Organization Name *</label>
-          <input
-            type="text"
+          <select
             id="editOrganizationName"
             name="editOrganizationName"
             [(ngModel)]="editRepresentative.organizationName"
             required
             class="form-input"
             [class.error]="hasEditFieldError('organizationName')"
-            placeholder="Enter organization name"
           >
+            <option value="" disabled>Select organization</option>
+            <option *ngFor="let org of organizations" [value]="org.legalName">{{ org.legalName }}</option>
+          </select>
           <div *ngIf="hasEditFieldError('organizationName')" class="field-error">
             {{ getEditFieldError('organizationName') }}
           </div>
@@ -306,16 +309,17 @@
 
         <div class="form-group">
           <label for="editNationality">Nationality *</label>
-          <input
-            type="text"
+          <select
             id="editNationality"
             name="editNationality"
             [(ngModel)]="editRepresentative.nationality"
             required
             class="form-input"
             [class.error]="hasEditFieldError('nationality')"
-            placeholder="Enter nationality"
           >
+            <option value="" disabled selected>Select nationality</option>
+            <option *ngFor="let country of countries" [value]="country.code">{{ country.code }} - {{ country.name }}</option>
+          </select>
           <div *ngIf="hasEditFieldError('nationality')" class="field-error">
             {{ getEditFieldError('nationality') }}
           </div>

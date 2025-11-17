@@ -54,7 +54,7 @@ export class VesselType implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private searchSubject$ = new Subject<string>();
-  
+
 
   constructor(
     private vesselTypeService: VesselTypeService,
@@ -178,8 +178,6 @@ export class VesselType implements OnInit, OnDestroy {
     this.clearSearchAndNotify();
   }
 
-  // Removed timer-based hide: we clear errors immediately when results arrive or search is cleared.
-
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredVesselTypes = [...this.vesselTypes]; this.searchSubject$.next(this.searchTerm); }
 
   selectVesselType(vesselType: VesselTypeModel) {
@@ -276,15 +274,11 @@ export class VesselType implements OnInit, OnDestroy {
     if (error.originalError && error.originalError.error) {
       const backendError = error.originalError.error;
       console.error('Backend error object:', backendError);
-
-
       if (Array.isArray(backendError)) {
         errorMessage = backendError.join('; ');
         this.modalErrorMessage = errorMessage;
         return;
       }
-
-
       if (backendError.errors && typeof backendError.errors === 'object') {
         for (const field in backendError.errors) {
           const fieldName = field.toLowerCase();
@@ -295,8 +289,6 @@ export class VesselType implements OnInit, OnDestroy {
         this.modalErrorMessage = 'Please correct the validation errors below.';
         return;
       }
-
-
       if (backendError.message) {
         errorMessage = backendError.message;
       } else if (backendError.title) {
@@ -307,13 +299,9 @@ export class VesselType implements OnInit, OnDestroy {
         errorMessage = backendError;
       }
     }
-
-
     if (!errorMessage && error.message) {
       errorMessage = error.message;
     }
-
-
     if (!errorMessage) {
       errorMessage = 'Error creating vessel type. Please try again.';
     }
@@ -421,13 +409,11 @@ export class VesselType implements OnInit, OnDestroy {
     if (error.originalError && error.originalError.error) {
       const backendError = error.originalError.error;
       console.error('Backend error object:', backendError);
-
       if (Array.isArray(backendError)) {
         errorMessage = backendError.join('; ');
         this.editModalErrorMessage = errorMessage;
         return;
       }
-
       if (backendError.errors && typeof backendError.errors === 'object') {
         for (const field in backendError.errors) {
           const fieldName = field.toLowerCase();
@@ -438,7 +424,6 @@ export class VesselType implements OnInit, OnDestroy {
         this.editModalErrorMessage = 'Please correct the validation errors below.';
         return;
       }
-
       if (backendError.message) {
         errorMessage = backendError.message;
       } else if (backendError.title) {
@@ -449,11 +434,9 @@ export class VesselType implements OnInit, OnDestroy {
         errorMessage = backendError;
       }
     }
-
     if (!errorMessage && error.message) {
       errorMessage = error.message;
     }
-
     if (!errorMessage) {
       errorMessage = 'Error updating vessel type. Please try again.';
     }

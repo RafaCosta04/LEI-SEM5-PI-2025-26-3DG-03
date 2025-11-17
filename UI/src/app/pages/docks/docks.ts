@@ -289,10 +289,8 @@ export class Docks implements OnInit, OnDestroy {
     event.stopPropagation();
 
     if (this.selectedVesselTypes.includes(vesselTypeName)) {
-      // Se já está selecionado, remover
       this.selectedVesselTypes = this.selectedVesselTypes.filter(vt => vt !== vesselTypeName);
     } else {
-      // Se não está selecionado, adicionar
       this.selectedVesselTypes.push(vesselTypeName);
     }
   }
@@ -314,11 +312,7 @@ export class Docks implements OnInit, OnDestroy {
   onSaveNewDock() {
     this.modalErrorMessage = '';
     this.fieldErrors = {};
-
-    // Assign selected vessel type names to the dock
     this.newDock.vesselTypesAllowed = [...this.selectedVesselTypes];
-
-    // Validate vessel types selection
     if (this.selectedVesselTypes.length === 0) {
       this.modalErrorMessage = 'At least one vessel type must be selected.';
       return;
@@ -434,7 +428,7 @@ export class Docks implements OnInit, OnDestroy {
   closeEditModal() {
     this.showEditModal = false;
     this.resetEditDock();
-    this.originalEditDock = null; // Clear original data
+    this.originalEditDock = null;
     this.isEditing = false;
   }
 
@@ -444,17 +438,13 @@ export class Docks implements OnInit, OnDestroy {
   }
 
   selectEditVesselType(vesselTypeName: string, event: Event) {
-    event.stopPropagation(); // Prevenir que o dropdown feche
+    event.stopPropagation();
 
     if (this.editSelectedVesselTypes.includes(vesselTypeName)) {
-      // Se já está selecionado, remover
       this.editSelectedVesselTypes = this.editSelectedVesselTypes.filter(vt => vt !== vesselTypeName);
     } else {
-      // Se não está selecionado, adicionar
       this.editSelectedVesselTypes.push(vesselTypeName);
     }
-
-    // Sync with editDock.vesselTypesAllowed for dirty detection
     this.editDock.vesselTypesAllowed = [...this.editSelectedVesselTypes];
   }
 
@@ -475,20 +465,16 @@ export class Docks implements OnInit, OnDestroy {
   onSaveEditDock() {
     this.editModalErrorMessage = '';
     this.editFieldErrors = {};
-
-    // Process vessel types from dropdown selection
     this.editDock.vesselTypesAllowed = [...this.editSelectedVesselTypes];
 
     if (!this.isValidEditDock()) {
       this.editModalErrorMessage = 'Please fill in all required fields (name, location, length, depth, maxDraft).';
       return;
     }
-
     if (!this.selectedDock?.id) {
       this.editModalErrorMessage = 'No dock selected for editing.';
       return;
     }
-
     if (!this.isEditDirty()) {
       this.editModalErrorMessage = 'No changes to save.';
       return;

@@ -21,7 +21,6 @@ export class Qualification implements OnInit, OnDestroy {
 
   statusMessage: string = '';
   statusMessageType: 'success' | 'error' | '' = '';
-  // Controls the hide animation when clearing the status message
   statusHiding: boolean = false;
 
   // Modal properties
@@ -102,7 +101,6 @@ export class Qualification implements OnInit, OnDestroy {
   private performSearch(searchTerm: string) {
     if (!searchTerm.trim()) {
       this.filteredQualifications = [...this.qualifications];
-      // If the user cleared the search, hide any top error message immediately (same behavior as Representative)
       if (this.statusMessage && this.statusMessageType === 'error') {
         this.clearStatusMessage();
       }
@@ -132,13 +130,11 @@ export class Qualification implements OnInit, OnDestroy {
       .subscribe({
         next: (qualifications) => {
           this.filteredQualifications = qualifications;
-          // If remote search returned results, clear any previous error message
           if (qualifications && qualifications.length > 0) {
             if (this.statusMessage && this.statusMessageType === 'error') {
               this.clearStatusMessage();
             }
           } else {
-            // No results from remote search -> show top error banner
             this.statusHiding = false;
             this.statusMessage = `No results found for "${name}"`;
             this.statusMessageType = 'error';
@@ -157,10 +153,8 @@ export class Qualification implements OnInit, OnDestroy {
   }
 
   clearStatusMessage() {
-    // Play hide animation before removing the node from DOM so the exit animation can be seen.
     if (!this.statusMessage) return;
     this.statusHiding = true;
-    // Give the CSS exit animation time to run (match to CSS animation duration: 200ms)
     setTimeout(() => {
       this.statusMessage = '';
       this.statusMessageType = '';
@@ -170,8 +164,6 @@ export class Qualification implements OnInit, OnDestroy {
 
   clearSearch() { this.clearSearchAndNotify(); }
 
-  // When clearing programmatically (e.g. clicking the clear button) ensure the
-  // search pipeline and error-hide behavior run as if the user emptied the input.
   clearSearchAndNotify() { this.searchTerm = ''; this.filteredQualifications = [...this.qualifications]; this.searchSubject$.next(this.searchTerm); }
 
   selectQualification(qualification: QualificationModel) {
