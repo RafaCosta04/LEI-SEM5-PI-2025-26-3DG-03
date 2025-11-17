@@ -1,8 +1,8 @@
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import * as THREE from 'three';
 
-export function createSea(): THREE.Mesh {
-    const waterGeometry = new THREE.PlaneGeometry(800, 600);
+export function createSea(width: number ,lenght: number, centerX: number ): THREE.Mesh {
+    const waterGeometry = new THREE.PlaneGeometry(width, lenght);
 
     const waterNormals = new THREE.TextureLoader().load('https://threejs.org/examples/textures/waternormals.jpg',(texture) => {texture.wrapS = texture.wrapT = THREE.RepeatWrapping;});
 
@@ -36,7 +36,7 @@ export function createSea(): THREE.Mesh {
 
     water.position.y = 21;
     water.position.z = 75;
-    water.position.x = -200;
+    water.position.x = centerX;
 
 
     water.castShadow = true;

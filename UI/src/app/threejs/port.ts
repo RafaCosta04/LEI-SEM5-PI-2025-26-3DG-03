@@ -11,12 +11,6 @@ export function createPortStructure()
         roughness: 0.6,
         metalness: 0.1
     });
-
-    const material1 = new THREE.MeshStandardMaterial({
-        color: 0x8080ff,
-        roughness: 0.6,
-        metalness: 0.1
-    });
     
     const dockGeometry = new THREE.BoxGeometry(400, 30, 200);
     const dockMesh = new THREE.Mesh(dockGeometry, material);

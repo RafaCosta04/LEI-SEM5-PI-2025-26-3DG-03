@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 
-export async function createYard(): Promise<THREE.Object3D> {
+import { createStorageAreaLabel } from './storageAreaLabel';
+
+export async function createYard(labelText: string): Promise<THREE.Object3D> {
   return new Promise((resolve, reject) => {
     const objLoader = new OBJLoader();
     const mtlLoader = new MTLLoader();
@@ -20,9 +22,7 @@ export async function createYard(): Promise<THREE.Object3D> {
           (object) => {
             // Mantém transform similar ao warehouse; caller pode ajustar se necessário
             object.scale.set(100, 50, 50);
-            
 
-            
             object.rotation.y = Math.PI;
 
             object.traverse((child: any) => {
@@ -45,7 +45,12 @@ export async function createYard(): Promise<THREE.Object3D> {
               }
             });
 
-            resolve(object as THREE.Object3D);
+            const label = createStorageAreaLabel(labelText);
+            label.scale.x *= 0.5
+            object.add(label);
+            
+            resolve(object as THREE.Group);
+
           },
           (xhr) => {
             if (xhr && xhr.total) {

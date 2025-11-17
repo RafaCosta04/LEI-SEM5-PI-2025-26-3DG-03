@@ -16,10 +16,15 @@ export class PortLayoutService {
   async getLayout(): Promise<{
     dockPositions: any[];
     storageAreas: {
-      x: number; y: number; z: number;
+      x: number;
+      y: number;
+      z: number;
       type: StorageAreaType;
-      data: any;
-    }[];
+      name: string;
+      currentCapacity: number;
+      maxCapacity: number;
+    }[]
+
   }> {
     try {
       // 1️⃣ Buscar layout base
@@ -28,8 +33,8 @@ export class PortLayoutService {
       );
 
       // 2️⃣ Buscar dados reais do backend
-      const docks = await firstValueFrom(this.docksService.getAllDocks());
-      const storageAreas = await firstValueFrom(this.storageAreaService.getAllStorageAreas());
+      const docks = (await firstValueFrom(this.docksService.getAllDocks())).reverse();
+      const storageAreas = (await firstValueFrom(this.storageAreaService.getAllStorageAreas())).reverse();
 
       // 3️⃣ DOCAS → mapear até ao limite dos slots
       const dockPositions = layout.dockSlots
@@ -49,6 +54,9 @@ export class PortLayoutService {
           y: slot.y,
           z: slot.z,
           type: area.storageAreaType,
+          name: area.location ,
+          currentCapacity: area.currentCapacity ?? 0,
+          maxCapacity: area.maxCapacity ?? area.capacity ?? 0,
           data: area
         };
       }).filter(x => x !== null);

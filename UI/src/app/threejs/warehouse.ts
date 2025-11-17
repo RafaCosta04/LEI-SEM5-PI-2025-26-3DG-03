@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 
-export async function createWarehouse(): Promise<THREE.Group> {
+import { createStorageAreaLabel } from './storageAreaLabel';
+
+export async function createWarehouse(labelText: string): Promise<THREE.Group> {
   return new Promise((resolve, reject) => {
     const objLoader = new OBJLoader();
     const mtlLoader = new MTLLoader();
@@ -46,8 +48,15 @@ export async function createWarehouse(): Promise<THREE.Group> {
                 child.geometry?.computeVertexNormals?.();
               }
             });
+ 
+            
+
+            const label = createStorageAreaLabel(labelText);
+            
+            object.add(label);
 
             resolve(object as THREE.Group);
+
           },
           (xhr) => {
             if (xhr && xhr.total) {

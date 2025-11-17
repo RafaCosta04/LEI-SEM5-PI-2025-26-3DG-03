@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-export function createSeaBed(): THREE.Mesh {
-  const geometry = new THREE.BoxGeometry(800, 600, 10);
+export function createSeaBed(width: number ,lenght: number, centerX: number ): THREE.Mesh {
+  const geometry = new THREE.BoxGeometry(width, lenght, 10);
   
   
   const material = new THREE.MeshStandardMaterial({
@@ -14,7 +14,7 @@ export function createSeaBed(): THREE.Mesh {
   seabed.rotation.x = -Math.PI / 2;
   seabed.position.y = 5;
   seabed.position.z = 75;
-  seabed.position.x = -200; 
+  seabed.position.x = centerX; 
 
   seabed.castShadow = false;
   seabed.receiveShadow = true;

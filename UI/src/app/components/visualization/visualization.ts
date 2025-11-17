@@ -9,6 +9,7 @@ import { createWarehouse } from '../../threejs/warehouse';
 import { createYard } from '../../threejs/yard';
 
 import { PortLayoutService } from '../../services/portLayout.service';
+import { label } from 'three/src/nodes/TSL.js';
 
 @Component({
   selector: 'app-visualization',
@@ -36,14 +37,15 @@ export class PortVisualizationComponent implements AfterViewInit, OnDestroy {
       })
     );
 
-     const storageMeshes = await Promise.all(
+    const storageMeshes = await Promise.all(
       storageAreas.map(async (area) => {
         let mesh;
-
+        const labelText = `${area.name} \n ${area.currentCapacity}/${area.maxCapacity}`;
         if (area.type === 'Warehouse') {
-          mesh = await createWarehouse();
+          
+          mesh = await createWarehouse(labelText);
         } else {
-          mesh = await createYard();
+          mesh = await createYard(labelText);
           area.y += 0.5;
         }
 
@@ -52,16 +54,37 @@ export class PortVisualizationComponent implements AfterViewInit, OnDestroy {
       })
     );
 
-
     const portStructure = createPortStructure();
-    const sea = createSea();
-    const seaBed = createSeaBed();
+    
+    
     const vessel = await createVessel();
+
+
+    let seaWidth = 800;
+    let seaLenght = 600;
+    let seaCenterX = -200;
+
+
+    if (storageMeshes.length > 3 || docks.length > 3) {
+      const portStructure2 = createPortStructure();
+      portStructure2.position.x = -400;
+      portStructure.add(portStructure2);
+
+      seaWidth = 1200;
+      seaLenght = 600;
+      seaCenterX = -400;
+
+    }
+
+    const sea = createSea(seaWidth, seaLenght, seaCenterX);
+    const seaBed = createSeaBed(seaWidth, seaLenght, seaCenterX);
+
+    
 
     const allObjects = [...docks, ...storageMeshes];
 
 
-    scene.initialize(portStructure, sea, seaBed, [vessel], allObjects);
+    scene.initialize(portStructure, sea , seaBed, [vessel], allObjects);
     scene.start();
 
     this.scene = scene;
