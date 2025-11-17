@@ -4,39 +4,52 @@
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_json)).
+:- use_module(library(http/http_parameters)).
 :- consult('Algorithms/vessel_schedule.pl').
+:- consult('Algorithms/improved_vessel_schedule.pl').
 
 :- http_handler(root(api/scheduling/compute), handle_scheduling_request, []).
-
 
 handle_scheduling_request(Request) :-
     catch(
         (
             http_read_json_dict(Request, Dict),
-            process_data(Dict, Result),
-            reply_json_dict(_{status: "ok", schedule: Result})
+            http_parameters(Request, [algorithm(AlgParam, [optional(true)])]),
+            (   (get_dict(algorithm, Dict, AlgJson) -> true ; AlgJson = '' ),
+                (AlgParam \= '' -> Algorithm = AlgParam ; (AlgJson \= '' -> Algorithm = AlgJson ; Algorithm = default))
+            ),
+            with_output_to(user_error, format('Selected algorithm: ~w~n', [Algorithm])),
+            ( process_data_with_algorithm(Algorithm, Dict, Result)
+            -> reply_json_dict(_{status: "ok", schedule: Result})
+            ; reply_json_dict(_{error: "processing_failed"}, [status(500)])
+            )
         ),
         Error,
         (
-            format(" ERRO ao processar JSON: ~w~n", [Error]),
-            reply_json_dict(_{error:"invalid_json"}, [status(400)])
+            with_output_to(user_error, format("ERRO ao processar JSON: ~w~n", [Error])),
+            reply_json_dict(_{error: Error}, [status(400)])
         )
     ).
 
-log_json(Dict) :-
-    with_output_to(user_error, format("Recebi JSON: ~w~n", [Dict])).
 
-process_data(Dict, Result) :-
+% process_data_with_algorithm(+Algorithm, +Dict, -Result)
+% Dispatches to the selected algorithm implementation.
+process_data_with_algorithm(Algorithm, Dict, Result) :-
     retractall(vessel(_,_,_,_,_)),
     Notifications = Dict.vesselVisitNotifications,
     Crane = Dict.assignedCrane,
     CraneCapacity = Crane.operationalCapacity,
     process_vessels(Notifications, CraneCapacity, _),
-    obtain_seq_shortest_delay(SeqTriplets, ShortestDelay),
+    downcase_atom(Algorithm, AlgorithmAtom),
+    (   AlgorithmAtom = 'improved'
+    ->  obtain_seq_shortest_delay_improved(SeqTriplets, ShortestDelay, ExecutionTime)
+    ;   obtain_seq_shortest_delay(SeqTriplets, ShortestDelay, ExecutionTime)
+    ),
     triplets_to_dicts(SeqTriplets, SeqDicts),
     Result = _{
         schedule: SeqDicts,
-        totalDelay: ShortestDelay
+        totalDelay: ShortestDelay,
+        executionTime: ExecutionTime
     }.
 
 process_vessels([], _, []).

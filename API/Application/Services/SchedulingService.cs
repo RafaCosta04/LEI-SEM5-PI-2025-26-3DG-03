@@ -41,7 +41,7 @@ public class SchedulingService
         _vesselRecordRepository = vesselRecordRepository;
     }
 
-    public async Task<SchedulingDTO?> GetSchedulingForTargetDay(DateTime targetDay, List<string> errorMessages)
+    public async Task<SchedulingDTO?> GetSchedulingForTargetDay(DateTime targetDay, List<string> errorMessages, string algorithm = "default")
     {
         IEnumerable<VesselVisitNotification> notifications = await _vesselVisitNotificationRepository.GetVisitsByTargetDay_StatusAsync(targetDay, VisitStatus.Approved);
         if (!notifications.Any())
@@ -73,7 +73,22 @@ public class SchedulingService
         DataScheduleDTO dataScheduleDTO = new DataScheduleDTO(notificationDTOs.ToList(), fastestCraneDTO);
 
 
-        string endpoint = _configuration["Scheduling:Endpoint"] ?? "http://localhost:6000/api/scheduling/compute";
+        string configured = _configuration["Scheduling:Endpoint"] ?? "http://localhost:6000/";
+        string baseEndpoint = configured;
+        if (!baseEndpoint.EndsWith("/")) baseEndpoint += "/";
+        string path = "api/scheduling/compute";
+        var algNorm = (algorithm ?? "default").Trim();
+        if (string.IsNullOrEmpty(algNorm)) algNorm = "default";
+        var algParam = algNorm.ToLowerInvariant();
+        if (algParam != "default" && algParam != "improved")
+        {
+            var msgInvalid = $"Unsupported algorithm '{algParam}'. Supported values: 'default' or 'improved'.";
+            Console.WriteLine(msgInvalid);
+            errorMessages.Add(msgInvalid);
+            return null;
+        }
+        string endpoint = baseEndpoint + path + "?algorithm=" + System.Uri.EscapeDataString(algParam);
+        Console.WriteLine($"SchedulingService: requested algorithm='{algParam}', calling Prolog endpoint: {endpoint}");
         try
         {
             using var client = new HttpClient();
@@ -83,8 +98,17 @@ public class SchedulingService
             );
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await client.PostAsync(endpoint, content);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errBody = await response.Content.ReadAsStringAsync();
+                var msg = $"Scheduling endpoint returned {(int)response.StatusCode} {response.ReasonPhrase}: {errBody}";
+                Console.WriteLine(msg);
+                errorMessages.Add(msg);
+                return null;
+            }
             var responseJson = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Received scheduling response from Prolog:");
+            Console.WriteLine(responseJson);
             var doc = JsonDocument.Parse(responseJson);
 
             var scheduleArray = doc.RootElement
@@ -96,6 +120,10 @@ public class SchedulingService
                 .GetProperty("schedule")
                 .GetProperty("totalDelay")
                 .GetInt32();
+            double executionTime = doc.RootElement
+                .GetProperty("schedule")
+                .GetProperty("executionTime")
+                .GetDouble();
             var entries = new List<SchedulingEntryDTO>();
             foreach (var item in scheduleArray)
             {
@@ -112,13 +140,13 @@ public class SchedulingService
                 var schedulingEntryDTO = new SchedulingEntryDTO(vesselName, startTime, endTime, assignedCranes, staffNames);
                 entries.Add(schedulingEntryDTO);
             }
-            var schedulingDTO = new SchedulingDTO(entries, totalDelay);
+            var schedulingDTO = new SchedulingDTO(entries, totalDelay, executionTime);
             return schedulingDTO;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
-            errorMessages.Add(ex.Message);
+            Console.WriteLine($"Error: {ex}");
+            errorMessages.Add(ex.ToString());
             return null;
         }
     }

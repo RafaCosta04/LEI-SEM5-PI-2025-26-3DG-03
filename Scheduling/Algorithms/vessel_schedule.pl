@@ -26,12 +26,13 @@ sum_delays([(V,_,TEndLoad)|LV],S):-
 		S is SV+SLV.
 
 
-obtain_seq_shortest_delay(SeqBetterTriplets, SShortestDelay):-
+obtain_seq_shortest_delay(SeqBetterTriplets, SShortestDelay, ExecutionTime):-
     get_time(Ti),
     (obtain_seq_shortest_delay1;true),retract(shortest_delay(SeqBetterTriplets, SShortestDelay)),!,
     get_time(Tf),
-    T is Tf-Ti,
-    safe_log('Time to generate the shortest delay solution: ~w~n', [T]).
+    TimeSecs is Tf - Ti,
+    ExecutionTime = TimeSecs,
+    safe_log('Time to generate the shortest delay solution (secs): ~w~n', [TimeSecs]).
 
 obtain_seq_shortest_delay1:-
     asserta(shortest_delay(_,100000)),

@@ -7,10 +7,13 @@ public class SchedulingDTO
 
     public int TotalDelay { get; set; }
 
-    public SchedulingDTO(List<SchedulingEntryDTO> entries, int totalDelay)
+    public double ExecutionTime { get; set; }
+
+    public SchedulingDTO(List<SchedulingEntryDTO> entries, int totalDelay, double executionTime)
     {
         Entries = entries;
         TotalDelay = totalDelay;
+        ExecutionTime = executionTime;
     }
 
 }
