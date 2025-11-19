@@ -84,7 +84,8 @@ namespace Domain.Model
         private static void ValidateQualification(IEnumerable<Qualification> qualification)
         {
             if (qualification == null || !qualification.Any())
-                throw new ArgumentNullException(nameof(qualification), "At least one valid QualificationCode must be provided to update a Staff.");
+                //throw new ArgumentNullException(nameof(qualification), "At least one valid QualificationCode must be provided to update a Staff.");
+                Console.WriteLine("Rebenta Aqui!");
         }
 
         private static void ValidateOperationalWindow(OperationalWindow operationalWindow)
