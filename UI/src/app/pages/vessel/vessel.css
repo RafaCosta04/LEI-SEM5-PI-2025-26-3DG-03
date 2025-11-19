@@ -1,10 +1,5 @@
 /* Estilos específicos da página de vessel records */
 
-/* Modo escuro - título branco usando host-context */
-:host-context([data-coreui-theme="dark"]) .page-title {
-  color: #FFFFFF !important;
-}
-
 /* Vessel specific styling */
 .imo-number {
   font-family: 'Courier New', monospace;

@@ -1,10 +1,4 @@
-
 /* Staff page specific styles */
-
-/* Dark mode title */
-:host-context([data-coreui-theme="dark"]) .page-title {
-  color: #FFFFFF !important;
-}
 
 /* Styled Field */
 .styled-field {

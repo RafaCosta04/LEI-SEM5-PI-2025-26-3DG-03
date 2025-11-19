@@ -17,8 +17,3 @@
   background-color: #1a365d;
   border-color: #2c5aa0;
 }
-
-/* Dark mode title */
-:host-context([data-coreui-theme="dark"]) .page-title {
-  color: #FFFFFF !important;
-}

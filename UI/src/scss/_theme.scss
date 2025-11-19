@@ -462,37 +462,138 @@ body.sidebar-narrow .nav-link.nav-group-toggle {
   }
 }
 
-@media (max-width: 768px) {
-  .page-container {
-    padding: 15px;
-  }
+/* Dropdown Styles */
+.dropdown {
+  position: relative;
+  width: 100%;
 
-  .top-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-  }
+  &-toggle {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-sizing: border-box;
 
-  .search-container {
-    max-width: none;
-  }
+    &:hover {
+      border-color: #adb5bd;
+    }
 
-  .action-buttons {
-    justify-content: center;
-  }
-
-  .data-table {
-    font-size: 12px;
-
-    th,
-    td {
-      padding: 8px 6px;
+    &.open {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     }
   }
 
+  &-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999;
+  }
+
+  &-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f8f9fa;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover:not(.disabled) {
+      background-color: #f8f9fa;
+    }
+
+    &.disabled {
+      color: #6c757d;
+      cursor: not-allowed;
+      font-style: italic;
+      justify-content: center;
+    }
+  }
+
+  &-arrow {
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+    color: #6c757d;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/* Dark Mode Dropdown Styles */
+@include color-mode(dark) {
+  .dropdown {
+    &-toggle {
+      background-color: #4a5568;
+      border-color: #718096;
+      color: #e2e8f0;
+
+      &:hover {
+        border-color: #a0aec0;
+      }
+
+      &.open {
+        border-color: #0d6efd;
+        background-color: #4a5568;
+      }
+    }
+
+    &-menu {
+      background-color: #4a5568;
+      border-color: #718096;
+    }
+
+    &-item {
+      border-bottom-color: #2d3748;
+
+      &:hover:not(.disabled) {
+        background-color: #2d3748;
+      }
+
+      &.disabled {
+        color: #a0aec0;
+      }
+    }
+
+    &-arrow {
+      color: #a0aec0;
+    }
+  }
+}
+
+/* Estilos globais para títulos de página */
+.page-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* Modo escuro para títulos de página */
+@include color-mode(dark) {
   .page-title {
-    font-size: 1.5rem;
-    text-align: center;
+    color: #FFFFFF !important;
   }
 }
 
@@ -653,6 +754,69 @@ body.sidebar-narrow .nav-link.nav-group-toggle {
 .form-textarea {
   resize: vertical;
   min-height: 80px;
+}
+
+/* Estilos globais para dropdowns */
+select.form-select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #333;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+
+  option {
+    background-color: #ffffff !important;
+    color: #333 !important;
+  }
+
+  option:hover {
+    background-color: #f8f9fa !important;
+    color: #333 !important;
+  }
+
+  option:checked {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Estilos para dark mode com maior especificidade */
+@include color-mode(dark) {
+  select.form-select {
+    background-color: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+
+    &:focus {
+      border-color: #0d6efd;
+      background-color: #4a5568;
+    }
+
+    option {
+      background-color: #4a5568 !important;
+      color: #e2e8f0 !important;
+    }
+
+    option:hover {
+      background-color: #2d3748 !important;
+      color: #e2e8f0 !important;
+    }
+
+    option:checked {
+      background-color: #0d6efd !important;
+      color: #ffffff !important;
+    }
+  }
 }
 
 /* Alert Styles */

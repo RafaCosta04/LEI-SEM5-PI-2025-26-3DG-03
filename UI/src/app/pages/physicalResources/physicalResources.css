@@ -21,11 +21,6 @@
   white-space: normal;
 }
 
-/* Modo escuro - título branco usando host-context */
-:host-context([data-coreui-theme="dark"]) .page-title {
-  color: #FFFFFF !important;
-}
-
 /* Styled Field */
 .styled-field {
   font-family: 'Courier New', monospace;
@@ -220,14 +215,7 @@
   margin-bottom: 0;
 }
 
-.form-select {
-  background-color: white;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 8px center;
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
-  padding-right: 32px;
-}
+/* Removendo ajustes que não surtiram efeito */
 
 /* Form sections for grouping related fields */
 .form-section {
@@ -250,10 +238,6 @@
 
 :host-context([data-coreui-theme="dark"]) .form-section {
   border-top-color: #4a5568;
-}
-
-:host-context([data-coreui-theme="dark"]) .form-select {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a0aec0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
 /* Responsive styles for large modal */

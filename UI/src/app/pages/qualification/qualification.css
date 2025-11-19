@@ -1,10 +1,5 @@
 /* Estilos específicos da página de qualifications */
 
-/* Modo escuro - título branco usando host-context */
-:host-context([data-coreui-theme="dark"]) .page-title {
-  color: #FFFFFF !important;
-}
-
 /* Styled Field */
 .styled-field {
   font-family: 'Courier New', monospace;
