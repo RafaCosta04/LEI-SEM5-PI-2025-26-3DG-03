@@ -43,8 +43,8 @@ public class SystemUserMapper
         SystemUserDataModel systemUserDM = new SystemUserDataModel(systemUser);
         return systemUserDM;
     }
-    
-    public void UpdateDataModelAsync(SystemUserDataModel systemUserDataModel,SystemUser systemUser)
+
+    public void UpdateDataModelAsync(SystemUserDataModel systemUserDataModel, SystemUser systemUser)
     {
         systemUserDataModel.Code = systemUser.Code;
         systemUserDataModel.Username = systemUser.Username;

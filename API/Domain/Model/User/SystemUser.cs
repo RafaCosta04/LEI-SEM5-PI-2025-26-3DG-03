@@ -1,10 +1,11 @@
 namespace Domain.Model;
+
 using System.ComponentModel.DataAnnotations;
 
 
 public enum SystemRole
 {
-    Admin, 
+    Admin,
     LogisticOperator,
     PortAuthorityOfficer
 }
@@ -20,20 +21,20 @@ public class SystemUser
 {
     public long Id { get; set; }
 
-    public string? Code {get; private set;}
+    public string? Code { get; private set; }
 
-    public string? Username { get; private set; } 
+    public string? Username { get; private set; }
 
-    public string? Email { get;private set; } 
+    public string? Email { get; private set; }
 
     public SystemRole Role { get; private set; }
 
-    public bool IsActive { get;private set; }
+    public bool IsActive { get; private set; }
 
     private SystemUser() { }
 
-    public SystemUser(string code, string username,string email, SystemRole role)
-    {   
+    public SystemUser(string code, string username, string email, SystemRole role)
+    {
         ValidateCode(code);
         ValidateUsername(username);
         ValidateEmail(email);
@@ -61,7 +62,7 @@ public class SystemUser
 
     public void ValidateCode(string code)
     {
-         if (string.IsNullOrWhiteSpace(code))
+        if (string.IsNullOrWhiteSpace(code))
         {
             throw new ArgumentException("Code cannot be null or empty.", nameof(code));
         }

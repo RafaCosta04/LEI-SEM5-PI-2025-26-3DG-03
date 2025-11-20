@@ -94,22 +94,23 @@ public class SystemUserService
 
     public async Task<SystemUserDTO?> AddSystemUser(SystemUserDTO dto, List<string> errorMessages)
     {
-        if(await SystemUserExistsByUsername(dto.Username!))
+        if (await SystemUserExistsByUsername(dto.Username!))
         {
-           errorMessages.Add("Username already exists.");
-           return null; 
+            errorMessages.Add("Username already exists.");
+            return null;
         }
-        if(await SystemUserExistsByEmail(dto.Email!))
+        if (await SystemUserExistsByEmail(dto.Email!))
         {
-           errorMessages.Add("Email already exists.");
-           return null; 
+            errorMessages.Add("Email already exists.");
+            return null;
         }
         SystemUser user;
         try
         {
             user = _systemUserFactory.NewSystemUser(dto.Code, dto.Username, dto.Email, dto.Role);
 
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             errorMessages.Add($"Error creating system user: {ex.Message}");
             return null;
@@ -123,25 +124,25 @@ public class SystemUserService
     public async Task<bool> UpdateSystemUser(string code, SystemUserDTO systemUserDTO, List<string> errorMessages)
     {
         SystemUser? systemUser = await _systemUserRepository.GetSystemUserByCode(code);
-        if(systemUser == null)
+        if (systemUser == null)
         {
             errorMessages.Add("There is no System User with this code.");
             return false;
         }
-        if(code != systemUserDTO.Code)
+        if (code != systemUserDTO.Code)
         {
             errorMessages.Add("System User Code is not updatable");
             return false;
         }
 
         var username = await _systemUserRepository.GetSystemUserByUsernameAsync(systemUserDTO.Username);
-        if(username != null && systemUser.Username != systemUserDTO.Username)
+        if (username != null && systemUser.Username != systemUserDTO.Username)
         {
             errorMessages.Add("There is already a System User with this username!");
             return false;
         }
         var email = await _systemUserRepository.GetSystemUserByEmailAsync(systemUserDTO.Email);
-        if(email != null && systemUser.Email != systemUserDTO.Email)
+        if (email != null && systemUser.Email != systemUserDTO.Email)
         {
             errorMessages.Add("There is already a System User with this email!");
             return false;
@@ -151,7 +152,8 @@ public class SystemUserService
             systemUser.ChangeBooleanStatus(systemUserDTO.IsActive);
             systemUser.ChangeSystemRole(systemUserDTO.Role);
             return await _systemUserRepository.Update(systemUser, errorMessages);
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             errorMessages.Add($"Error updating system user: {ex.Message}");
             return false;

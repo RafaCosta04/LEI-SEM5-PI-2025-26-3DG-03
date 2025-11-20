@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Domain.Tests
 {
-    
+
     public class SystemUserTest
     {
         [Fact]
@@ -43,9 +43,9 @@ namespace Domain.Tests
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        [InlineData("ABC123")] 
+        [InlineData("ABC123")]
         [InlineData("USR12")]
-        [InlineData("usr0001")] 
+        [InlineData("usr0001")]
         public void Constructor_InvalidCode_Throws(string badCode)
         {
             var username = "validUser";

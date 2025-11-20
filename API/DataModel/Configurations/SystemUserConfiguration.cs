@@ -1,4 +1,5 @@
 namespace DataModel.Configurations;
+
 using DataModel.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -11,7 +12,7 @@ public class SystemUserConfiguration : IEntityTypeConfiguration<SystemUserDataMo
 
         builder.HasIndex(su => su.Username)
             .IsUnique();
-        
+
         builder.HasIndex(su => su.Email)
             .IsUnique();
 

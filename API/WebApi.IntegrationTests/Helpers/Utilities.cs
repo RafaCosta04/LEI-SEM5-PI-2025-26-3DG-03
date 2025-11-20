@@ -100,7 +100,7 @@ public static class Utilities
         {
             new SystemUserDataModel
             {
-                Code = "USR1111", 
+                Code = "USR1111",
                 Username = "adminTeste",
                 Email = "admin.teste@example.com",
                 Role = SystemRole.Admin.ToString(),
@@ -108,15 +108,15 @@ public static class Utilities
             },
             new SystemUserDataModel
             {
-                Code = "USR2222", 
+                Code = "USR2222",
                 Username = "operatorTeste",
                 Email = "operator.teste@example.com",
                 Role = SystemRole.LogisticOperator.ToString(),
-                IsActive = true    
+                IsActive = true
             },
             new SystemUserDataModel
             {
-                Code = "USR3333", 
+                Code = "USR3333",
                 Username = "officer",
                 Email = "portofficer.teste@example.com",
                 Role = SystemRole.PortAuthorityOfficer.ToString(),

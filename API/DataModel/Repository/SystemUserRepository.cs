@@ -1,4 +1,5 @@
 namespace DataModel.Repository;
+
 using DataModel.Mapper;
 using DataModel.Model;
 using Domain.IRepository;
@@ -108,7 +109,7 @@ public class SystemUserRepository : GenericRepository<SystemUser>, ISystemUserRe
         }
     }
 
-    
+
 
     public async Task<SystemUser?> GetSystemUserByUsernameAsync(string username)
     {
@@ -136,7 +137,7 @@ public class SystemUserRepository : GenericRepository<SystemUser>, ISystemUserRe
         try
         {
             SystemUserDataModel systemUserDataModel = _systemUserMapper.ToDataModel(systemUser);
-            EntityEntry<SystemUserDataModel> addedEntry =  _context.Set<SystemUserDataModel>().Add(systemUserDataModel);
+            EntityEntry<SystemUserDataModel> addedEntry = _context.Set<SystemUserDataModel>().Add(systemUserDataModel);
             await _context.SaveChangesAsync();
             return _systemUserMapper.ToDomain(addedEntry.Entity);
         }
@@ -162,7 +163,7 @@ public class SystemUserRepository : GenericRepository<SystemUser>, ISystemUserRe
             await _context.SaveChangesAsync();
             return true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             errorMessages.Add($"An error occurred while updating the StorageArea: {ex.Message}");
             return false;
@@ -194,6 +195,6 @@ public class SystemUserRepository : GenericRepository<SystemUser>, ISystemUserRe
             throw;
         }
     }
-    
+
 
 }

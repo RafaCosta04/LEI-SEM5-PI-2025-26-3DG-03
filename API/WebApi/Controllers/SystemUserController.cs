@@ -83,7 +83,7 @@ public class SystemUserController : ControllerBase
         {
             return BadRequest("Code in the URL does not match Code in the body.");
         }
-        if(systemUserDTO == null)
+        if (systemUserDTO == null)
         {
             return BadRequest("SystemUser data is required.");
         }
@@ -104,7 +104,7 @@ public class SystemUserController : ControllerBase
         }
         SystemUserDTO? createdSystemUser = await _systemUserService.AddSystemUser(systemUserDTO, _errorMessages);
         if (createdSystemUser == null && _errorMessages.Any())
-        {   
+        {
             if (_errorMessages.Any(e => e.Contains("already exists.", StringComparison.OrdinalIgnoreCase)))
                 return Conflict(_errorMessages);
             return BadRequest(_errorMessages);

@@ -108,10 +108,10 @@ namespace WebApi.IntegrationTests.Tests
         }
 
         [Theory]
-        [InlineData("USR4444","newuser","new.user@example.com","LogisticOperator", false, 201)]
-        [InlineData("USR5555","adminTeste","unique.email@example.com","LogisticOperator", true, 409)]
-        [InlineData("USR6666","uniqueusername","admin.teste@example.com","LogisticOperator", true, 409)]
-        [InlineData("BADCODE","someuser","some.user@example.com","LogisticOperator", true, 400)]
+        [InlineData("USR4444", "newuser", "new.user@example.com", "LogisticOperator", false, 201)]
+        [InlineData("USR5555", "adminTeste", "unique.email@example.com", "LogisticOperator", true, 409)]
+        [InlineData("USR6666", "uniqueusername", "admin.teste@example.com", "LogisticOperator", true, 409)]
+        [InlineData("BADCODE", "someuser", "some.user@example.com", "LogisticOperator", true, 400)]
         public async Task PostSystemUser_VariousInputs_ReturnsExpected(string code, string username, string email, string roleString, bool isActive, int expectedStatus)
         {
             var dto = new SystemUserDTO
@@ -139,8 +139,8 @@ namespace WebApi.IntegrationTests.Tests
         }
 
         [Theory]
-        [InlineData("USR2222","Admin",200)]
-        [InlineData("USR1111","LogisticOperator",200)]
+        [InlineData("USR2222", "Admin", 200)]
+        [InlineData("USR1111", "LogisticOperator", 200)]
         public async Task PutSystemUser_UpdateStatusAndRole_Various(string code, string newRoleString, int expectedStatus)
         {
             var get = await _client.GetAsync($"/api/SystemUser/ByCode/{code}");
@@ -171,13 +171,13 @@ namespace WebApi.IntegrationTests.Tests
             var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>();
             Assert.NotNull(dto);
 
-            dto.Code = "USR9999"; 
+            dto.Code = "USR9999";
             var put = await _client.PutAsJsonAsync($"/api/SystemUser/Update/USR1111", dto);
             Assert.Equal(HttpStatusCode.BadRequest, put.StatusCode);
         }
 
         [Theory]
-        [InlineData("USR1111","operatorTeste",400)]
+        [InlineData("USR1111", "operatorTeste", 400)]
         public async Task PutSystemUser_DuplicateUsername_ReturnsBadRequest(string code, string newUsername, int expectedStatus)
         {
             var get = await _client.GetAsync($"/api/SystemUser/ByCode/{code}");
