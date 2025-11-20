@@ -30,7 +30,7 @@ import { AuthService } from '../../../auth/auth.service';
 export class DefaultHeader extends HeaderComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
-  readonly keycloak = inject(AuthService);
+  readonly auth0 = inject(AuthService);
 
   userName = 'User';
 
@@ -51,11 +51,11 @@ export class DefaultHeader extends HeaderComponent implements OnInit {
   sidebarId = input('sidebar1');
 
   async ngOnInit() {
-    this.userName = await this.keycloak.getUserName();
+    this.userName = await this.auth0.getUserName();
   }
 
   logout() {
-    this.keycloak.logout();
+    this.auth0.logout();
   }
 
 

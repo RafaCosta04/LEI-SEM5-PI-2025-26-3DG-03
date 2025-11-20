@@ -7,7 +7,7 @@ export async function createCrane(): Promise<THREE.Object3D> {
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
 
-    const CDN_PATH = 'http://141.253.198.138/assets/models/cranes/';
+    const CDN_PATH = 'https://lapr5-frontend.duckdns.org/cdn/models/cranes/';
 
 
     loader.load(
@@ -23,7 +23,7 @@ export async function createCrane(): Promise<THREE.Object3D> {
             color: 0xff0000,
             metalness: 0.1,
             roughness: 0.35,
-            emissive: 0x222200,  
+            emissive: 0x222200,
             emissiveIntensity: 0.2,
         });
         object.traverse((child: any) => {

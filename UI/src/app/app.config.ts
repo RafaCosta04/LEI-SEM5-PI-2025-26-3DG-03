@@ -1,9 +1,13 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+  importProvidersFrom
+} from '@angular/core';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
-  withHashLocation,
   withInMemoryScrolling,
   withRouterConfig,
   withViewTransitions
@@ -11,39 +15,44 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
+
 import { routes } from './app.routes';
-import { provideKeycloak } from 'keycloak-angular';
+import { AuthModule } from '@auth0/auth0-angular';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideKeycloak({
-      config: {
-        url: 'https://lapr5-frontend.duckdns.org/auth',
-        realm: 'lapr5-realm',
-        clientId: 'lapr5-frontend'
-      },
-      initOptions:{
-        onLoad: 'login-required',
-        silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
-      }
-    }),
+    importProvidersFrom(
+      AuthModule.forRoot({
+        domain: 'dev-sxooc3zbxwdqprci.us.auth0.com',
+        clientId: 'ZiL9lSLVIJnHqqmOXXdegwCQTfwQQWt0',
+        authorizationParams: {
+          redirect_uri: window.location.origin,
+          audience: 'https://lapr5-api',
+        },
+        cacheLocation: 'memory',
+        useRefreshTokens: true
+      })
+    ),
 
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
+
     provideHttpClient(withInterceptorsFromDi()),
-    provideRouter(routes,
-      withRouterConfig({
-        onSameUrlNavigation: 'reload'
-      }),
+
+    provideRouter(
+      routes,
+      withRouterConfig({ onSameUrlNavigation: 'reload' }),
       withInMemoryScrolling({
         scrollPositionRestoration: 'top',
         anchorScrolling: 'enabled'
       }),
       withEnabledBlockingInitialNavigation(),
-      withViewTransitions(),
+      withViewTransitions()
     ),
+
     importProvidersFrom(SidebarModule, DropdownModule),
     IconSetService,
+
     provideAnimationsAsync()
   ]
 };

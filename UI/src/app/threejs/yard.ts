@@ -11,7 +11,7 @@ export async function createYard(labelText: string): Promise<THREE.Object3D> {
     const objLoader = new OBJLoader();
     const mtlLoader = new MTLLoader();
 
-    const CDN_PATH = 'http://141.253.198.138/assets/models/yard/';
+    const CDN_PATH = 'https://lapr5-frontend.duckdns.org/cdn/models/yard/';
 
     mtlLoader.setPath(CDN_PATH);
     mtlLoader.load(

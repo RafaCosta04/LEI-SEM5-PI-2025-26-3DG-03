@@ -1,20 +1,20 @@
 {
   "dock": {
-    "colorMap": "http://141.253.198.138/assets/textures/Concrete044D_1K-PNG_Color.png",
-    "roughnessMap": "http://141.253.198.138/assets/textures/Concrete044D_1K-PNG_Roughness.png",
-    "normalMap": "http://141.253.198.138/assets/textures/Concrete044D_1K-PNG_NormalGL.png",
+    "colorMap": "https://lapr5-frontend.duckdns.org/cdn/textures/Concrete044D_1K-PNG_Color.png",
+    "roughnessMap": "https://lapr5-frontend.duckdns.org/cdn/textures/Concrete044D_1K-PNG_Roughness.png",
+    "normalMap": "https://lapr5-frontend.duckdns.org/cdn/textures/Concrete044D_1K-PNG_NormalGL.png",
     "tileSize": 50
   },
   "port": {
-    "colorMap": "http://141.253.198.138/assets/textures/PavingStones112_1K-PNG_Color.png",
-    "roughnessMap": "http://141.253.198.138/assets/textures/PavingStones112_1K-PNG_Roughness.png",
-    "normalMap": "http://141.253.198.138/assets/textures/PavingStones112_1K-PNG_NormalGL.png",
+    "colorMap": "https://lapr5-frontend.duckdns.org/cdn/textures/PavingStones112_1K-PNG_Color.png",
+    "roughnessMap": "https://lapr5-frontend.duckdns.org/cdn/textures/PavingStones112_1K-PNG_NormalGL.png",
+    "normalMap": "https://lapr5-frontend.duckdns.org/cdn/textures/PavingStones112_1K-PNG_Roughness.png",
     "tileSize": 50
   },
   "seaBed": {
-    "colorMap": "http://141.253.198.138/assets/textures/Ground054_1K-PNG_Color.png",
-    "roughnessMap": "http://141.253.198.138/assets/textures/Ground054_1K-PNG_Roughness.png",
-    "normalMap": "http://141.253.198.138/assets/textures/Ground054_1K-PNG_NormalGL.png",
+    "colorMap": "https://lapr5-frontend.duckdns.org/cdn/textures/Ground054_1K-PNG_Color.png",
+    "roughnessMap": "https://lapr5-frontend.duckdns.org/cdn/textures/Ground054_1K-PNG_Roughness.png",
+    "normalMap": "https://lapr5-frontend.duckdns.org/cdn/textures/Ground054_1K-PNG_NormalGL.png",
     "tileSize": 10
   }
 }

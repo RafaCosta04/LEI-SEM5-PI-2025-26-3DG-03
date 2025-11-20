@@ -11,7 +11,7 @@ export async function createWarehouse(labelText: string): Promise<THREE.Group> {
     const objLoader = new OBJLoader();
     const mtlLoader = new MTLLoader();
 
-    const CDN_PATH = 'http://141.253.198.138/assets/models/warehouse/';
+    const CDN_PATH = 'https://lapr5-frontend.duckdns.org/cdn/models/warehouse/';
 
     mtlLoader.setPath(CDN_PATH);
     mtlLoader.load(

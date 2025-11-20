@@ -1,36 +1,36 @@
-import { Injectable, inject } from '@angular/core';
-import Keycloak from 'keycloak-js';
+import { Injectable } from '@angular/core';
+import { AuthService as Auth0Service, User } from '@auth0/auth0-angular';
+import { Observable, firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly keycloak = inject(Keycloak);
+  constructor(private auth0: Auth0Service) {}
 
-  async isLoggedIn(): Promise<boolean> {
-    return this.keycloak.authenticated ?? false;
-  }
-
-  async loadUserProfile() {
-    return await this.keycloak.loadUserProfile();
-  }
-
-  async getUserName(): Promise<string> {
-    try {
-      const profile = await this.loadUserProfile();
-      return profile.firstName || profile.username || 'User';
-    } catch (err) {
-      console.error('Error loading Keycloak profile', err);
-      return 'User';
-    }
+  login(): void {
+    this.auth0.loginWithRedirect();
   }
 
   logout(): void {
-    this.keycloak.logout({ redirectUri: window.location.origin });
+    this.auth0.logout({ logoutParams: { returnTo: window.location.origin } });
   }
 
-  async getToken(): Promise<string | undefined> {
-    if (!this.keycloak.token) {
-      await this.keycloak.updateToken(30);
-    }
-    return this.keycloak.token;
-  } 
+  isLoggedIn(): Observable<boolean> {
+    return this.auth0.isAuthenticated$;
+  }
+
+  user(): Observable<User | null | undefined> {
+    return this.auth0.user$;
+  }
+
+  getToken(): Observable<string> {
+    return this.auth0.getAccessTokenSilently();
+  }
+
+  async getUserName(): Promise<string> {
+    const user = await firstValueFrom(this.auth0.user$);
+
+    if (!user) return 'User';
+
+    return user.name || user.nickname || user.email || 'User';
+  }
 }

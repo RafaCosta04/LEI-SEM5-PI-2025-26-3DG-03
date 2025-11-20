@@ -8,7 +8,7 @@ export async function createVessel(): Promise<THREE.Group> {
   return new Promise((resolve, reject) => {
     const objLoader = new OBJLoader();
 
-    const CDN_PATH = 'http://141.253.198.138/assets/models/ships/';
+    const CDN_PATH = 'https://lapr5-frontend.duckdns.org/cdn/models/ships/';
 
     const mtlLoader = new MTLLoader();
     mtlLoader.setPath(CDN_PATH);
