@@ -3,27 +3,16 @@ version: "3.9"
 services:
   postgres:
     image: postgres:15
-    container_name: keycloak-postgres
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
-    ports:
-      - "5432:5432"
     volumes:
       - keycloak-data:/var/lib/postgresql/data
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.4.2
-    container_name: keycloak
-    command: >
-      start
-      --http-enabled=true
-      --hostname=lapr5-frontend.duckdns.org
-      --hostname-strict=false
-      --proxy-headers=xforwarded
-      --import-realm
-      --spi-import-export-strategy=IGNORE_EXISTING
+    command: start --http-enabled=true --hostname-strict=false
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: postgres
@@ -34,10 +23,6 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-    volumes:
-      - ./export:/opt/keycloak/data/import
-      - keycloak-data-vol:/opt/keycloak/data
 
 volumes:
   keycloak-data:
-  keycloak-data-vol:
