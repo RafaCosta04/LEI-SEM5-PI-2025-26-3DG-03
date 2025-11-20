@@ -4,6 +4,7 @@ namespace WebApi.Controllers;
 using Application.DTO;
 using Application.Services;
 using Domain.Model;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/SystemUser")]
@@ -109,5 +110,32 @@ public class SystemUserController : ControllerBase
             return BadRequest(_errorMessages);
         }
         return CreatedAtAction(nameof(GetSystemUserByCode), new { code = createdSystemUser!.Code }, createdSystemUser);
+    }
+
+
+    [Authorize]
+    [HttpGet("MyRole")]
+    public async Task<ActionResult> GetMyRole()
+    {
+        var email = User.FindFirst("email")?.Value;
+        if (string.IsNullOrEmpty(email))
+        {
+            return Unauthorized("No email claim found in Auth0 token.");
+        }
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByEmail(email);
+        if (user == null)
+        {
+            RepresentativeDTO? representative = await _systemUserService.GetRepresentativeByEmail(email);
+            if (representative == null)
+            {
+                return Forbid("Access denied.");
+            }
+            return Ok(new{ role = "Representative" });
+        }
+        if (!user.IsActive)
+        {
+            return Forbid("Access denied.");
+        }
+        return Ok(new { role = user.Role.ToString() });
     }
 }

@@ -14,10 +14,13 @@ public class SystemUserService
     private readonly ISystemUserRepository _systemUserRepository;
     private readonly ISystemUserFactory _systemUserFactory;
 
-    public SystemUserService(ISystemUserRepository systemUserRepository, ISystemUserFactory systemUserFactory)
+    private readonly IRepresentativeRepository _representativeRepository;
+
+    public SystemUserService(ISystemUserRepository systemUserRepository, ISystemUserFactory systemUserFactory, IRepresentativeRepository representativeRepository)
     {
         _systemUserRepository = systemUserRepository;
         _systemUserFactory = systemUserFactory;
+        _representativeRepository = representativeRepository;
     }
 
     public async Task<IEnumerable<SystemUserDTO>> GetAllSystemUsers()
@@ -74,6 +77,17 @@ public class SystemUserService
         {
             SystemUserDTO systemUserDTO = SystemUserDTO.ToDTO(systemUser);
             return systemUserDTO;
+        }
+        return null;
+    }
+
+    public async Task<RepresentativeDTO?> GetRepresentativeByEmail(string email)
+    {
+        Representative? representative = await _representativeRepository.GetRepresentativeByEmailAsync(email);
+        if (representative != null)
+        {
+            RepresentativeDTO representativeDTO = RepresentativeDTO.ToDTO(representative);
+            return representativeDTO;
         }
         return null;
     }
