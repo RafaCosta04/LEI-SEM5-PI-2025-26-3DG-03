@@ -102,6 +102,12 @@ builder.Services.AddTransient<PhysicalResourceService>();
 
 builder.Services.AddTransient<SchedulingService>();
 
+builder.Services.AddTransient<ISystemUserRepository, SystemUserRepository>();
+builder.Services.AddTransient<ISystemUserFactory, SystemUserFactory>();
+builder.Services.AddTransient<SystemUserMapper>();
+builder.Services.AddTransient<SystemUserService>();
+
+
 
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 

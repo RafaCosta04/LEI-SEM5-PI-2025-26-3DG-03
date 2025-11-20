@@ -31,6 +31,9 @@ public static class Utilities
         db.PhysicalResources.AddRange(GetSeedingPhysicalResourcesDataModel(qualifications));
         db.SaveChanges();
 
+        db.SystemUsers.AddRange(GetSeedingSystemUsersDataModel());
+        db.SaveChanges();
+
 
         if (!db.ShippingAgentOrganizations.Any())
         {
@@ -74,7 +77,7 @@ public static class Utilities
         db.Qualifications.RemoveRange(db.Qualifications);
         db.VesselTypes.RemoveRange(db.VesselTypes);
         db.ShippingAgentOrganizations.RemoveRange(db.ShippingAgentOrganizations);
-
+        db.SystemUsers.RemoveRange(db.SystemUsers);
 
         db.SaveChanges();
 
@@ -88,6 +91,37 @@ public static class Utilities
             new VesselTypeDataModel(new VesselType("Teste1", "DescriptionTeste1", 100, 5,5,5)),
             new VesselTypeDataModel(new VesselType("Teste2", "DescriptionTeste2", 200, 10,10,10)),
             new VesselTypeDataModel(new VesselType("Teste3", "DescriptionTeste3", 300, 15,15,15))
+        };
+    }
+
+    public static List<SystemUserDataModel> GetSeedingSystemUsersDataModel()
+    {
+        return new List<SystemUserDataModel>()
+        {
+            new SystemUserDataModel
+            {
+                Code = "USR1111", 
+                Username = "adminTeste",
+                Email = "admin.teste@example.com",
+                Role = SystemRole.Admin.ToString(),
+                IsActive = true
+            },
+            new SystemUserDataModel
+            {
+                Code = "USR2222", 
+                Username = "operatorTeste",
+                Email = "operator.teste@example.com",
+                Role = SystemRole.LogisticOperator.ToString(),
+                IsActive = true    
+            },
+            new SystemUserDataModel
+            {
+                Code = "USR3333", 
+                Username = "officer",
+                Email = "portofficer.teste@example.com",
+                Role = SystemRole.PortAuthorityOfficer.ToString(),
+                IsActive = true
+            }
         };
     }
 

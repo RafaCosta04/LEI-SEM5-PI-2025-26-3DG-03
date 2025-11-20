@@ -26,14 +26,12 @@ export class Dashboard {
   }
 
   private buildCalendar(year: number, month: number) {
-    const firstDay = new Date(year, month, 1).getDay(); // 0 (Sun) - 6
+    const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const weeks: (number | null)[][] = [];
     let week: (number | null)[] = new Array(7).fill(null);
-    // Treat week starting Sunday — adapt if needed
     let dayCounter = 1;
-    // fill first week
     for (let i = firstDay; i < 7; i++) {
       week[i] = dayCounter++;
     }

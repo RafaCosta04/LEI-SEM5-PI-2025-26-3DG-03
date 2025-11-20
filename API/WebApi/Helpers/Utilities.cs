@@ -39,6 +39,10 @@ public static class Utilities
                 db.VesselTypes.AddRange(GetSeedingVesselTypesDataModel());
                 db.SaveChanges();
 
+                var systemUsers = GetSeedingSystemUsersDataModel();
+                db.SystemUsers.AddRange(systemUsers);
+                db.SaveChanges();
+
                 var vesselTypes = db.VesselTypes.ToList();
                 db.Docks.AddRange(GetSeedingDocksDataModel(vesselTypes));
                 db.SaveChanges();
@@ -92,6 +96,36 @@ public static class Utilities
         };
     }
 
+    public static List<SystemUserDataModel> GetSeedingSystemUsersDataModel()
+    {
+        return new List<SystemUserDataModel>()
+        {
+            new SystemUserDataModel
+            {
+                Code = "USR0001", 
+                Username = "admin",
+                Email = "user1@example.com",
+                Role = SystemRole.Admin.ToString(),
+                IsActive = true
+            },
+            new SystemUserDataModel
+            {
+                Code = "USR0002", 
+                Username = "operator",
+                Email = "operator@example.com",
+                Role = SystemRole.LogisticOperator.ToString(),
+                IsActive = true    
+            },
+            new SystemUserDataModel
+            {
+                Code = "USR0003", 
+                Username = "officer",
+                Email = "portofficer@example.com",
+                Role = SystemRole.PortAuthorityOfficer.ToString(),
+                IsActive = true
+            }
+        };
+    }
     public static List<DockDataModel> GetSeedingDocksDataModel(List<VesselTypeDataModel> vesselTypes)
     {
         return new List<DockDataModel>()

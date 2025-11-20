@@ -1,0 +1,26 @@
+namespace DataModel.Model;
+
+using Domain.Model;
+
+public class SystemUserDataModel
+{
+    public long Id { get; set; }
+    public string? Code { get; set; }
+    public string? Username { get; set; }
+    public string? Email { get; set; }
+    public string? Role { get; set; }
+    public bool IsActive { get; set; }
+
+    public SystemUserDataModel() { }
+
+    public SystemUserDataModel(SystemUser systemUser)
+    {
+        Id = systemUser.Id;
+        Code = systemUser.Code;
+        Username = systemUser.Username;
+        Email = systemUser.Email;
+        Role = systemUser.Role.ToString();
+        IsActive = systemUser.IsActive;
+    }
+
+}

@@ -1,0 +1,113 @@
+using Microsoft.AspNetCore.Mvc;
+namespace WebApi.Controllers;
+
+using Application.DTO;
+using Application.Services;
+using Domain.Model;
+
+[ApiController]
+[Route("api/SystemUser")]
+public class SystemUserController : ControllerBase
+{
+    private readonly SystemUserService _systemUserService;
+    List<string> _errorMessages = new List<string>();
+
+    public SystemUserController(SystemUserService userService)
+    {
+        _systemUserService = userService;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<SystemUserDTO>>> GetAllSystemUsers()
+    {
+        IEnumerable<SystemUserDTO> users = await _systemUserService.GetAllSystemUsers();
+        return Ok(users);
+    }
+
+    [HttpGet("ByUsername/{username}")]
+    public async Task<ActionResult<SystemUserDTO>> GetSystemUserByUsername(string username)
+    {
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByUsername(username);
+        if (user == null)
+        {
+            return NotFound($"User with username '{username}' not found.");
+        }
+        return Ok(user);
+    }
+
+    [HttpGet("ByEmail/{email}")]
+    public async Task<ActionResult<SystemUserDTO>> GetSystemUserByEmail(string email)
+    {
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByEmail(email);
+        if (user == null)
+        {
+            return NotFound($"User with email '{email}' not found.");
+        }
+        return Ok(user);
+    }
+
+    [HttpGet("ByID/{id}")]
+    public async Task<ActionResult<SystemUserDTO>> GetSystemUserById(int id)
+    {
+        SystemUserDTO? userDTO = await _systemUserService.GetSystemUserById(id);
+        if (userDTO == null)
+        {
+            return NotFound($"User with ID '{id}' not found.");
+        }
+        return Ok(userDTO);
+    }
+
+    [HttpGet("ByCode/{code}")]
+    public async Task<ActionResult<SystemUserDTO>> GetSystemUserByCode(string code)
+    {
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByCode(code);
+        if (user == null)
+        {
+            return NotFound($"User with code '{code}' not found.");
+        }
+        return Ok(user);
+    }
+
+    [HttpGet("ByRole/{role}")]
+    public async Task<ActionResult<IEnumerable<SystemUserDTO>>> GetSystemUsersByRole(SystemRole role)
+    {
+        IEnumerable<SystemUserDTO> users = await _systemUserService.GetSystemUsersByRoleAsync(role);
+        return Ok(users);
+    }
+
+    [HttpPut("Update/{code}")]
+    public async Task<IActionResult> PutSystemUser(string code, SystemUserDTO systemUserDTO)
+    {
+        if (code != systemUserDTO.Code)
+        {
+            return BadRequest("Code in the URL does not match Code in the body.");
+        }
+        if(systemUserDTO == null)
+        {
+            return BadRequest("SystemUser data is required.");
+        }
+        bool updateResult = await _systemUserService.UpdateSystemUser(code, systemUserDTO, _errorMessages);
+        if (!updateResult && _errorMessages.Any())
+        {
+            return BadRequest(_errorMessages);
+        }
+        return Ok();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<SystemUserDTO>> PostSystemUser(SystemUserDTO systemUserDTO)
+    {
+        if (systemUserDTO == null)
+        {
+            return BadRequest("SystemUser data is required.");
+        }
+        SystemUserDTO? createdSystemUser = await _systemUserService.AddSystemUser(systemUserDTO, _errorMessages);
+        if (createdSystemUser == null && _errorMessages.Any())
+        {   
+            if (_errorMessages.Any(e => e.Contains("already exists.", StringComparison.OrdinalIgnoreCase)))
+                return Conflict(_errorMessages);
+            return BadRequest(_errorMessages);
+        }
+        return CreatedAtAction(nameof(GetSystemUserByCode), new { code = createdSystemUser!.Code }, createdSystemUser);
+    }
+}

@@ -27,4 +27,5 @@ public interface IShippingManagementContext
     DbSet<CargoManifestEntryDataModel> CargoManifestEntries { get; set; }
 
     DbSet<CrewMemberDataModel> CrewMembers { get; set; }
+    DbSet<SystemUserDataModel> SystemUsers {get; set;}
 }

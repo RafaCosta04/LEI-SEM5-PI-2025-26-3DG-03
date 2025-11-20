@@ -1,0 +1,56 @@
+namespace DataModel.Mapper;
+
+using DataModel.Model;
+using Domain.Factory;
+using Domain.Model;
+
+public class SystemUserMapper
+{
+    private readonly ISystemUserFactory _systemUserFactory;
+
+    public SystemUserMapper(ISystemUserFactory systemUserFactory)
+    {
+        _systemUserFactory = systemUserFactory;
+    }
+
+    public SystemUser ToDomain(SystemUserDataModel systemUserDataModel)
+    {
+        SystemUser systemUserDomain = _systemUserFactory.NewSystemUser(
+            systemUserDataModel.Code!,
+            systemUserDataModel.Username!,
+            systemUserDataModel.Email!,
+            Enum.Parse<SystemRole>(systemUserDataModel.Role!)
+        );
+        systemUserDomain.Id = systemUserDataModel.Id;
+        systemUserDomain.ChangeBooleanStatus(systemUserDataModel.IsActive);
+        return systemUserDomain;
+    }
+
+    public IEnumerable<SystemUser> ToDomain(IEnumerable<SystemUserDataModel> systemUserDataModels)
+    {
+        List<SystemUser> systemUsersDomain = new List<SystemUser>();
+
+        foreach (SystemUserDataModel systemUserDataModel in systemUserDataModels)
+        {
+            SystemUser systemUser = ToDomain(systemUserDataModel);
+            systemUsersDomain.Add(systemUser);
+        }
+        return systemUsersDomain.AsEnumerable();
+    }
+
+    public SystemUserDataModel ToDataModel(SystemUser systemUser)
+    {
+        SystemUserDataModel systemUserDM = new SystemUserDataModel(systemUser);
+        return systemUserDM;
+    }
+    
+    public void UpdateDataModelAsync(SystemUserDataModel systemUserDataModel,SystemUser systemUser)
+    {
+        systemUserDataModel.Code = systemUser.Code;
+        systemUserDataModel.Username = systemUser.Username;
+        systemUserDataModel.Email = systemUser.Email;
+        systemUserDataModel.Role = systemUser.Role.ToString();
+        systemUserDataModel.IsActive = systemUser.IsActive;
+    }
+
+}
