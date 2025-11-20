@@ -50,6 +50,8 @@ namespace Application.Services
             return r.Select(x => PhysicalResourceDTO.ToDTO(x)).ToList();
         }
 
+        
+
         public async Task<IEnumerable<PhysicalResourceDTO>> GetByKind(PhysicalResourceKind kind)
         {
             var r = (await _repo.GetPhysicalResourceByKindAsync(kind)) ?? Enumerable.Empty<PhysicalResource>();
