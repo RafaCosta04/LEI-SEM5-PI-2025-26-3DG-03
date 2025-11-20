@@ -19,11 +19,9 @@ services:
     command: >
       start
       --http-enabled=true
-      --hostname=lapr5-frontend.duckdns.org
-      --hostname-admin=lapr5-frontend.duckdns.org
+      --hostname=https://lapr5-frontend.duckdns.org
       --hostname-strict=false
       --proxy-headers=xforwarded
-      --http-relative-path=/auth
       --import-realm
       --spi-import-export-strategy=IGNORE_EXISTING
     environment:
