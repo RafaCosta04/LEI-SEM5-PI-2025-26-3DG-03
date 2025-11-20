@@ -56,7 +56,7 @@ namespace DataModel.Repository
             return mappedList;
         }
 
-        
+
 
         public async Task<IEnumerable<PhysicalResource>> GetPhysicalResourceByKindAsync(PhysicalResourceKind kind)
         {
@@ -79,13 +79,13 @@ namespace DataModel.Repository
             var mappedStatus = list.Select(dm => _mapper.ToDomain(dm)).Where(r => r != null).Select(r => r!).ToList();
             return mappedStatus;
         }
-        
+
         public async Task<PhysicalResource> AddPhysicalResource(PhysicalResource resource)
         {
             var dm = _mapper.ToDataModel(resource);
-            
-            
-            
+
+
+
             if (dm.QualificationRequirements is IEnumerable<QualificationDataModel> qColl)
             {
                 var qList = qColl.ToList();

@@ -46,7 +46,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        
+
 
         [HttpGet("ByKind/{kind}")]
         public async Task<ActionResult<IEnumerable<PhysicalResourceDTO>>> GetByKind(PhysicalResourceKind kind)
