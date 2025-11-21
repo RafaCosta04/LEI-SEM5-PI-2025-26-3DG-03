@@ -8,6 +8,7 @@ namespace WebApi.Helpers;
 using DataModel.Model;
 using Domain.Model;
 using Domain.Model.Resources;
+using Microsoft.EntityFrameworkCore;
 using ShippingManagement.Domain.Qualifications;
 
 public static class Utilities
@@ -26,7 +27,7 @@ public static class Utilities
                 var db = scope.ServiceProvider.GetRequiredService<ShippingManagementContext>();
 
 
-                db.Database.EnsureCreated();
+                db.Database.Migrate();
 
 
                 if (db.Qualifications.Any())
