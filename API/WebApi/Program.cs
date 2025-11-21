@@ -39,10 +39,13 @@ builder.Services.AddControllers()
         opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ShippingManagementContext>(opt =>
-    opt.UseInMemoryDatabase("ShippingManagementDatabase")
+    //opt.UseInMemoryDatabase("ShippingManagementDatabase")
     //opt.UseSqlite("Data Source=ShippingManagementDatabase.sqlite")
     //opt.UseSqlite(Host.CreateApplicationBuilder().Configuration.GetConnectionString("ShippingManagementDatabase"))
+     opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     );
 
 
