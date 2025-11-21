@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(options =>
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        NameClaimType = "email" 
+        NameClaimType = "email"
     };
 });
 
