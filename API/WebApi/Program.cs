@@ -137,7 +137,18 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 var app = builder.Build();
 
-Utilities.InitializeDatabase(app);
+if (app.Environment.IsProduction())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ShippingManagementContext>();
+    db.Database.Migrate();
+}
+
+// Only seed when running locally (Development), never during tests
+if (app.Environment.IsDevelopment())
+{
+    Utilities.InitializeDatabase(app);
+}
 
 
 

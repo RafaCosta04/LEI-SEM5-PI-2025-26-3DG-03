@@ -11,6 +11,14 @@ public static class Utilities
 {
     public static void InitializeDbForTests(ShippingManagementContext db)
     {
+        try
+        {
+            db.Database.EnsureCreated();
+        }
+        catch
+        {
+            // best-effort
+        }
         db.VesselTypes.AddRange(GetSeedingVesselTypesDataModel());
         db.SaveChanges();
 
@@ -66,6 +74,14 @@ public static class Utilities
 
     public static void ReinitializeDbForTests(ShippingManagementContext db)
     {
+        try
+        {
+            db.Database.EnsureCreated();
+        }
+        catch
+        {
+            // best-effort
+        }
         db.Decisions.RemoveRange(db.Decisions);
         db.VesselVisitNotifications.RemoveRange(db.VesselVisitNotifications);
         db.Representatives.RemoveRange(db.Representatives);

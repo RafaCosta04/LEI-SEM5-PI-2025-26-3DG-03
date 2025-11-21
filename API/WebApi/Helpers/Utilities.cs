@@ -25,9 +25,7 @@ public static class Utilities
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ShippingManagementContext>();
-
-
-                db.Database.Migrate();
+                //db.Database.Migrate();
 
 
                 if (db.Qualifications.Any())

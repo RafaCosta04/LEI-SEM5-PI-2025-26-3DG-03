@@ -8,89 +8,99 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WebApi.IntegrationTests.Helpers;
 
 namespace WebApi.IntegrationTests;
-
 
 public class IntegrationTestsWebApplicationFactory<Program>
     : WebApplicationFactory<Program> where Program : class
 {
-
-    public IntegrationTestsWebApplicationFactory()
-    {
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-
-        // based on https://stackoverflow.com/questions/72679169/override-host-configuration-in-integration-testing-using-asp-net-core-6-minimal
-        var configurationValues = new Dictionary<string, string?>
-        {
-        };
-
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configurationValues)
-            .Build();
-
-        builder
-            // This configuration is used during the creation of the application
-            // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
-            .UseConfiguration(configuration)
-            .ConfigureAppConfiguration(configurationBuilder =>
-            {
-                // This overrides configuration settings that were added as part 
-                // of building the Host (e.g. calling WebApplication.CreateBuilder(args)).
-                configurationBuilder.AddInMemoryCollection(configurationValues);
-            });
-
+        builder.UseEnvironment("Testing");
 
         builder.ConfigureServices(services =>
         {
+            //
+            // 1 — Remove MySQL DbContext configuration
+            //
             var dbContextDescriptor = services.SingleOrDefault(
-                d => d.ServiceType ==
-                    typeof(DbContextOptions<DataModel.Repository.ShippingManagementContext>));
-
+                d => d.ServiceType == typeof(DbContextOptions<ShippingManagementContext>)
+            );
             if (dbContextDescriptor != null)
                 services.Remove(dbContextDescriptor);
 
-            var dbConnectionDescriptor = services.SingleOrDefault(
-                d => d.ServiceType ==
-                    typeof(DbConnection));
+            //
+            // 2 — Remove any existing DbConnection
+            //
+            var connDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(DbConnection)
+            );
+            if (connDescriptor != null)
+                services.Remove(connDescriptor);
 
-            if (dbConnectionDescriptor != null)
-                services.Remove(dbConnectionDescriptor);
-
-            // Create open SqliteConnection so EF won't automatically close it.
-            services.AddSingleton<DbConnection>(container =>
+            //
+            // 3 — Add a shared SQLite in-memory connection (must stay open!)
+            //
+            services.AddSingleton<DbConnection>(_ =>
             {
                 var connection = new SqliteConnection("DataSource=:memory:");
                 connection.Open();
-
                 return connection;
             });
 
-            services.AddDbContext<ShippingManagementContext>((container, options) =>
+            //
+            // 4 — Register DbContext using SQLite
+            //
+            services.AddDbContext<ShippingManagementContext>((provider, options) =>
             {
-                var connection = container.GetRequiredService<DbConnection>();
-                options.UseSqlite(connection);
+                var conn = provider.GetRequiredService<DbConnection>();
+                options.UseSqlite(conn);
             });
 
-            // Add a test authentication scheme so integration tests can call endpoints without real JWTs
+            //
+            // 5 — Add test authentication (bypass JWT)
+            //
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "Test";
                 options.DefaultChallengeScheme = "Test";
             })
-            .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, WebApi.IntegrationTests.Helpers.TestAuthHandler>(
-                "Test", options => { });
+            .AddScheme<
+                Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions,
+                TestAuthHandler
+            >("Test", _ => { });
+
+
+            //
+            // 6 — Build provider so we can initialize DB
+            //
+            var sp = services.BuildServiceProvider();
+
+            using (var scope = sp.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ShippingManagementContext>();
+
+                //
+                // 7 — Create schema via EnsureCreated (NOT migrations!)
+                //
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+
+                //
+                // 8 — Seed the test database
+                //
+                Utilities.InitializeDbForTests(db);
+            }
         });
 
+        //
+        // 9 — Minimize logging noise
+        //
         builder.ConfigureLogging(logging =>
         {
             logging.ClearProviders();
             logging.SetMinimumLevel(LogLevel.Warning);
         });
-
-        builder.UseEnvironment("Development");
     }
 }
