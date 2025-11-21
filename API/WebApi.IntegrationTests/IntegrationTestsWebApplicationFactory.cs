@@ -74,6 +74,15 @@ public class IntegrationTestsWebApplicationFactory<Program>
                 var connection = container.GetRequiredService<DbConnection>();
                 options.UseSqlite(connection);
             });
+
+            // Add a test authentication scheme so integration tests can call endpoints without real JWTs
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "Test";
+                options.DefaultChallengeScheme = "Test";
+            })
+            .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, WebApi.IntegrationTests.Helpers.TestAuthHandler>(
+                "Test", options => { });
         });
 
         builder.ConfigureLogging(logging =>
