@@ -149,7 +149,7 @@ public class SystemUserService
         }
         try
         {
-            systemUser.ChangeBooleanStatus(systemUserDTO.IsActive);
+            systemUser.ChangeUserStatus(systemUserDTO.Status);
             systemUser.ChangeSystemRole(systemUserDTO.Role);
             return await _systemUserRepository.Update(systemUser, errorMessages);
         }

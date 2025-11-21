@@ -22,7 +22,8 @@ public class SystemUserMapper
             Enum.Parse<SystemRole>(systemUserDataModel.Role!)
         );
         systemUserDomain.Id = systemUserDataModel.Id;
-        systemUserDomain.ChangeBooleanStatus(systemUserDataModel.IsActive);
+        var parsedStatus = Enum.Parse<SystemUserStatus>(systemUserDataModel.Status!);
+        systemUserDomain.ChangeUserStatus(parsedStatus);
         return systemUserDomain;
     }
 
@@ -50,7 +51,8 @@ public class SystemUserMapper
         systemUserDataModel.Username = systemUser.Username;
         systemUserDataModel.Email = systemUser.Email;
         systemUserDataModel.Role = systemUser.Role.ToString();
-        systemUserDataModel.IsActive = systemUser.IsActive;
+        systemUserDataModel.IsFirstTime = systemUser.IsFirstTime;
+        systemUserDataModel.Status = systemUser.Status.ToString();
     }
 
 }

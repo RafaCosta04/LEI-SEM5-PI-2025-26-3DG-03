@@ -17,23 +17,25 @@ public class SystemUserDTO
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public SystemRole Role { get; set; }
 
-    public bool IsActive { get; set; }
+    public SystemUserStatus Status { get; set; }
+    public bool IsFirstTime { get; set; }
 
     public SystemUserDTO() { }
 
-    public SystemUserDTO(long id, string code, string username, string email, SystemRole role, bool isActive)
+    public SystemUserDTO(long id, string code, string username, string email, SystemRole role, bool isFirstTime, SystemUserStatus status)
     {
         Id = id;
         Code = code;
         Username = username;
         Email = email;
         Role = role;
-        IsActive = isActive;
+        IsFirstTime = isFirstTime;
+        Status = status;
     }
 
     static public SystemUserDTO ToDTO(SystemUser systemUser)
     {
-        return new SystemUserDTO(systemUser.Id, systemUser.Code!, systemUser.Username!, systemUser.Email!, systemUser.Role, systemUser.IsActive);
+        return new SystemUserDTO(systemUser.Id, systemUser.Code!, systemUser.Username!, systemUser.Email!, systemUser.Role, systemUser.IsFirstTime, systemUser.Status);
     }
 
     static public IEnumerable<SystemUserDTO> ToDTO(IEnumerable<SystemUser> systemUsers)

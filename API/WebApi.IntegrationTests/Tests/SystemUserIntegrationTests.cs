@@ -11,6 +11,8 @@ using WebApi.IntegrationTests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Domain.Model;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WebApi.IntegrationTests.Tests
 {
@@ -18,6 +20,11 @@ namespace WebApi.IntegrationTests.Tests
     public class SystemUserIntegrationTests : IClassFixture<IntegrationTestsWebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
+        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        };
 
         public SystemUserIntegrationTests(IntegrationTestsWebApplicationFactory<Program> factory)
         {
@@ -35,7 +42,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync("/api/SystemUser");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            var users = await response.Content.ReadFromJsonAsync<List<SystemUserDTO>>();
+            var users = await response.Content.ReadFromJsonAsync<List<SystemUserDTO>>(_jsonOptions);
             Assert.NotNull(users);
             Assert.Contains(users, u => u.Code == "USR1111");
             Assert.Contains(users, u => u.Code == "USR2222");
@@ -46,7 +53,7 @@ namespace WebApi.IntegrationTests.Tests
         {
             var found = await _client.GetAsync("/api/SystemUser/ByCode/USR1111");
             Assert.Equal(HttpStatusCode.OK, found.StatusCode);
-            var dto = await found.Content.ReadFromJsonAsync<SystemUserDTO>();
+            var dto = await found.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
             Assert.NotNull(dto);
             Assert.Equal("USR1111", dto.Code);
 
@@ -59,7 +66,7 @@ namespace WebApi.IntegrationTests.Tests
         {
             var found = await _client.GetAsync("/api/SystemUser/ByUsername/adminTeste");
             Assert.Equal(HttpStatusCode.OK, found.StatusCode);
-            var dto = await found.Content.ReadFromJsonAsync<SystemUserDTO>();
+            var dto = await found.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
             Assert.NotNull(dto);
             Assert.Equal("adminTeste", dto.Username);
 
@@ -72,7 +79,7 @@ namespace WebApi.IntegrationTests.Tests
         {
             var found = await _client.GetAsync("/api/SystemUser/ByEmail/admin.teste@example.com");
             Assert.Equal(HttpStatusCode.OK, found.StatusCode);
-            var dto = await found.Content.ReadFromJsonAsync<SystemUserDTO>();
+            var dto = await found.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
             Assert.NotNull(dto);
             Assert.Equal("admin.teste@example.com", dto.Email);
 
@@ -85,7 +92,7 @@ namespace WebApi.IntegrationTests.Tests
         {
             var resp = await _client.GetAsync($"/api/SystemUser/ByRole/{SystemRole.Admin}");
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
-            var list = await resp.Content.ReadFromJsonAsync<List<SystemUserDTO>>();
+            var list = await resp.Content.ReadFromJsonAsync<List<SystemUserDTO>>(_jsonOptions);
             Assert.NotNull(list);
             Assert.Contains(list, u => u.Role == SystemRole.Admin);
         }
@@ -95,7 +102,7 @@ namespace WebApi.IntegrationTests.Tests
         {
             var all = await _client.GetAsync("/api/SystemUser");
             all.EnsureSuccessStatusCode();
-            var users = await all.Content.ReadFromJsonAsync<List<SystemUserDTO>>();
+            var users = await all.Content.ReadFromJsonAsync<List<SystemUserDTO>>(_jsonOptions);
             Assert.NotNull(users);
             Assert.NotEmpty(users);
 
@@ -120,7 +127,7 @@ namespace WebApi.IntegrationTests.Tests
                 Username = username,
                 Email = email,
                 Role = Enum.Parse<SystemRole>(roleString),
-                IsActive = isActive
+                Status = isActive ? SystemUserStatus.Active : SystemUserStatus.Deactivated
             };
 
             var resp = await _client.PostAsJsonAsync("/api/SystemUser", dto);
@@ -130,7 +137,7 @@ namespace WebApi.IntegrationTests.Tests
             {
                 var get = await _client.GetAsync($"/api/SystemUser/ByCode/{dto.Code}");
                 Assert.Equal(HttpStatusCode.OK, get.StatusCode);
-                var returned = await get.Content.ReadFromJsonAsync<SystemUserDTO>();
+                var returned = await get.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
                 Assert.NotNull(returned);
                 Assert.Equal(dto.Username, returned.Username);
                 Assert.Equal(dto.Email, returned.Email);
@@ -145,10 +152,10 @@ namespace WebApi.IntegrationTests.Tests
         {
             var get = await _client.GetAsync($"/api/SystemUser/ByCode/{code}");
             Assert.Equal(HttpStatusCode.OK, get.StatusCode);
-            var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>();
+            var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
             Assert.NotNull(dto);
 
-            dto.IsActive = !dto.IsActive;
+            dto.Status = dto.Status == SystemUserStatus.Active ? SystemUserStatus.Deactivated : SystemUserStatus.Active;
             dto.Role = Enum.Parse<SystemRole>(newRoleString);
 
             var put = await _client.PutAsJsonAsync($"/api/SystemUser/Update/{dto.Code}", dto);
@@ -157,9 +164,9 @@ namespace WebApi.IntegrationTests.Tests
             if (put.StatusCode == HttpStatusCode.OK)
             {
                 var check = await _client.GetAsync($"/api/SystemUser/ByCode/{dto.Code}");
-                var updated = await check.Content.ReadFromJsonAsync<SystemUserDTO>();
+                var updated = await check.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
                 Assert.NotNull(updated);
-                Assert.Equal(dto.IsActive, updated.IsActive);
+                Assert.Equal(dto.Status, updated.Status);
                 Assert.Equal(dto.Role, updated.Role);
             }
         }
@@ -168,7 +175,7 @@ namespace WebApi.IntegrationTests.Tests
         public async Task PutSystemUser_CodeMismatch_ReturnsBadRequest()
         {
             var get = await _client.GetAsync("/api/SystemUser/ByCode/USR1111");
-            var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>();
+            var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
             Assert.NotNull(dto);
 
             dto.Code = "USR9999";
@@ -181,7 +188,7 @@ namespace WebApi.IntegrationTests.Tests
         public async Task PutSystemUser_DuplicateUsername_ReturnsBadRequest(string code, string newUsername, int expectedStatus)
         {
             var get = await _client.GetAsync($"/api/SystemUser/ByCode/{code}");
-            var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>();
+            var dto = await get.Content.ReadFromJsonAsync<SystemUserDTO>(_jsonOptions);
             Assert.NotNull(dto);
 
             dto.Username = newUsername;

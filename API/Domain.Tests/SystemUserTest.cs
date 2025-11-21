@@ -22,7 +22,7 @@ namespace Domain.Tests
             Assert.Equal("testeUser", user.Username);
             Assert.Equal("user@example.com", user.Email);
             Assert.Equal(SystemRole.Admin, user.Role);
-            Assert.False(user.IsActive);
+            Assert.True(user.IsFirstTime);
         }
 
         [Theory]
@@ -69,16 +69,16 @@ namespace Domain.Tests
         }
 
         [Fact]
-        public void ChangeBooleanStatus_TogglesIsActive()
+        public void ChangeUserStatus_TogglesStatus()
         {
             var user = new SystemUser("USR0011", "tester", "t@t.com", SystemRole.Admin);
-            Assert.False(user.IsActive);
+            Assert.Equal(SystemUserStatus.Deactivated, user.Status);
 
-            user.ChangeBooleanStatus(true);
-            Assert.True(user.IsActive);
+            user.ChangeUserStatus(SystemUserStatus.Active);
+            Assert.Equal(SystemUserStatus.Active, user.Status);
 
-            user.ChangeBooleanStatus(false);
-            Assert.False(user.IsActive);
+            user.ChangeUserStatus(SystemUserStatus.Deactivated);
+            Assert.Equal(SystemUserStatus.Deactivated, user.Status);
         }
 
         [Fact]

@@ -124,24 +124,20 @@ public class SystemUserController : ControllerBase
         Console.WriteLine("AUTH0 EMAIL = " + email);
         if (string.IsNullOrEmpty(email))
         {
-            Console.WriteLine("AAAAAAAAAAA");
             return Unauthorized("No email claim found in Auth0 token.");
         }
         SystemUserDTO? user = await _systemUserService.GetSystemUserByEmail(email);
         if (user == null)
         {
-            Console.WriteLine("A???");
             RepresentativeDTO? representative = await _systemUserService.GetRepresentativeByEmail(email);
             if (representative == null)
             {
-                Console.WriteLine("AEEEE");
                 return Forbid("Access denied.");
             }
             return Ok(new { role = "Representative" });
         }
-        if (!user.IsActive)
+        if (user.Status.Equals(SystemUserStatus.Deactivated))
         {
-            Console.WriteLine("AAAAAAAAAAAFDS");
             return Forbid("Access denied.");
         }
         return Ok(new { role = user.Role.ToString() });

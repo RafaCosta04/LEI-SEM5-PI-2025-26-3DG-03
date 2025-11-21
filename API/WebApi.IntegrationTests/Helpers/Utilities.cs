@@ -120,7 +120,8 @@ public static class Utilities
                 Username = "adminTeste",
                 Email = "admin.teste@example.com",
                 Role = SystemRole.Admin.ToString(),
-                IsActive = true
+                IsFirstTime = false,
+                Status = SystemUserStatus.Active.ToString()
             },
             new SystemUserDataModel
             {
@@ -128,7 +129,8 @@ public static class Utilities
                 Username = "operatorTeste",
                 Email = "operator.teste@example.com",
                 Role = SystemRole.LogisticOperator.ToString(),
-                IsActive = true
+                IsFirstTime = false,
+                Status = SystemUserStatus.Active.ToString()
             },
             new SystemUserDataModel
             {
@@ -136,7 +138,8 @@ public static class Utilities
                 Username = "officer",
                 Email = "portofficer.teste@example.com",
                 Role = SystemRole.PortAuthorityOfficer.ToString(),
-                IsActive = true
+                IsFirstTime = false,
+                Status = SystemUserStatus.Active.ToString()
             }
         };
     }

@@ -29,7 +29,9 @@ public class SystemUser
 
     public SystemRole Role { get; private set; }
 
-    public bool IsActive { get; private set; }
+    public SystemUserStatus Status { get; private set; }
+
+    public bool IsFirstTime { get; private set; }
 
     private SystemUser() { }
 
@@ -42,7 +44,8 @@ public class SystemUser
         Username = username.Trim();
         Email = email.Trim();
         Role = role;
-        IsActive = false;
+        Status = SystemUserStatus.Deactivated;
+        IsFirstTime = true;
     }
 
 
@@ -85,9 +88,14 @@ public class SystemUser
         }
     }
 
-    public void ChangeBooleanStatus(bool status)
+    public void ChangeBoolenaIsFirstTime(bool isFirstTime)
     {
-        IsActive = status;
+        IsFirstTime = isFirstTime;
+    }
+
+    public void ChangeUserStatus(SystemUserStatus status)
+    {
+        Status = status;
     }
 
 

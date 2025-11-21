@@ -9,7 +9,8 @@ public class SystemUserDataModel
     public string? Username { get; set; }
     public string? Email { get; set; }
     public string? Role { get; set; }
-    public bool IsActive { get; set; }
+    public string? Status { get; set; }
+    public bool IsFirstTime { get; set; }
 
     public SystemUserDataModel() { }
 
@@ -20,7 +21,8 @@ public class SystemUserDataModel
         Username = systemUser.Username;
         Email = systemUser.Email;
         Role = systemUser.Role.ToString();
-        IsActive = systemUser.IsActive;
+        IsFirstTime = systemUser.IsFirstTime;
+        Status = systemUser.Status.ToString();
     }
 
 }
