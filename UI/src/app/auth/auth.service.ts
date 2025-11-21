@@ -23,7 +23,12 @@ export class AuthService {
   }
 
   getToken(): Observable<string> {
-    return this.auth0.getAccessTokenSilently();
+    return this.auth0.getAccessTokenSilently({
+      authorizationParams: {
+        audience: 'https://lapr5-api',
+        scope: 'openid profile email'
+      }
+    });
   }
 
   async getUserName(): Promise<string> {
