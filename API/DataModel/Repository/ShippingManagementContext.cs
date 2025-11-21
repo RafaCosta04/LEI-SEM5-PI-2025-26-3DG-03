@@ -13,7 +13,7 @@ public class ShippingManagementContext : DbContext
     public ShippingManagementContext(DbContextOptions<ShippingManagementContext> options)
         : base(options)
     {
-        Database.EnsureCreated();
+        Database.Migrate();
     }
 
     public virtual DbSet<VesselTypeDataModel> VesselTypes { get; set; } = null!;
