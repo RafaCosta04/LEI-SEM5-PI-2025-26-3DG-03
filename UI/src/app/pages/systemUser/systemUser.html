@@ -1,0 +1,153 @@
+<div class="page-container">
+  <h1 class="page-title">System Users</h1>
+  <div class="top-bar">
+    <div class="search-container">
+      <input type="text" [(ngModel)]="searchTerm" (input)="onSearchInput()" placeholder="Search users..." class="search-input" />
+      <button *ngIf="searchTerm" (click)="searchTerm=''; applyFilter('')" class="clear-button">✕</button>
+    </div>
+
+    <div class="action-buttons">
+      <button (click)="onCreateNew()" class="btn btn-primary">New User</button>
+      <button (click)="onUpdate()" class="btn btn-secondary" [disabled]="!selectedUser">Edit User</button>
+    </div>
+  </div>
+
+  <div class="search-error-container">
+    <div *ngIf="searchError" class="error-message search-error" [class.hiding]="searchErrorHiding">
+      <span>{{ searchError }}</span>
+      <button class="close-error" (click)="hideSearchErrorImmediate()">✕</button>
+    </div>
+  </div>
+
+  <!-- Page-level status message shown between search bar and users table -->
+  <div *ngIf="statusMessage" class="status-container" [class.hiding]="statusHiding">
+    <div [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'">
+      {{ statusMessage }}
+      <button (click)="clearStatusMessage()" class="close-error">✕</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of filteredUsers" [class.selected]="selectedUser?.code === u.code" (click)="selectUser(u)">
+          <td><span class="styled-field">{{ u.code }}</span></td>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>
+            <span [ngClass]="'status-' + (u.status?.toLowerCase() || '')">
+              {{ u.status }}
+            </span>
+          </td>
+          <td>
+            <button (click)="selectUser(u); $event.stopPropagation()" class="btn-select" [class.selected]="selectedUser?.code === u.code">
+              {{ selectedUser?.code === u.code ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredUsers.length === 0 && !isLoading" class="no-results">
+      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No system users found.' }}</p>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header"><h2>Create User</h2><button class="close-button" (click)="closeCreateModal()">✕</button></div>
+      <div class="modal-body">
+        <div *ngIf="modalErrorMessage" class="alert alert-danger">{{ modalErrorMessage }}</div>
+        <div *ngIf="modalSuccessMessage" class="alert alert-success">{{ modalSuccessMessage }}</div>
+        <form (ngSubmit)="onSaveNewUser()" #userForm="ngForm">
+          <div class="form-group"><label>Code *</label><input name="code" [(ngModel)]="newUser.code" required class="form-input" />
+            <div *ngIf="hasFieldError('code')" class="field-error">{{ getFieldError('code') }}</div>
+          </div>
+          <div class="form-group"><label>Username *</label><input name="username" [(ngModel)]="newUser.username" required class="form-input" />
+            <div *ngIf="hasFieldError('username')" class="field-error">{{ getFieldError('username') }}</div>
+          </div>
+          <div class="form-group"><label>Email *</label><input name="email" [(ngModel)]="newUser.email" required class="form-input" />
+            <div *ngIf="hasFieldError('email')" class="field-error">{{ getFieldError('email') }}</div>
+          </div>
+          <div class="form-group"><label>Role</label>
+            <select name="role" [(ngModel)]="newUser.role" class="form-select">
+              <option value="Admin">Admin</option>
+              <option value="LogisticOperator">LogisticOperator</option>
+              <option value="PortAuthorityOfficer">PortAuthorityOfficer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <input name="status" [(ngModel)]="newUser.status" class="form-input readonly-input" readonly />
+            <div *ngIf="hasFieldError('status')" class="field-error">{{ getFieldError('status') }}</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" (click)="closeCreateModal()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">{{ isCreating ? 'Creating...' : 'Create' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header"><h2>Edit User</h2><button class="close-button" (click)="closeEditModal()">✕</button></div>
+      <div class="modal-body">
+        <form (ngSubmit)="onSaveEditUser()" #editForm="ngForm">
+          <div *ngIf="editModalErrorMessage" class="alert alert-danger">{{ editModalErrorMessage }}</div>
+          <div class="form-group"><label>Code</label>
+            <input name="code" [(ngModel)]="editUser.code" class="form-input readonly-input" readonly tabindex="-1" aria-readonly="true" />
+            <div *ngIf="hasEditFieldError('code')" class="field-error">{{ getEditFieldError('code') }}</div>
+          </div>
+
+          <div class="form-group"><label>Email</label>
+            <input name="email" [(ngModel)]="editUser.email" class="form-input readonly-input" readonly tabindex="-1" aria-readonly="true" />
+            <div *ngIf="hasEditFieldError('email')" class="field-error">{{ getEditFieldError('email') }}</div>
+          </div>
+
+          <div class="form-group"><label>Username</label>
+            <input name="username" [(ngModel)]="editUser.username" class="form-input" />
+            <div *ngIf="hasEditFieldError('username')" class="field-error">{{ getEditFieldError('username') }}</div>
+          </div>
+
+          <div class="form-group"><label>Role</label>
+            <select name="role" [(ngModel)]="editUser.role" class="form-select">
+              <option value="Admin">Admin</option>
+              <option value="LogisticOperator">LogisticOperator</option>
+              <option value="PortAuthorityOfficer">PortAuthorityOfficer</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Status</label>
+            <select name="statusEdit" [(ngModel)]="editUser.status" class="form-select">
+              <option value="Active">Active</option>
+              <option value="Deactivated">Deactivated</option>
+            </select>
+            <div *ngIf="hasEditFieldError('status')" class="field-error">{{ getEditFieldError('status') }}</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" (click)="closeEditModal()" class="btn btn-secondary" [disabled]="isEditing">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isEditing || !editForm.form.valid || !isEditDirty()">
+              {{ isEditing ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

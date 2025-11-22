@@ -74,3 +74,23 @@
 :host-context([data-coreui-theme="dark"]) .help-text {
   color: #a0aec0;
 }
+
+
+.error-message {
+  background: var(--cui-danger-bg, #f8d7da);
+  border: 1px solid var(--cui-danger-border, #f5c6cb);
+  color: var(--cui-danger-text, #721c24);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[data-coreui-theme="dark"] .error-message {
+  background: var(--cui-danger-bg-dark, #5c1e21);
+  border: 1px solid var(--cui-danger-border-dark, #7a2e32);
+  color: var(--cui-danger-text-dark, #f8a5ab);
+}
+

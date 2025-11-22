@@ -114,7 +114,7 @@ public class SystemUserController : ControllerBase
     }
 
 
-    [Authorize]
+    //[Authorize]
     [HttpGet("MyRole")]
     public async Task<ActionResult> GetMyRole()
     {

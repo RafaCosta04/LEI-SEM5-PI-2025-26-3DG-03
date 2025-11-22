@@ -76,6 +76,10 @@ export const routes: Routes = [
         path: 'schedule',
         data: { title: 'Schedule', breadcrumb: 'Schedule' },
         loadChildren: () => import('./routing/schedule.routes').then((m) => m.routes)
+      },
+      {
+        path: 'user',
+        loadChildren: () => import('./routing/systemUser.routes').then((m) => m.routes)
       }
     ],
   },

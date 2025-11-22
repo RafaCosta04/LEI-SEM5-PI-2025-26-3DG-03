@@ -103,6 +103,11 @@ public class SystemUser
     {
         Role = systemRole;
     }
-
+    
+    public void ChangeUsername(string username)
+    {
+        ValidateUsername(username);
+        Username = username.Trim();
+    }
 
 }

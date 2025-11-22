@@ -105,6 +105,13 @@ export const navItems: IExtendedNavData[] = [
   {
     name: 'Schedule',
     url: '/schedule',
-    icon: 'nav-img nav-img-schedule'
+    icon: 'nav-img nav-img-schedule',
+    roles: ['Admin', 'LogisticOperator']
+  },
+  {
+    name: 'System Users',
+    url: '/user',
+    icon: 'nav-img nav-img-systemUser',
+    roles: ['Admin']
   }
 ];

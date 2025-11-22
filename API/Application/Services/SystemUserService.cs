@@ -149,6 +149,7 @@ public class SystemUserService
         }
         try
         {
+            systemUser.ChangeUsername(systemUserDTO.Username);
             systemUser.ChangeUserStatus(systemUserDTO.Status);
             systemUser.ChangeSystemRole(systemUserDTO.Role);
             return await _systemUserRepository.Update(systemUser, errorMessages);
