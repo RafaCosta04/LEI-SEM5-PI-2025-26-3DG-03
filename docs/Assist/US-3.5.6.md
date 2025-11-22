@@ -5,7 +5,7 @@
 |----|------------------|-----------------------------------------------|------------------------------|---------------------------|----------------------|----------------------------------|
 | 1 | Failure or misconfiguration of IAM integration may prevent users from authenticating. | Security/Operational | Medium | High |  Monitor IAM availability; test token validation thoroughly. | Low |
 | 2 | RBAC rules incorrectly configured in SPA or backend may expose unauthorized features. | Security | Medium | High | Enforce RBAC on backend; add automated tests; conduct regular audits; log unauthorized attempts. | Low |
-|3 | Mismatch between frontend auth integration (Keycloak) and backend auth setup could allow unauthorized access. | Security/Technical | Medium | High | Align auth configuration between UI (Keycloak) and API; verify token validation on server; add end-to-end auth tests. | Low |
+|3 | Mismatch between frontend auth integration (Auth0) and backend auth setup could allow unauthorized access. | Security/Technical | Medium | High | Align auth configuration between UI (Auth0) and API; verify token validation on server; add end-to-end auth tests. | Low |
 | 4 | Improper handling or validation of authentication tokens leakage. | Security | Medium | High | Validate tokens on server, use secure storage for refresh tokens, rotate keys. | Low |
 | 5| 3D module integration may degrade SPA performance or create UI instability. | Technical | Medium | Medium | Use lazy loading; test performance early; optimize models and textures. | Low |
 | 6 | API downtime or network issues between backend modules may break scheduling or 3D data loading. | Operational | Medium | High | Add retries/timeouts; display user-friendly errors. | Medium |
