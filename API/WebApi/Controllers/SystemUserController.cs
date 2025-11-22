@@ -112,7 +112,26 @@ public class SystemUserController : ControllerBase
         }
         return CreatedAtAction(nameof(GetSystemUserByCode), new { code = createdSystemUser!.Code }, createdSystemUser);
     }
-
+    [HttpGet("MyIsFirstTime")]
+    public async Task<ActionResult> GetMyIsFirstTime()
+    {
+        var email =
+                User.FindFirst("https://lapr5/email")?.Value ??
+                User.FindFirst("email")?.Value;
+        Console.WriteLine("AUTH0 EMAIL = " + email);
+        if (string.IsNullOrEmpty(email))
+        {
+            return Unauthorized("No email claim found in Auth0 token.");
+        }
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByEmail(email);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+        // Log and return email/code so frontend can present it to the user
+        Console.WriteLine($"MyIsFirstTime -> user.Code={user.Code}, IsFirstTime={user.IsFirstTime}");
+        return Ok(new { isFirstTime = user.IsFirstTime, email = user.Email, code = user.Code });
+    }
 
     //[Authorize]
     [HttpGet("MyRole")]
@@ -132,7 +151,7 @@ public class SystemUserController : ControllerBase
             RepresentativeDTO? representative = await _systemUserService.GetRepresentativeByEmail(email);
             if (representative == null)
             {
-                return Forbid("Access denied.");
+                return Forbid();
             }
             return Ok(new { role = "Representative" });
         }
@@ -142,4 +161,38 @@ public class SystemUserController : ControllerBase
         }
         return Ok(new { role = user.Role.ToString() });
     }
+
+    [HttpPost("SendActivationEmail")]
+    public async Task<IActionResult> SendActivationEmail()
+    {
+        var email =
+                User.FindFirst("https://lapr5/email")?.Value ??
+                User.FindFirst("email")?.Value;
+        Console.WriteLine("AUTH0 EMAIL = " + email);
+        if (string.IsNullOrEmpty(email))
+        {
+            return Unauthorized("No email claim found in Auth0 token.");
+        }
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByEmail(email);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        try
+        {
+            bool emailSent = await _systemUserService.SendActivationEmail(user);
+            if (!emailSent)
+            {
+                return StatusCode(500, "Failed to send activation email.");
+            }
+
+            return Ok($"Activation email sent to {user.Email}.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error sending activation email: {ex.Message}");
+        }
+    }
+
 }

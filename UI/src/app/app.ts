@@ -44,7 +44,9 @@ export class App implements OnInit {
   ngOnInit(): void {
 
     this.#auth.getAccessTokenSilently().subscribe(t => {
-      console.log("ACCESS TOKEN:", JSON.parse(atob(t.split('.')[1])));
+      try {
+        console.log("ACCESS TOKEN:", JSON.parse(atob(t.split('.')[1])));
+      } catch { }
     });
 
     this.#permissions.loadRoleFromStorage();
@@ -69,17 +71,61 @@ export class App implements OnInit {
   }
 
   private loadRole() {
+    this.#api.get('/SystemUser/MyIsFirstTime').subscribe({
+      next: (data: any) => {
+        try {
+          if (data?.isFirstTime) {
+            // Request server to send activation email for the current user
+            this.#api.post('/SystemUser/SendActivationEmail', null).subscribe({
+              next: () => {
+                this.roleLoading = false;
+                // Navigate to activation-sent page and include email if provided
+                this.#router.navigate(['/activation-sent'], { queryParams: { email: data?.email } });
+                // Do NOT call loadUserRole() here because the account remains Deactivated
+                // until the user clicks the activation link. The activation page can
+                // offer a 'I've activated' button that triggers role reload.
+              },
+              error: () => {
+                this.roleLoading = false;
+                this.logoutAlert();
+              }
+            });
+          } else {
+            // Not first time → load role normally
+            this.loadUserRole();
+          }
+        } catch (e) {
+          this.roleLoading = false;
+          this.logoutAlert();
+        }
+      },
+      error: () => {
+        this.roleLoading = false;
+        this.logoutAlert();
+      }
+    });
+  }
+
+  private loadUserRole() {
     this.#api.get('/SystemUser/MyRole').subscribe({
       next: (data: any) => {
         this.#permissions.setRole(data.role);
         this.roleLoading = false;
-        console.log("Role loaded:", data.role);
       },
       error: () => {
         this.roleLoading = false;
-        alert("Your account does not have permissions to access this system.");
-        this.#auth.logout();
+        alert('Your account does not have permissions to access this system.');
+        try { this.#auth.logout(); } catch { }
       }
     });
+  }
+
+  private logoutAlert() {
+    try {
+      alert('Your account does not have permissions to access this system.');
+    } catch { }
+    try {
+      this.#auth.logout();
+    } catch { }
   }
 }

@@ -120,6 +120,7 @@ builder.Services.AddTransient<ISystemUserRepository, SystemUserRepository>();
 builder.Services.AddTransient<ISystemUserFactory, SystemUserFactory>();
 builder.Services.AddTransient<SystemUserMapper>();
 builder.Services.AddTransient<SystemUserService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 

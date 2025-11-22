@@ -1,0 +1,14 @@
+<div class="activation-container">
+  <h2>Activation required</h2>
+  <p *ngIf="email">An activation link was sent to <strong>{{ email }}</strong>.</p>
+  <p *ngIf="!email">An activation link was sent to your email address.</p>
+
+  <p>Please check your inbox and click the activation link to enable your account.</p>
+
+  <div class="actions">
+    <button class="btn btn-primary" (click)="onResend()" [disabled]="loading">Resend activation email</button>
+    <button class="btn btn-success" (click)="onIveActivated()" [disabled]="loading">I've activated</button>
+  </div>
+
+  <div *ngIf="message" class="message">{{ message }}</div>
+</div>

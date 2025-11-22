@@ -84,6 +84,11 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'activation-sent',
+    loadComponent: () => import('./pages/activation-sent/activation-sent').then(m => m.ActivationSent),
+    data: { title: 'Activation Sent' }
+  },
+  {
     path: 'v',
     loadComponent: () => import('./components/visualization/visualization').then(m => m.PortVisualizationComponent),
     data: { title: '3D Port Visualization' }

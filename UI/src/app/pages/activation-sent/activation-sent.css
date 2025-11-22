@@ -1,0 +1,13 @@
+.activation-container {
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.activation-container h2 { margin-bottom: 8px; }
+.activation-container .actions { margin-top: 18px; display: flex; gap: 12px; justify-content: center; }
+.activation-container .message { margin-top: 14px; color: #d9534f; }

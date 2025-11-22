@@ -8,19 +8,24 @@ using Domain.Factory;
 using System.ComponentModel;
 using NuGet.Protocol.Plugins;
 using System.Xml.Schema;
+using Microsoft.Extensions.Configuration;
+using Application.Services;
 
 public class SystemUserService
 {
     private readonly ISystemUserRepository _systemUserRepository;
     private readonly ISystemUserFactory _systemUserFactory;
-
+    private readonly IConfiguration _configuration;
     private readonly IRepresentativeRepository _representativeRepository;
+    private readonly IEmailService _emailService;
 
-    public SystemUserService(ISystemUserRepository systemUserRepository, ISystemUserFactory systemUserFactory, IRepresentativeRepository representativeRepository)
+    public SystemUserService(ISystemUserRepository systemUserRepository, ISystemUserFactory systemUserFactory, IRepresentativeRepository representativeRepository, IConfiguration configuration, IEmailService emailService)
     {
         _systemUserRepository = systemUserRepository;
         _systemUserFactory = systemUserFactory;
         _representativeRepository = representativeRepository;
+        _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<IEnumerable<SystemUserDTO>> GetAllSystemUsers()
@@ -165,7 +170,22 @@ public class SystemUserService
             return false;
         }
     }
+    public async Task<bool> SendActivationEmail(SystemUserDTO user)
+    {
+        string activationLink = GenerateActivationLink(user.Code); 
 
+        await _emailService.SendEmailAsync(user.Email!, "Ative sua conta",
+            $"Clique aqui para ativar sua conta: <a href='{activationLink}'>Ativar</a>");
+
+        return true;
+    }
+
+    private string GenerateActivationLink(string userCode)
+    {
+        var token = Guid.NewGuid().ToString();
+
+        return $"{_configuration["AppSettings:ActivationBaseUrl"]}?token={token}&code={userCode}";
+    }
     public async Task<bool> SystemUserExistsByCode(string code)
     {
         return await _systemUserRepository.SystemUserExistsByCode(code);
