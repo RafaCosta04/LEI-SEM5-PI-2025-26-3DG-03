@@ -94,6 +94,7 @@ public class ShippingAgentOrganizationController : ControllerBase
         return Ok(organization);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutShippingAgentOrganization(long id, ShippingAgentOrganizationDTO organizationDTO)
     {
@@ -117,6 +118,7 @@ public class ShippingAgentOrganizationController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost]
     public async Task<ActionResult<ShippingAgentOrganizationWithRepresentativeDTO>> PostShippingAgentOrganization(ShippingAgentOrganizationWithRepresentativeDTO organizationRepDTO)
     {

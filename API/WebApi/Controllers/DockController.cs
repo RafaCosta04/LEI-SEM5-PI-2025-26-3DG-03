@@ -74,6 +74,7 @@ public class DockController : ControllerBase
         return Ok(docks);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutDock(long id, DockDTO dockDTO)
     {
@@ -95,6 +96,7 @@ public class DockController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost]
     public async Task<ActionResult<DockDTO>> PostDock(DockDTO dockDTO)
     {

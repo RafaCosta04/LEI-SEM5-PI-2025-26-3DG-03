@@ -66,6 +66,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin,LogisticOperator")]
         [HttpPost]
         public async Task<ActionResult<PhysicalResourceDTO>> Post(PhysicalResourceDTO dto)
         {
@@ -82,6 +83,7 @@ namespace WebApi.Controllers
             return CreatedAtAction(nameof(GetByCode), new { code = created.Code }, created);
         }
 
+        [Authorize(Roles = "Admin,LogisticOperator")]
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Put(long id, PhysicalResourceDTO dto)
         {

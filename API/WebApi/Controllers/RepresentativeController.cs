@@ -99,6 +99,7 @@ public class RepresentativeController : ControllerBase
         return Ok(representatives);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutRepresentative(long id, RepresentativeDTO representativeDTO)
     {
@@ -121,6 +122,7 @@ public class RepresentativeController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost]
     public async Task<ActionResult<RepresentativeDTO>> PostRepresentative(RepresentativeDTO representativeDTO)
     {

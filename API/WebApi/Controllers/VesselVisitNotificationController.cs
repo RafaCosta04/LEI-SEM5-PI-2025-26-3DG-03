@@ -101,6 +101,7 @@ public class VesselVisitNotificationController : ControllerBase
         return Ok(notifications);
     }
 
+    [Authorize(Roles = "Admin,Representative")]
     [HttpPost]
     public async Task<ActionResult<VesselVisitNotificationDTO>> PostVesselVisitNotification([FromBody] VesselVisitNotificationDTO vesselVisitNotificationDTO)
     {
@@ -118,6 +119,7 @@ public class VesselVisitNotificationController : ControllerBase
         return CreatedAtAction(nameof(GetVesselVisitNotificationById), new { id = createdNotificationDTO.Id }, createdNotificationDTO);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost("Decision")]
     public async Task<ActionResult<DecisionDTO>> PostDecision(DecisionDTO decisionDTO)
     {
@@ -138,6 +140,7 @@ public class VesselVisitNotificationController : ControllerBase
         return CreatedAtAction(nameof(GetDecisionById), new { id = createdDecisionDTO.Id }, createdDecisionDTO);
     }
 
+    [Authorize(Roles = "Admin,Representative")]
     [HttpPut("Update/{visitCode}")]
     public async Task<IActionResult> PutVesselVisitNotification(string visitCode, VesselVisitNotificationDTO vesselVisitNotificationDTO)
     {

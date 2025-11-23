@@ -29,14 +29,11 @@ namespace WebApi.Controllers
         [HttpGet("Layout")]
         public IActionResult GetLayout()
         {
-            // The WebApi project's ContentRootPath is the WebApi folder.
-            // The layout.json file lives in the parent API/Port folder, so go up one level.
             var projectRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, ".."));
             var filePath = Path.Combine(projectRoot, "Port", "layout.json");
 
             if (!System.IO.File.Exists(filePath))
             {
-                // Return detailed path for easier debugging
                 return NotFound($"layout.json not found at {filePath}");
             }
 

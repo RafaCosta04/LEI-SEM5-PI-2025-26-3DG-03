@@ -59,6 +59,7 @@ public class StorageAreaController : ControllerBase
         return Ok(storageAreaDTO);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost]
     public async Task<ActionResult<StorageAreaDTO>> PostStorageArea([FromBody] StorageAreaDTO storageAreaDTO)
     {
@@ -80,6 +81,7 @@ public class StorageAreaController : ControllerBase
         return CreatedAtAction(nameof(GetStorageAreaById), new { id = createdStorageAreaDTO.Id }, createdStorageAreaDTO);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutStorageArea(long id, StorageAreaDTO storageAreaDTO)
     {

@@ -62,6 +62,7 @@ public class VesselTypeController : ControllerBase
         return Ok(vesselTypes);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutVesselType(long id, VesselTypeDTO vesselTypeDTO)
     {
@@ -76,6 +77,7 @@ public class VesselTypeController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost]
     public async Task<ActionResult<VesselTypeDTO>> PostVesselType(VesselTypeDTO vesselTypeDTO)
     {

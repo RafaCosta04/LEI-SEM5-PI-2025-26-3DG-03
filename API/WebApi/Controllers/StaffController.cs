@@ -97,6 +97,7 @@ public class StaffController : ControllerBase
         return Ok(staffDTO);
     }
 
+    [Authorize(Roles = "Admin,LogisticOperator")]
     [HttpPost]
     public async Task<ActionResult<StaffDTO>> PostStaff(StaffDTO staffDTO)
     {
@@ -122,6 +123,7 @@ public class StaffController : ControllerBase
         return CreatedAtAction(nameof(GetStaffByName), new { name = createdStaff.Name }, createdStaff);
     }
 
+    [Authorize(Roles = "Admin,LogisticOperator")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> PutStaff(long id, StaffDTO staffDTO)
     {

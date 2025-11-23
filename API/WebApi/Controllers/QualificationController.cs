@@ -44,6 +44,7 @@ public class QualificationController : ControllerBase
         return Ok(qs);
     }
 
+    [Authorize(Roles = "Admin,LogisticOperator")]
     [HttpPost]
     public async Task<ActionResult<QualificationDTO>> Create(QualificationDTO dto)
     {
@@ -55,6 +56,7 @@ public class QualificationController : ControllerBase
         return CreatedAtAction(nameof(GetByCode), new { code = created!.Code }, created);
     }
 
+    [Authorize(Roles = "Admin,LogisticOperator")]
     [HttpPut("Update/{id}")]
     public async Task<IActionResult> Update(long id, QualificationDTO dto)
     {

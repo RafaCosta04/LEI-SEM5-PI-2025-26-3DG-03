@@ -72,6 +72,7 @@ public class VesselRecordController : ControllerBase
         return Ok(vesselRecord);
     }
 
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPut("Update/{imoNumber}")]
     public async Task<IActionResult> PutVesselRecord(string imoNumber, VesselRecordDTO vesselRecordDTO)
     {
@@ -87,9 +88,8 @@ public class VesselRecordController : ControllerBase
         return Ok();
     }
 
-
+    [Authorize(Roles = "Admin,PortAuthorityOfficer")]
     [HttpPost]
-
     public async Task<ActionResult<VesselRecordDTO>> PostVesselRecord(VesselRecordDTO vesselRecordDTO)
     {
         if (vesselRecordDTO == null)

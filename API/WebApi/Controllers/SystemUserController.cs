@@ -77,6 +77,7 @@ public class SystemUserController : ControllerBase
         return Ok(users);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("Update/{code}")]
     public async Task<IActionResult> PutSystemUser(string code, SystemUserDTO systemUserDTO)
     {
@@ -96,6 +97,7 @@ public class SystemUserController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<SystemUserDTO>> PostSystemUser(SystemUserDTO systemUserDTO)
     {
@@ -112,6 +114,7 @@ public class SystemUserController : ControllerBase
         }
         return CreatedAtAction(nameof(GetSystemUserByCode), new { code = createdSystemUser!.Code }, createdSystemUser);
     }
+
     [HttpGet("MyIsFirstTime")]
     public async Task<ActionResult> GetMyIsFirstTime()
     {
@@ -140,7 +143,6 @@ public class SystemUserController : ControllerBase
         return Ok(new { userId, name, isFirstTime = user.IsFirstTime, email = user.Email, code = user.Code });
     }
 
-    //[Authorize]
     [HttpGet("MyRole")]
     public async Task<ActionResult> GetMyRole()
     {

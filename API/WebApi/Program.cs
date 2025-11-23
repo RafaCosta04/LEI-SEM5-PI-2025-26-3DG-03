@@ -9,7 +9,9 @@ using Domain.IRepository;
 using WebApi.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Domain.Model;
 var builder = WebApplication.CreateBuilder(args);
 
 // Authentication + Authorization
@@ -27,11 +29,49 @@ builder.Services.AddAuthentication(options =>
     {
         NameClaimType = "email"
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var httpContext = context.HttpContext;
+
+            var email =
+                context.Principal!.FindFirst("https://lapr5/email")?.Value ??
+                context.Principal.FindFirst("email")?.Value;
+
+            if (email == null)
+                return;
+
+            var userService = httpContext.RequestServices.GetRequiredService<SystemUserService>();
+            var user = await userService.GetSystemUserByEmail(email);
+            var identity = context.Principal.Identity as ClaimsIdentity;
+            if (user != null)
+            {
+                if (user.Status.Equals("Deactivated"))
+                {
+                    context.Fail("User deactivated");
+                    return;
+                }
+
+                identity!.AddClaim(new Claim(ClaimTypes.Role, user.Role.ToString()));
+                return;
+            }
+
+            var rep = await userService.GetRepresentativeByEmail(email);
+
+            if (rep != null)
+            {
+                identity!.AddClaim(new Claim(ClaimTypes.Role, "Representative"));
+                return;
+            }
+            context.Fail("User not registered in system.");
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
 
-// JSON enum handling
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -60,7 +100,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// DI (como já tinhas)
+
 builder.Services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
 builder.Services.AddTransient<IVesselTypeFactory, VesselTypeFactory>();
 builder.Services.AddTransient<VesselTypeMapper>();
