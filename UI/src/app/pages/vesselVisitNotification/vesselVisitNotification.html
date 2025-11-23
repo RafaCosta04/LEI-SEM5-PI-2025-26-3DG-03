@@ -1,5 +1,5 @@
 <div class="page-container">
-  <h1 class="page-title">Vessel Visit Notifications</h1>
+  <h1 class="page-title">{{ 'VESSEL_VISIT_NOTIFICATIONS.TITLE' | translate }}</h1>
 
   <div class="top-bar">
     <div class="search-container">
@@ -7,7 +7,7 @@
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search for vessel visit notifications..."
+        [placeholder]="'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SEARCH' | translate"
         class="search-input"
       >
       <button
@@ -24,17 +24,17 @@
       <button
         (click)="onCreateNew()"
         class="btn btn-primary"
-        title="Create new vessel visit notification"
+        [title]="'VESSEL_VISIT_NOTIFICATIONS.ACTIONS.NEW' | translate"
       >
-        New Notification
+        {{ 'VESSEL_VISIT_NOTIFICATIONS.ACTIONS.NEW' | translate }}
       </button>
       <button
         (click)="onUpdate()"
         class="btn btn-secondary"
         [disabled]="!selectedNotification"
-        title="Edit selected notification"
+        [title]="'VESSEL_VISIT_NOTIFICATIONS.ACTIONS.EDIT' | translate"
       >
-        Edit Notification
+        {{ 'VESSEL_VISIT_NOTIFICATIONS.ACTIONS.EDIT' | translate }}
       </button>
     </div>
   </div>
@@ -45,23 +45,23 @@
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    Loading Vessel Visit Notifications...
+    {{ 'VESSEL_VISIT_NOTIFICATIONS.TITLE' | translate }}
   </div>
 
   <div *ngIf="!isLoading" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Code</th>
-          <th>Vessel IMO</th>
-          <th>Representative</th>
-          <th>ETA</th>
-          <th>ETD</th>
-          <th>Cargo Type</th>
-          <th>Volume</th>
-          <th>Status</th>
-          <th>Crew Members</th>
-          <th>Actions</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.CODE' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.VESSEL_IMO' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.REPRESENTATIVE' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.ETA' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.ETD' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.CARGO_TYPE' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.VOLUME' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.STATUS' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.CREW_MEMBERS' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_NOTIFICATIONS.TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -79,7 +79,7 @@
           <td>{{ notification.volume }}</td>
           <td>
             <span [class]="'status-' + notification.visitStatus?.toLowerCase()">
-              {{ notification.visitStatus }}
+              {{ ('VESSEL_VISIT_NOTIFICATIONS.STATUS.' + (notification.visitStatus || '').toUpperCase()) | translate }}
             </span>
           </td>
           <td>{{ notification.numberOfCrewMembers }}</td>
@@ -89,7 +89,7 @@
               class="btn-select"
               [class.selected]="selectedNotification?.id === notification.id"
             >
-              {{ selectedNotification?.id === notification.id ? 'Unselect' : 'Select' }}
+              {{ selectedNotification?.id === notification.id ? ('VESSEL_VISIT_NOTIFICATIONS.ACTIONS.UNSELECT' | translate) : ('VESSEL_VISIT_NOTIFICATIONS.ACTIONS.SELECT' | translate) }}
             </button>
           </td>
         </tr>
@@ -97,61 +97,57 @@
     </table>
 
     <div *ngIf="filteredNotifications.length === 0 && !isLoading" class="no-results">
-      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No vessel visit notifications found.' }}</p>
+      <p>{{ searchTerm ? (('VESSEL_VISIT_NOTIFICATIONS.NO_RESULTS.NO_MATCH' | translate) + ' "' + searchTerm + '"') : ('VESSEL_VISIT_NOTIFICATIONS.NO_RESULTS.NONE_FOUND' | translate) }}</p>
     </div>
   </div>
 
   <!-- Information of selected notification -->
   <div *ngIf="selectedNotification" class="selected-info">
-    <h3>Selected Vessel Visit Notification:</h3>
+    <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.TITLE' | translate }}:</h3>
     <div class="info-card">
       <div class="info-section">
-        <h4>Basic Information</h4>
-        <p><strong>Code:</strong> {{ selectedNotification.code }}</p>
-        <p><strong>Vessel IMO:</strong> {{ selectedNotification.vesselIMO }}</p>
-        <p><strong>Representative Citizen ID:</strong> {{ selectedNotification.representativeCitizenID }}</p>
-        <p><strong>ETA:</strong> {{ formatDateForDisplay(selectedNotification.eta) }}</p>
-        <p><strong>ETD:</strong> {{ formatDateForDisplay(selectedNotification.etd) }}</p>
-        <p><strong>Status:</strong>
-          <span [class]="'status-' + selectedNotification.visitStatus?.toLowerCase()">
-            {{ selectedNotification.visitStatus }}
-          </span>
+        <h4>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.TITLE' | translate }}</h4>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.CODE' | translate }}:</strong> {{ selectedNotification.code }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.VESSEL_IMO' | translate }}:</strong> {{ selectedNotification.vesselIMO }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.REPRESENTATIVE' | translate }}:</strong> {{ selectedNotification.representativeCitizenID }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.ETA' | translate }}:</strong> {{ formatDateForDisplay(selectedNotification.eta) }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.ETD' | translate }}:</strong> {{ formatDateForDisplay(selectedNotification.etd) }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.STATUS' | translate }}:</strong>
+            <span [class]="'status-' + selectedNotification.visitStatus?.toLowerCase()">
+            {{ ('VESSEL_VISIT_NOTIFICATIONS.STATUS.' + (selectedNotification.visitStatus || '').toUpperCase()) | translate }}
+            </span>
         </p>
-        <p><strong>Last Modified:</strong> {{ formatDateForDisplay(selectedNotification.lastModifiedAt) }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.BASIC.LAST_MODIFIED' | translate }}:</strong> {{ formatDateForDisplay(selectedNotification.lastModifiedAt) }}</p>
       </div>
 
       <div class="info-section">
-        <h4>Cargo Information</h4>
-        <p><strong>Cargo Type:</strong> {{ selectedNotification.cargoType }}</p>
-        <p><strong>Volume:</strong> {{ selectedNotification.volume }}</p>
+        <h4>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CARGO.TITLE' | translate }}</h4>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CARGO.CARGO_TYPE' | translate }}:</strong> {{ selectedNotification.cargoType }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CARGO.VOLUME' | translate }}:</strong> {{ selectedNotification.volume }}</p>
       </div>
 
       <div class="info-section">
-        <h4>Crew Information</h4>
-        <p><strong>Number of Crew Members:</strong> {{ selectedNotification.numberOfCrewMembers }}</p>
+        <h4>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CREW.TITLE' | translate }}</h4>
+        <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CREW.COUNT' | translate }}:</strong> {{ selectedNotification.numberOfCrewMembers }}</p>
         <div *ngIf="selectedNotification.crewMembers && selectedNotification.crewMembers.length > 0" class="crew-list">
-          <p><strong>Crew Members:</strong></p>
+          <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CREW.LIST' | translate }}</strong></p>
           <ul>
             <li *ngFor="let crew of selectedNotification.crewMembers">
-              {{ crew.name }} ({{ crew.rank }}) - {{ crew.nationality }} - {{ crew.citizenID }}
+              {{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.CREW.ITEM' | translate:{ name: crew.name, rank: crew.rank, nationality: crew.nationality, citizenID: crew.citizenID } }}
             </li>
           </ul>
         </div>
       </div>
 
       <div class="info-section" *ngIf="selectedNotification.cargoManifests && selectedNotification.cargoManifests.length > 0">
-        <h4>Cargo Manifests</h4>
+        <h4>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.TITLE' | translate }}</h4>
         <div *ngFor="let manifest of selectedNotification.cargoManifests; let i = index" class="manifest-info">
-          <p><strong>Manifest {{ i + 1 }}:</strong> {{ manifest.manifestType }}</p>
+          <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.MANIFEST_LABEL' | translate:{ index: i + 1 } }}:</strong> {{ manifest.manifestType }}</p>
           <div *ngIf="manifest.entries && manifest.entries.length > 0">
-            <p><strong>Entries ({{ manifest.entries.length }}):</strong></p>
+            <p><strong>{{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.ENTRIES_COUNT' | translate:{ count: manifest.entries.length } }}:</strong></p>
             <ul class="manifest-entries">
               <li *ngFor="let entry of manifest.entries">
-                Container: {{ entry.containerNumber }} |
-                Row: {{ entry.row }} |
-                Bay: {{ entry.bay }} |
-                Tier: {{ entry.tier }} |
-                Storage Area: {{ entry.storageAreaCode }}
+                {{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.ENTRY' | translate:{ containerNumber: entry.containerNumber, row: entry.row, bay: entry.bay, tier: entry.tier, storageAreaCode: entry.storageAreaCode } }}
               </li>
             </ul>
           </div>
@@ -165,7 +161,7 @@
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Create New Vessel Visit Notification</h2>
+      <h2>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeCreateModal()">✕</button>
     </div>
 
@@ -177,11 +173,11 @@
       <form (ngSubmit)="onSaveNewNotification()" #notificationForm="ngForm">
         <!-- Basic Information Section -->
         <div class="form-section">
-          <h3>Basic Information</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BASIC.TITLE' | translate }}</h3>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="vesselIMO">Vessel IMO *</label>
+              <label for="vesselIMO">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BASIC.VESSEL_IMO' | translate }}</label>
               <select
                 id="vesselIMO"
                 name="vesselIMO"
@@ -190,7 +186,7 @@
                 class="form-input"
                 [class.error]="hasFieldError('vesselIMO')"
               >
-                <option value="" disabled selected>Select vessel</option>
+                <option value="" disabled selected>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_VESSEL' | translate }}</option>
                 <option *ngFor="let vessel of vessels" [value]="vessel.imoNumber">{{ vessel.imoNumber }} - {{ vessel.vesselName }}</option>
               </select>
               <div *ngIf="hasFieldError('vesselIMO')" class="field-error">
@@ -199,7 +195,7 @@
             </div>
 
             <div class="form-group">
-              <label for="representativeCitizenID">Representative Citizen ID *</label>
+              <label for="representativeCitizenID">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BASIC.REPRESENTATIVE' | translate }}</label>
               <select
                 id="representativeCitizenID"
                 name="representativeCitizenID"
@@ -208,7 +204,7 @@
                 class="form-input"
                 [class.error]="hasFieldError('representativeCitizenID')"
               >
-                <option value="" disabled selected>Select representative</option>
+                <option value="" disabled selected>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_REPRESENTATIVE' | translate }}</option>
                 <option *ngFor="let rep of representatives" [value]="rep.citizenId">{{ rep.citizenId }} - {{ rep.name }}</option>
               </select>
               <div *ngIf="hasFieldError('representativeCitizenID')" class="field-error">
@@ -219,7 +215,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="eta">ETA *</label>
+              <label for="eta">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BASIC.ETA' | translate }}</label>
               <input
                 type="datetime-local"
                 id="eta"
@@ -236,7 +232,7 @@
             </div>
 
             <div class="form-group">
-              <label for="etd">ETD *</label>
+              <label for="etd">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BASIC.ETD' | translate }}</label>
               <input
                 type="datetime-local"
                 id="etd"
@@ -256,11 +252,11 @@
 
         <!-- Cargo Information Section -->
         <div class="form-section">
-          <h3>Cargo Information</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CARGO.TITLE' | translate }}</h3>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="cargoType">Cargo Type *</label>
+              <label for="cargoType">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CARGO.CARGO_TYPE' | translate }}</label>
               <select
                 id="cargoType"
                 name="cargoType"
@@ -269,7 +265,7 @@
                 class="form-input"
                 [class.error]="hasFieldError('cargoType')"
               >
-                <option value="">Select cargo type</option>
+                <option value="">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_CARGO_TYPE' | translate }}</option>
                 <option *ngFor="let type of getCargoTypes()" [value]="type">{{ type }}</option>
               </select>
               <div *ngIf="hasFieldError('cargoType')" class="field-error">
@@ -278,7 +274,7 @@
             </div>
 
             <div class="form-group">
-              <label for="volume">Volume *</label>
+              <label for="volume">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CARGO.VOLUME' | translate }}</label>
               <input
                 type="number"
                 id="volume"
@@ -289,7 +285,7 @@
                 step="0.01"
                 class="form-input"
                 [class.error]="hasFieldError('volume')"
-                placeholder="Enter cargo volume"
+                placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_VOLUME' | translate }}"
               >
               <div *ngIf="hasFieldError('volume')" class="field-error">
                 {{ getFieldError('volume') }}
@@ -300,39 +296,39 @@
 
         <!-- Crew Information Section -->
         <div class="form-section">
-          <h3>Crew Information</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CREW.TITLE' | translate }}</h3>
 
           <div style="margin-top: 20px;">
-            <h4>Crew Members * (Required: 1 Captain{{ newNotification.cargoType === 'Hazardous' ? ' + 1 Safety Officer' : '' }})</h4>
+            <h4>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CREW.REQUIREMENTS' | translate:{ extra: newNotification.cargoType === 'Hazardous' ? ' + 1 Safety Officer' : '' } }}</h4>
 
             <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="newCrewName">Name</label>
+                  <label for="newCrewName">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_NAME' | translate }}</label>
                   <input
                     type="text"
                     id="newCrewName"
                     name="newCrewName"
                     [(ngModel)]="newCrewMember.name"
                     class="form-input"
-                    placeholder="Enter crew member name"
+                    placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_NAME' | translate }}"
                   >
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="newCrewCitizenID">Citizen ID</label>
+                  <label for="newCrewCitizenID">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_ID' | translate }}</label>
                   <input
                     type="text"
                     id="newCrewCitizenID"
                     name="newCrewCitizenID"
                     [(ngModel)]="newCrewMember.citizenID"
                     class="form-input"
-                    placeholder="Enter citizen ID"
+                    placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_ID' | translate }}"
                   >
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="newCrewRank">Rank</label>
+                  <label for="newCrewRank">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CREW.ADD_MEMBER' | translate }}</label>
                   <select
                     id="newCrewRank"
                     name="newCrewRank"
@@ -344,14 +340,14 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="newCrewNationality">Nationality</label>
+                  <label for="newCrewNationality">{{ 'REPRESENTATIVES.CREATE_MODAL.SELECT_NATIONALITY' | translate }}</label>
                   <select
                     id="newCrewNationality"
                     name="newCrewNationality"
                     [(ngModel)]="newCrewMember.nationality"
                     class="form-input"
                   >
-                    <option value="" disabled selected>Select nationality</option>
+                    <option value="" disabled selected>{{ 'REPRESENTATIVES.CREATE_MODAL.SELECT_NATIONALITY' | translate }}</option>
                     <option *ngFor="let country of countries" [value]="country.code">
                       {{ country.code }} - {{ country.name }}
                     </option>
@@ -365,13 +361,13 @@
                 (click)="addCrewMember()"
                 style="margin-top: 15px; width: 100%;"
               >
-                Add Crew Member
+                {{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CREW.ADD_MEMBER' | translate }}
               </button>
             </div>
 
             <!-- List of added crew members -->
             <div *ngIf="additionalCrewMembers.length > 0" style="margin-top: 15px;">
-              <h5>Added Crew Members ({{ additionalCrewMembers.length }})</h5>
+              <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CREW.LIST_TITLE' | translate:{ count: additionalCrewMembers.length } }}</h5>
               <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div
                   *ngFor="let member of additionalCrewMembers; let i = index"
@@ -389,7 +385,7 @@
                     (click)="removeCrewMember(i)"
                     style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                   >
-                    Remove
+                    {{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.CREW.REMOVE' | translate }}
                   </button>
                 </div>
               </div>
@@ -399,11 +395,11 @@
 
         <!-- Cargo Manifest Section -->
         <div class="form-section">
-          <h3>Cargo Manifest</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.TITLE' | translate }}</h3>
 
           <!-- Manifest Type Selector -->
           <div class="form-group">
-            <label for="manifestType">Manifest Type</label>
+            <label for="manifestType">{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.MANIFEST_TYPE' | translate }}</label>
             <select
               id="manifestType"
               name="manifestType"
@@ -417,61 +413,61 @@
 
           <!-- Add Manifest Entry Form -->
           <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-            <h5>Add Container Entry ({{ currentManifestType }})</h5>
+            <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.ADD_ENTRY' | translate }} ({{ currentManifestType }})</h5>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
               <div class="form-group">
-                <label>Container Number *</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CONTAINER' | translate }} *</label>
                 <input
                   type="text"
                   name="containerNumber"
                   [(ngModel)]="newManifestEntry.containerNumber"
-                  placeholder="e.g., MSCU1234567"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CONTAINER' | translate }}"
                   class="form-input"
                 />
               </div>
 
               <div class="form-group">
-                <label>Storage Area Code *</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_STORAGE_AREA' | translate }} *</label>
                 <input
                   type="text"
                   name="storageAreaCode"
                   [(ngModel)]="newManifestEntry.storageAreaCode"
-                  placeholder="e.g., AREA-A1"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_STORAGE_AREA' | translate }}"
                   class="form-input"
                 />
               </div>
 
               <div class="form-group">
-                <label>Row</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_ROW' | translate }}</label>
                 <input
                   type="number"
                   name="row"
                   [(ngModel)]="newManifestEntry.row"
-                  placeholder="Row number"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_ROW' | translate }}"
                   class="form-input"
                   min="0"
                 />
               </div>
 
               <div class="form-group">
-                <label>Tier</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_TIER' | translate }}</label>
                 <input
                   type="number"
                   name="tier"
                   [(ngModel)]="newManifestEntry.tier"
-                  placeholder="Tier number"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_TIER' | translate }}"
                   class="form-input"
                   min="0"
                 />
               </div>
 
               <div class="form-group">
-                <label>Bay</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_BAY' | translate }}</label>
                 <input
                   type="number"
                   name="bay"
                   [(ngModel)]="newManifestEntry.bay"
-                  placeholder="Bay number"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_BAY' | translate }}"
                   class="form-input"
                   min="0"
                 />
@@ -484,14 +480,14 @@
                 (click)="addManifestEntry()"
                 class="btn btn-secondary"
               >
-                Add Container Entry
+                {{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.ADD_ENTRY' | translate }}
               </button>
             </div>
           </div>
 
           <!-- Display Loading Manifest Entries -->
           <div *ngIf="getManifestEntries(ManifestType.Loading).length > 0" style="margin-bottom: 15px;">
-            <h5>Loading Manifest ({{ getManifestEntries(ManifestType.Loading).length }} containers)</h5>
+            <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.LOADING_TITLE' | translate:{ count: getManifestEntries(ManifestType.Loading).length } }}</h5>
             <div style="display: flex; flex-direction: column; gap: 10px;">
               <div
                 *ngFor="let entry of getManifestEntries(ManifestType.Loading); let i = index"
@@ -501,7 +497,7 @@
                   <strong>{{ entry.containerNumber }}</strong>
                   <br>
                   <small style="color: var(--cui-secondary-color);">
-                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                    {{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.ENTRY' | translate:{ containerNumber: entry.containerNumber, row: entry.row, bay: entry.bay, tier: entry.tier, storageAreaCode: entry.storageAreaCode } }}
                   </small>
                 </div>
                 <button
@@ -509,7 +505,7 @@
                   (click)="removeManifestEntry(ManifestType.Loading, i)"
                   style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                 >
-                  Remove
+                  {{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.REMOVE' | translate }}
                 </button>
               </div>
             </div>
@@ -517,7 +513,7 @@
 
           <!-- Display Unloading Manifest Entries -->
           <div *ngIf="getManifestEntries(ManifestType.Unloading).length > 0">
-            <h5>Unloading Manifest ({{ getManifestEntries(ManifestType.Unloading).length }} containers)</h5>
+            <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.UNLOADING_TITLE' | translate:{ count: getManifestEntries(ManifestType.Unloading).length } }}</h5>
             <div style="display: flex; flex-direction: column; gap: 10px;">
               <div
                 *ngFor="let entry of getManifestEntries(ManifestType.Unloading); let i = index"
@@ -527,7 +523,7 @@
                   <strong>{{ entry.containerNumber }}</strong>
                   <br>
                   <small style="color: var(--cui-secondary-color);">
-                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                    {{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.ENTRY' | translate:{ containerNumber: entry.containerNumber, row: entry.row, bay: entry.bay, tier: entry.tier, storageAreaCode: entry.storageAreaCode } }}
                   </small>
                 </div>
                 <button
@@ -535,7 +531,7 @@
                   (click)="removeManifestEntry(ManifestType.Unloading, i)"
                   style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                 >
-                  Remove
+                  {{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.MANIFEST.REMOVE' | translate }}
                 </button>
               </div>
             </div>
@@ -549,14 +545,14 @@
             class="btn btn-secondary"
             [disabled]="isCreating"
           >
-            Cancel
+            {{ 'VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BUTTONS.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isCreating || !notificationForm.form.valid"
           >
-            {{ isCreating ? 'Creating...' : 'Create Notification' }}
+            {{ isCreating ? ('VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BUTTONS.CREATING' | translate) : ('VESSEL_VISIT_NOTIFICATIONS.CREATE_MODAL.BUTTONS.CREATE' | translate) }}
           </button>
         </div>
       </form>
@@ -568,7 +564,7 @@
 <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Edit Vessel Visit Notification</h2>
+      <h2>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeEditModal()">✕</button>
     </div>
 
@@ -580,10 +576,10 @@
       <form (ngSubmit)="onSaveEditNotification()" #editNotificationForm="ngForm">
         <!-- Basic Information Section -->
         <div class="form-section">
-          <h3>Basic Information</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.TITLE' | translate }}</h3>
 
           <div class="form-group">
-            <label for="editCode">Code (Read-only)</label>
+            <label for="editCode">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.CODE' | translate }}</label>
             <input
               type="text"
               id="editCode"
@@ -591,13 +587,13 @@
               [value]="editNotification.code"
               readonly
               class="form-input readonly"
-              placeholder="Notification code"
+              placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.CODE' | translate }}"
             >
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="editVesselIMO">Vessel IMO *</label>
+              <label for="editVesselIMO">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.VESSEL_IMO' | translate }}</label>
               <select
                 id="editVesselIMO"
                 name="editVesselIMO"
@@ -605,13 +601,13 @@
                 required
                 class="form-input"
               >
-                <option value="" disabled selected>Select vessel</option>
+                <option value="" disabled selected>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_VESSEL' | translate }}</option>
                 <option *ngFor="let vessel of vessels" [value]="vessel.imoNumber">{{ vessel.imoNumber }} - {{ vessel.vesselName }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="editRepresentativeCitizenID">Representative Citizen ID *</label>
+              <label for="editRepresentativeCitizenID">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.REPRESENTATIVE' | translate }}</label>
               <select
                 id="editRepresentativeCitizenID"
                 name="editRepresentativeCitizenID"
@@ -619,7 +615,7 @@
                 required
                 class="form-input"
               >
-                <option value="" disabled selected>Select representative</option>
+                <option value="" disabled selected>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_REPRESENTATIVE' | translate }}</option>
                 <option *ngFor="let rep of representatives" [value]="rep.citizenId">{{ rep.citizenId }} - {{ rep.name }}</option>
               </select>
             </div>
@@ -627,7 +623,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="editEta">ETA *</label>
+              <label for="editEta">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.ETA' | translate }}</label>
               <input
                 type="datetime-local"
                 id="editEta"
@@ -644,7 +640,7 @@
             </div>
 
             <div class="form-group">
-              <label for="editEtd">ETD *</label>
+              <label for="editEtd">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.ETD' | translate }}</label>
               <input
                 type="datetime-local"
                 id="editEtd"
@@ -661,7 +657,7 @@
             </div>
 
             <div class="form-group">
-              <label for="editVisitStatus">Visit Status *</label>
+              <label for="editVisitStatus">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BASIC.STATUS' | translate }}</label>
               <select
                 id="editVisitStatus"
                 name="editVisitStatus"
@@ -670,9 +666,9 @@
                 class="form-input"
                 [class.error]="hasEditFieldError('visitStatus')"
               >
-                <option value="">Select status</option>
-                <option value="InProgress">In Progress</option>
-                <option value="Submitted">Submitted</option>
+                <option value="">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_STATUS' | translate }}</option>
+                <option value="InProgress">{{ 'VESSEL_VISIT_NOTIFICATIONS.STATUS.INPROGRESS' | translate }}</option>
+                <option value="Submitted">{{ 'VESSEL_VISIT_NOTIFICATIONS.STATUS.SUBMITTED' | translate }}</option>
               </select>
               <div *ngIf="hasEditFieldError('visitStatus')" class="field-error">
                 {{ getEditFieldError('visitStatus') }}
@@ -683,11 +679,11 @@
 
         <!-- Cargo Information Section -->
         <div class="form-section">
-          <h3>Cargo Information</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CARGO.TITLE' | translate }}</h3>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="editCargoType">Cargo Type *</label>
+              <label for="editCargoType">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CARGO.CARGO_TYPE' | translate }}</label>
               <select
                 id="editCargoType"
                 name="editCargoType"
@@ -696,7 +692,7 @@
                 class="form-input"
                 [class.error]="hasEditFieldError('cargoType')"
               >
-                <option value="">Select cargo type</option>
+                <option value="">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.SELECT_CARGO_TYPE' | translate }}</option>
                 <option *ngFor="let type of getCargoTypes()" [value]="type">{{ type }}</option>
               </select>
               <div *ngIf="hasEditFieldError('cargoType')" class="field-error">
@@ -705,7 +701,7 @@
             </div>
 
             <div class="form-group">
-              <label for="editVolume">Volume *</label>
+              <label for="editVolume">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CARGO.VOLUME' | translate }}</label>
               <input
                 type="number"
                 id="editVolume"
@@ -716,7 +712,7 @@
                 step="0.01"
                 class="form-input"
                 [class.error]="hasEditFieldError('volume')"
-                placeholder="Enter cargo volume"
+                placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_VOLUME' | translate }}"
               >
               <div *ngIf="hasEditFieldError('volume')" class="field-error">
                 {{ getEditFieldError('volume') }}
@@ -727,39 +723,39 @@
 
         <!-- Crew Information Section -->
         <div class="form-section">
-          <h3>Crew Information</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CREW.TITLE' | translate }}</h3>
 
           <div style="margin-top: 20px;">
-            <h4>Crew Members * (Required: 1 Captain{{ editNotification.cargoType === 'Hazardous' ? ' + 1 Safety Officer' : '' }})</h4>
+            <h4>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CREW.REQUIREMENTS' | translate:{ extra: editNotification.cargoType === 'Hazardous' ? ' + 1 Safety Officer' : '' } }}</h4>
 
             <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="editNewCrewName">Name</label>
+                  <label for="editNewCrewName">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_NAME' | translate }}</label>
                   <input
                     type="text"
                     id="editNewCrewName"
                     name="editNewCrewName"
                     [(ngModel)]="editNewCrewMember.name"
                     class="form-input"
-                    placeholder="Enter crew member name"
+                    placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_NAME' | translate }}"
                   >
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="editNewCrewCitizenID">Citizen ID</label>
+                  <label for="editNewCrewCitizenID">{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_ID' | translate }}</label>
                   <input
                     type="text"
                     id="editNewCrewCitizenID"
                     name="editNewCrewCitizenID"
                     [(ngModel)]="editNewCrewMember.citizenID"
                     class="form-input"
-                    placeholder="Enter citizen ID"
+                    placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CREW_ID' | translate }}"
                   >
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="editNewCrewRank">Rank</label>
+                  <label for="editNewCrewRank">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CREW.ADD_MEMBER' | translate }}</label>
                   <select
                     id="editNewCrewRank"
                     name="editNewCrewRank"
@@ -771,14 +767,14 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="editNewCrewNationality">Nationality</label>
+                  <label for="editNewCrewNationality">{{ 'REPRESENTATIVES.CREATE_MODAL.SELECT_NATIONALITY' | translate }}</label>
                   <select
                     id="editNewCrewNationality"
                     name="editNewCrewNationality"
                     [(ngModel)]="editNewCrewMember.nationality"
                     class="form-input"
                   >
-                    <option value="" disabled selected>Select nationality</option>
+                    <option value="" disabled selected>{{ 'REPRESENTATIVES.CREATE_MODAL.SELECT_NATIONALITY' | translate }}</option>
                     <option *ngFor="let country of countries" [value]="country.code">
                       {{ country.code }} - {{ country.name }}
                     </option>
@@ -792,13 +788,13 @@
                 (click)="addEditCrewMember()"
                 style="margin-top: 15px; width: 100%;"
               >
-                Add Crew Member
+                {{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CREW.ADD_MEMBER' | translate }}
               </button>
             </div>
 
             <!-- List of added crew members -->
             <div *ngIf="editAdditionalCrewMembers.length > 0" style="margin-top: 15px;">
-              <h5>Crew Members ({{ editAdditionalCrewMembers.length }})</h5>
+              <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CREW.LIST_TITLE' | translate:{ count: editAdditionalCrewMembers.length } }}</h5>
               <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div
                   *ngFor="let member of editAdditionalCrewMembers; let i = index"
@@ -816,7 +812,7 @@
                     (click)="removeEditCrewMember(i)"
                     style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                   >
-                    Remove
+                    {{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.CREW.REMOVE' | translate }}
                   </button>
                 </div>
               </div>
@@ -826,11 +822,11 @@
 
         <!-- Cargo Manifest Section -->
         <div class="form-section">
-          <h3>Cargo Manifest</h3>
+          <h3>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.TITLE' | translate }}</h3>
 
           <!-- Manifest Type Selector -->
           <div class="form-group">
-            <label for="editManifestType">Manifest Type</label>
+            <label for="editManifestType">{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.MANIFEST_TYPE' | translate }}</label>
             <select
               id="editManifestType"
               name="editManifestType"
@@ -844,61 +840,61 @@
 
           <!-- Add Manifest Entry Form -->
           <div style="background-color: var(--cui-tertiary-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-            <h5>Add Container Entry ({{ editCurrentManifestType }})</h5>
+            <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.ADD_ENTRY' | translate }} ({{ editCurrentManifestType }})</h5>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
               <div class="form-group">
-                <label>Container Number *</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CONTAINER' | translate }} *</label>
                 <input
                   type="text"
                   name="editContainerNumber"
                   [(ngModel)]="editNewManifestEntry.containerNumber"
-                  placeholder="e.g., MSCU1234567"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_CONTAINER' | translate }}"
                   class="form-input"
                 />
               </div>
 
               <div class="form-group">
-                <label>Storage Area Code *</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_STORAGE_AREA' | translate }} *</label>
                 <input
                   type="text"
                   name="editStorageAreaCode"
                   [(ngModel)]="editNewManifestEntry.storageAreaCode"
-                  placeholder="e.g., AREA-A1"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_STORAGE_AREA' | translate }}"
                   class="form-input"
                 />
               </div>
 
               <div class="form-group">
-                <label>Row</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_ROW' | translate }}</label>
                 <input
                   type="number"
                   name="editRow"
                   [(ngModel)]="editNewManifestEntry.row"
-                  placeholder="Row number"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_ROW' | translate }}"
                   class="form-input"
                   min="0"
                 />
               </div>
 
               <div class="form-group">
-                <label>Tier</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_TIER' | translate }}</label>
                 <input
                   type="number"
                   name="editTier"
                   [(ngModel)]="editNewManifestEntry.tier"
-                  placeholder="Tier number"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_TIER' | translate }}"
                   class="form-input"
                   min="0"
                 />
               </div>
 
               <div class="form-group">
-                <label>Bay</label>
+                <label>{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_BAY' | translate }}</label>
                 <input
                   type="number"
                   name="editBay"
                   [(ngModel)]="editNewManifestEntry.bay"
-                  placeholder="Bay number"
+                  placeholder="{{ 'VESSEL_VISIT_NOTIFICATIONS.PLACEHOLDERS.ENTER_BAY' | translate }}"
                   class="form-input"
                   min="0"
                 />
@@ -911,14 +907,14 @@
                 (click)="addEditManifestEntry()"
                 class="btn btn-secondary"
               >
-                Add Container Entry
+                {{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.ADD_ENTRY' | translate }}
               </button>
             </div>
           </div>
 
           <!-- Display Loading Manifest Entries -->
           <div *ngIf="getEditManifestEntries(ManifestType.Loading).length > 0" style="margin-bottom: 15px;">
-            <h5>Loading Manifest ({{ getEditManifestEntries(ManifestType.Loading).length }} containers)</h5>
+            <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.LOADING_TITLE' | translate:{ count: getEditManifestEntries(ManifestType.Loading).length } }}</h5>
             <div style="display: flex; flex-direction: column; gap: 10px;">
               <div
                 *ngFor="let entry of getEditManifestEntries(ManifestType.Loading); let i = index"
@@ -928,7 +924,7 @@
                   <strong>{{ entry.containerNumber }}</strong>
                   <br>
                   <small style="color: var(--cui-secondary-color);">
-                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                    {{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.ENTRY' | translate:{ containerNumber: entry.containerNumber, row: entry.row, bay: entry.bay, tier: entry.tier, storageAreaCode: entry.storageAreaCode } }}
                   </small>
                 </div>
                 <button
@@ -936,7 +932,7 @@
                   (click)="removeEditManifestEntry(ManifestType.Loading, i)"
                   style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                 >
-                  Remove
+                  {{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.REMOVE' | translate }}
                 </button>
               </div>
             </div>
@@ -944,7 +940,7 @@
 
           <!-- Display Unloading Manifest Entries -->
           <div *ngIf="getEditManifestEntries(ManifestType.Unloading).length > 0">
-            <h5>Unloading Manifest ({{ getEditManifestEntries(ManifestType.Unloading).length }} containers)</h5>
+            <h5>{{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.UNLOADING_TITLE' | translate:{ count: getEditManifestEntries(ManifestType.Unloading).length } }}</h5>
             <div style="display: flex; flex-direction: column; gap: 10px;">
               <div
                 *ngFor="let entry of getEditManifestEntries(ManifestType.Unloading); let i = index"
@@ -954,7 +950,7 @@
                   <strong>{{ entry.containerNumber }}</strong>
                   <br>
                   <small style="color: var(--cui-secondary-color);">
-                    Storage: {{ entry.storageAreaCode }} | Row: {{ entry.row }} | Tier: {{ entry.tier }} | Bay: {{ entry.bay }}
+                    {{ 'VESSEL_VISIT_NOTIFICATIONS.DETAILS.MANIFEST.ENTRY' | translate:{ containerNumber: entry.containerNumber, row: entry.row, bay: entry.bay, tier: entry.tier, storageAreaCode: entry.storageAreaCode } }}
                   </small>
                 </div>
                 <button
@@ -962,7 +958,7 @@
                   (click)="removeEditManifestEntry(ManifestType.Unloading, i)"
                   style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
                 >
-                  Remove
+                  {{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.MANIFEST.REMOVE' | translate }}
                 </button>
               </div>
             </div>
@@ -976,14 +972,14 @@
             class="btn btn-secondary"
             [disabled]="isEditing"
           >
-            Cancel
+            {{ 'VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BUTTONS.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isEditing || !isEditDirty()"
           >
-            {{ isEditing ? 'Updating...' : 'Update Notification' }}
+            {{ isEditing ? ('VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BUTTONS.UPDATING' | translate) : ('VESSEL_VISIT_NOTIFICATIONS.EDIT_MODAL.BUTTONS.UPDATE' | translate) }}
           </button>
         </div>
       </form>

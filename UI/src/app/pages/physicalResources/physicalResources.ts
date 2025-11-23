@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
 import { PhysicalResourcesService } from '../../services/physicalResources.service';
@@ -74,7 +74,8 @@ export class PhysicalResources implements OnInit, OnDestroy {
     private qualificationService: QualificationService,
     private storageAreaService: StorageAreaService,
     private docksService: DocksService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -622,13 +623,13 @@ export class PhysicalResources implements OnInit, OnDestroy {
   getAreaPlaceholder(): string {
     const kind = this.showCreateModal ? this.newPhysicalResource.kind : this.editPhysicalResource.kind;
     if (kind === PhysicalResourceKind.STSCrane) {
-      return 'Select a dock';
+      return this.translate.instant('PHYSICAL_RESOURCE.FORM.PLACEHOLDER.ASSIGNED_DOCK');
     } else if (kind === PhysicalResourceKind.Truck) {
-      return 'Select a storage area';
+      return this.translate.instant('PHYSICAL_RESOURCE.FORM.PLACEHOLDER.ASSIGNED_STORAGE_AREA');
     } else if (kind === PhysicalResourceKind.MobileCrane) {
-      return 'Select an area (optional)';
+      return this.translate.instant('PHYSICAL_RESOURCE.FORM.PLACEHOLDER.ASSIGNED_AREA_OPTIONAL');
     }
-    return 'Select area';
+    return this.translate.instant('PHYSICAL_RESOURCE.FORM.PLACEHOLDER.ASSIGNED_AREA');
   }
 
   isAreaRequired(): boolean {
@@ -639,12 +640,12 @@ export class PhysicalResources implements OnInit, OnDestroy {
   getAreaLabel(): string {
     const kind = this.showCreateModal ? this.newPhysicalResource.kind : this.editPhysicalResource.kind;
     if (kind === PhysicalResourceKind.STSCrane) {
-      return 'Assigned Dock *';
+      return this.translate.instant('PHYSICAL_RESOURCE.FORM.EDIT.ASSIGNED_DOCK');
     } else if (kind === PhysicalResourceKind.Truck) {
-      return 'Assigned Storage Area *';
+      return this.translate.instant('PHYSICAL_RESOURCE.FORM.EDIT.ASSIGNED_STORAGE_AREA');
     } else if (kind === PhysicalResourceKind.MobileCrane) {
-      return 'Assigned Area (Optional)';
+      return this.translate.instant('PHYSICAL_RESOURCE.FORM.EDIT.ASSIGNED_AREA_OPTIONAL');
     }
-    return 'Assigned Area';
+    return this.translate.instant('PHYSICAL_RESOURCE.FORM.ASSIGNED_AREA');
   }
 }

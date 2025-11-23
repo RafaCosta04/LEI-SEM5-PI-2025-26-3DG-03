@@ -1,5 +1,5 @@
 <div class="page-container">
-  <h1 class="page-title">Vessel Records</h1>
+  <h1 class="page-title">{{ 'VESSEL_RECORDS.TITLE' | translate }}</h1>
 
   <div class="top-bar">
     <div class="search-container">
@@ -7,7 +7,7 @@
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search for vessel records..."
+        placeholder="{{ 'VESSEL_RECORDS.SEARCH_PLACEHOLDER' | translate }}"
         class="search-input"
       >
       <button
@@ -24,17 +24,17 @@
       <button
         (click)="onCreateNew()"
         class="btn btn-primary"
-        title="Create new vessel record"
+        title="{{ 'VESSEL_RECORDS.BUTTON.NEW' | translate }}"
       >
-        New Vessel Record
+        {{ 'VESSEL_RECORDS.BUTTON.NEW' | translate }}
       </button>
       <button
         (click)="onUpdate()"
         class="btn btn-secondary"
         [disabled]="!selectedVesselRecord"
-        title="Edit selected vessel record"
+        title="{{ 'VESSEL_RECORDS.BUTTON.EDIT' | translate }}"
       >
-        Edit Vessel Record
+        {{ 'VESSEL_RECORDS.BUTTON.EDIT' | translate }}
       </button>
     </div>
   </div>
@@ -45,19 +45,19 @@
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    Loading Vessel Records...
+    {{ 'VESSEL_RECORDS.MESSAGES.LOADING' | translate }}
   </div>
 
   <div *ngIf="!isLoading" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>IMO Number</th>
-          <th>Vessel Name</th>
-          <th>Vessel Type</th>
-          <th>Operator</th>
-          <th>Last Modified</th>
-          <th>Actions</th>
+          <th>{{ 'VESSEL_RECORDS.TABLE.IMO' | translate }}</th>
+          <th>{{ 'VESSEL_RECORDS.TABLE.VESSEL_NAME' | translate }}</th>
+          <th>{{ 'VESSEL_RECORDS.TABLE.VESSEL_TYPE' | translate }}</th>
+          <th>{{ 'VESSEL_RECORDS.TABLE.OPERATOR' | translate }}</th>
+          <th>{{ 'VESSEL_RECORDS.TABLE.LAST_MODIFIED' | translate }}</th>
+          <th>{{ 'VESSEL_RECORDS.TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -81,13 +81,13 @@
               {{ vesselRecord.lastModifiedAt | date:'short' }}
             </span>
           </td>
-          <td>
+            <td>
             <button
               (click)="selectVesselRecord(vesselRecord); $event.stopPropagation()"
               class="btn-select"
               [class.selected]="selectedVesselRecord?.id === vesselRecord.id"
             >
-              {{ selectedVesselRecord?.id === vesselRecord.id ? 'Unselect' : 'Select' }}
+              {{ selectedVesselRecord?.id === vesselRecord.id ? ('VESSEL_RECORDS.BUTTON.UNSELECT' | translate) : ('VESSEL_RECORDS.BUTTON.SELECT' | translate) }}
             </button>
           </td>
         </tr>
@@ -96,19 +96,24 @@
 
     <!-- Message when no results are found -->
     <div *ngIf="filteredVesselRecords.length === 0 && !isLoading" class="no-results">
-      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No vessel records found.' }}</p>
+      <p>
+        <ng-container *ngIf="searchTerm; else noVessels">
+          {{ 'VESSEL_RECORDS.NO_RESULTS_FOR' | translate }} "{{ searchTerm }}"
+        </ng-container>
+        <ng-template #noVessels>{{ 'VESSEL_RECORDS.NO_RESULTS' | translate }}</ng-template>
+      </p>
     </div>
   </div>
 
   <!-- Information of selected vessel record -->
   <div *ngIf="selectedVesselRecord" class="selected-info">
-    <h3>Selected Vessel Record:</h3>
+    <h3>{{ 'VESSEL_RECORDS.DETAILS.TITLE' | translate }}</h3>
     <div class="info-card">
-      <p><strong>IMO Number:</strong> {{ selectedVesselRecord.imoNumber }}</p>
-      <p><strong>Vessel Name:</strong> {{ selectedVesselRecord.vesselName }}</p>
-      <p><strong>Vessel Type:</strong> {{ selectedVesselRecord.vesselTypeName }}</p>
-      <p><strong>Operator:</strong> {{ selectedVesselRecord.operator }}</p>
-      <p *ngIf="selectedVesselRecord.lastModifiedAt"><strong>Last Modified:</strong>
+      <p><strong>{{ 'VESSEL_RECORDS.TABLE.IMO' | translate }}:</strong> {{ selectedVesselRecord.imoNumber }}</p>
+      <p><strong>{{ 'VESSEL_RECORDS.TABLE.VESSEL_NAME' | translate }}:</strong> {{ selectedVesselRecord.vesselName }}</p>
+      <p><strong>{{ 'VESSEL_RECORDS.TABLE.VESSEL_TYPE' | translate }}:</strong> {{ selectedVesselRecord.vesselTypeName }}</p>
+      <p><strong>{{ 'VESSEL_RECORDS.TABLE.OPERATOR' | translate }}:</strong> {{ selectedVesselRecord.operator }}</p>
+      <p *ngIf="selectedVesselRecord.lastModifiedAt"><strong>{{ 'VESSEL_RECORDS.TABLE.LAST_MODIFIED' | translate }}:</strong>
         {{ selectedVesselRecord.lastModifiedAt | date:'medium' }}
       </p>
     </div>
@@ -119,7 +124,7 @@
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Create New Vessel Record</h2>
+      <h2>{{ 'VESSEL_RECORDS.CREATE_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeCreateModal()">✕</button>
     </div>
 
@@ -131,7 +136,7 @@
 
       <form (ngSubmit)="onSaveNewVesselRecord()" #vesselRecordForm="ngForm">
         <div class="form-group">
-          <label for="imoNumber">IMO Number *</label>
+          <label for="imoNumber">{{ 'VESSEL_RECORDS.CREATE_MODAL.IMO' | translate }}</label>
           <input
             type="text"
             id="imoNumber"
@@ -142,16 +147,16 @@
             pattern="[0-9]{7}"
             class="form-input"
             [class.error]="hasFieldError('imoNumber')"
-            placeholder="Enter 7-digit IMO number (e.g., 9241061)"
+            placeholder="{{ 'VESSEL_RECORDS.CREATE_MODAL.PLACEHOLDER_IMO' | translate }}"
           >
-          <small class="help-text">Must be exactly 7 digits</small>
+          <small class="help-text">{{ 'VESSEL_RECORDS.CREATE_MODAL.HELP_IMO' | translate }}</small>
           <div *ngIf="hasFieldError('imoNumber')" class="field-error">
             {{ getFieldError('imoNumber') }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="vesselName">Vessel Name *</label>
+          <label for="vesselName">{{ 'VESSEL_RECORDS.CREATE_MODAL.VESSEL_NAME' | translate }}</label>
           <input
             type="text"
             id="vesselName"
@@ -160,7 +165,7 @@
             required
             class="form-input"
             [class.error]="hasFieldError('vesselName')"
-            placeholder="Enter vessel name"
+            placeholder="{{ 'VESSEL_RECORDS.CREATE_MODAL.PLACEHOLDER_VESSEL_NAME' | translate }}"
           >
           <div *ngIf="hasFieldError('vesselName')" class="field-error">
             {{ getFieldError('vesselName') }}
@@ -168,7 +173,7 @@
         </div>
 
         <div class="form-group">
-          <label for="vesselTypeName">Vessel Type *</label>
+          <label for="vesselTypeName">{{ 'VESSEL_RECORDS.CREATE_MODAL.VESSEL_TYPE' | translate }}</label>
           <select
             id="vesselTypeName"
             name="vesselTypeName"
@@ -177,7 +182,7 @@
             class="form-input"
             [class.error]="hasFieldError('vesselTypeName')"
           >
-            <option value="">Select a vessel type</option>
+            <option value="">{{ 'VESSEL_RECORDS.CREATE_MODAL.PLACEHOLDER_VESSEL_TYPE' | translate }}</option>
             <option *ngFor="let vesselType of vesselTypes" [value]="vesselType.name">
               {{ vesselType.name }} - {{ vesselType.description }}
             </option>
@@ -188,7 +193,7 @@
         </div>
 
         <div class="form-group">
-          <label for="operator">Operator *</label>
+          <label for="operator">{{ 'VESSEL_RECORDS.CREATE_MODAL.OPERATOR' | translate }}</label>
           <input
             type="text"
             id="operator"
@@ -197,7 +202,7 @@
             required
             class="form-input"
             [class.error]="hasFieldError('operator')"
-            placeholder="Enter operator name"
+            placeholder="{{ 'VESSEL_RECORDS.CREATE_MODAL.PLACEHOLDER_OPERATOR' | translate }}"
           >
           <div *ngIf="hasFieldError('operator')" class="field-error">
             {{ getFieldError('operator') }}
@@ -211,14 +216,14 @@
             class="btn btn-secondary"
             [disabled]="isCreating"
           >
-            Cancel
+            {{ 'VESSEL_RECORDS.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isCreating || !vesselRecordForm.form.valid"
           >
-            {{ isCreating ? 'Creating...' : 'Create Vessel Record' }}
+            {{ isCreating ? ('VESSEL_RECORDS.BUTTON.CREATING' | translate) : ('VESSEL_RECORDS.BUTTON.CREATE' | translate) }}
           </button>
         </div>
       </form>
@@ -230,7 +235,7 @@
 <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Edit Vessel Record</h2>
+      <h2>{{ 'VESSEL_RECORDS.EDIT_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeEditModal()">✕</button>
     </div>
 
@@ -242,7 +247,7 @@
 
       <form (ngSubmit)="onSaveEditVesselRecord()" #editVesselRecordForm="ngForm">
         <div class="form-group">
-          <label for="editImoNumber">IMO Number (Read-only)</label>
+          <label for="editImoNumber">{{ 'VESSEL_RECORDS.EDIT_MODAL.IMO' | translate }}</label>
           <input
             type="text"
             id="editImoNumber"
@@ -250,13 +255,13 @@
             [value]="editVesselRecord.imoNumber"
             readonly
             class="form-input readonly"
-            placeholder="IMO Number"
+            placeholder="{{ 'VESSEL_RECORDS.EDIT_MODAL.PLACEHOLDER_IMO' | translate }}"
           >
-          <small class="help-text">IMO number cannot be changed</small>
+          <small class="help-text">{{ 'VESSEL_RECORDS.EDIT_MODAL.HELP_IMO' | translate }}</small>
         </div>
 
         <div class="form-group">
-          <label for="editVesselName">Vessel Name *</label>
+          <label for="editVesselName">{{ 'VESSEL_RECORDS.EDIT_MODAL.VESSEL_NAME' | translate }}</label>
           <input
             type="text"
             id="editVesselName"
@@ -265,7 +270,7 @@
             required
             class="form-input"
             [class.error]="hasEditFieldError('vesselName')"
-            placeholder="Enter vessel name"
+            placeholder="{{ 'VESSEL_RECORDS.EDIT_MODAL.PLACEHOLDER_VESSEL_NAME' | translate }}"
           >
           <div *ngIf="hasEditFieldError('vesselName')" class="field-error">
             {{ getEditFieldError('vesselName') }}
@@ -273,7 +278,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editVesselTypeName">Vessel Type *</label>
+          <label for="editVesselTypeName">{{ 'VESSEL_RECORDS.EDIT_MODAL.VESSEL_TYPE' | translate }}</label>
           <select
             id="editVesselTypeName"
             name="editVesselTypeName"
@@ -282,7 +287,7 @@
             class="form-input"
             [class.error]="hasEditFieldError('vesselTypeName')"
           >
-            <option value="">Select a vessel type</option>
+            <option value="">{{ 'VESSEL_RECORDS.CREATE_MODAL.PLACEHOLDER_VESSEL_TYPE' | translate }}</option>
             <option *ngFor="let vesselType of vesselTypes" [value]="vesselType.name">
               {{ vesselType.name }} - {{ vesselType.description }}
             </option>
@@ -293,7 +298,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editOperator">Operator *</label>
+          <label for="editOperator">{{ 'VESSEL_RECORDS.EDIT_MODAL.OPERATOR' | translate }}</label>
           <input
             type="text"
             id="editOperator"
@@ -302,7 +307,7 @@
             required
             class="form-input"
             [class.error]="hasEditFieldError('operator')"
-            placeholder="Enter operator name"
+            placeholder="{{ 'VESSEL_RECORDS.EDIT_MODAL.PLACEHOLDER_OPERATOR' | translate }}"
           >
           <div *ngIf="hasEditFieldError('operator')" class="field-error">
             {{ getEditFieldError('operator') }}
@@ -316,14 +321,14 @@
             class="btn btn-secondary"
             [disabled]="isEditing"
           >
-            Cancel
+            {{ 'VESSEL_RECORDS.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isEditing || !editVesselRecordForm.form.valid || !isEditDirty()"
           >
-            {{ isEditing ? 'Updating...' : 'Update Vessel Record' }}
+            {{ isEditing ? ('VESSEL_RECORDS.BUTTON.UPDATING' | translate) : ('VESSEL_RECORDS.BUTTON.UPDATE' | translate) }}
           </button>
         </div>
       </form>

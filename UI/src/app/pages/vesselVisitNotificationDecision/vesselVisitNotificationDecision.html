@@ -1,13 +1,13 @@
 <div class="page-container">
-  <h1 class="page-title">Vessel Visit Notification Decisions</h1>
+  <h1 class="page-title">{{ 'VESSEL_VISIT_DECISIONS.TITLE' | translate }}</h1>
 
   <div class="top-bar">
     <div class="search-container">
-      <input
+        <input
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search decisions..."
+        [placeholder]="'VESSEL_VISIT_DECISIONS.PLACEHOLDERS.SEARCH' | translate"
         class="search-input"
       >
       <button
@@ -24,16 +24,16 @@
       <button
         (click)="onCreateNew()"
         class="btn btn-primary"
-        title="Create new decision"
+        [title]="'VESSEL_VISIT_DECISIONS.ACTIONS.NEW' | translate"
       >
-        New Decision
+        {{ 'VESSEL_VISIT_DECISIONS.ACTIONS.NEW' | translate }}
       </button>
       <button
         (click)="refreshList()"
         class="btn btn-secondary"
-        title="Refresh list"
+        [title]="'VESSEL_VISIT_DECISIONS.ACTIONS.REFRESH' | translate"
       >
-        Refresh
+        {{ 'VESSEL_VISIT_DECISIONS.ACTIONS.REFRESH' | translate }}
       </button>
     </div>
   </div>
@@ -44,20 +44,20 @@
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    Loading Decisions...
+    {{ 'VESSEL_VISIT_DECISIONS.LOADING' | translate }}
   </div>
 
   <div *ngIf="!isLoading" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Notification Code</th>
-          <th>Status</th>
-          <th>Officer ID</th>
-          <th>Response Message</th>
-          <th>Decision Date</th>
-          <th>Actions</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.ID' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.NOTIFICATION_CODE' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.STATUS' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.OFFICER_ID' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.RESPONSE_MESSAGE' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.DECISION_DATE' | translate }}</th>
+          <th>{{ 'VESSEL_VISIT_DECISIONS.TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -69,8 +69,8 @@
           <td>{{ decision.id }}</td>
           <td><span class="styled-field">{{ decision.vesselVisitNotificationCode }}</span></td>
           <td>
-            <span [class]="'status-' + decision.status.toLowerCase()">
-              {{ decision.status }}
+            <span [class]="'status-' + (decision.status || '').toLowerCase()">
+              {{ ('VESSEL_VISIT_DECISIONS.STATUS.' + (decision.status || '').toUpperCase()) | translate }}
             </span>
           </td>
           <td>{{ decision.officerId }}</td>
@@ -82,7 +82,7 @@
               class="btn-select"
               [class.selected]="selectedDecision?.id === decision.id"
             >
-              {{ selectedDecision?.id === decision.id ? 'Unselect' : 'Select' }}
+              {{ selectedDecision?.id === decision.id ? ('VESSEL_VISIT_DECISIONS.ACTIONS.UNSELECT' | translate) : ('VESSEL_VISIT_DECISIONS.ACTIONS.SELECT' | translate) }}
             </button>
           </td>
         </tr>
@@ -90,35 +90,35 @@
     </table>
 
     <div *ngIf="filteredDecisions.length === 0 && !isLoading" class="no-results">
-      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No decisions found.' }}</p>
+      <p>{{ searchTerm ? (('VESSEL_VISIT_DECISIONS.NO_RESULTS.NO_MATCH' | translate) + ' "' + searchTerm + '"') : ('VESSEL_VISIT_DECISIONS.NO_RESULTS.NONE_FOUND' | translate) }}</p>
     </div>
   </div>
 
   <!-- Information of selected decision -->
   <div *ngIf="selectedDecision" class="selected-info">
-    <h3>Selected Decision:</h3>
+    <h3>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.TITLE' | translate }}</h3>
     <div class="info-card">
       <div class="info-section">
-        <h4>Decision Details</h4>
-        <p><strong>ID:</strong> {{ selectedDecision.id }}</p>
-        <p><strong>Notification Code:</strong> {{ selectedDecision.vesselVisitNotificationCode }}</p>
-        <p><strong>Status:</strong> <span [class]="'status-' + selectedDecision.status.toLowerCase()">{{ selectedDecision.status }}</span></p>
-        <p><strong>Officer ID:</strong> {{ selectedDecision.officerId }}</p>
-        <p><strong>Response Message:</strong> {{ selectedDecision.responseMessage }}</p>
-        <p *ngIf="selectedDecision.decisionDate"><strong>Decision Date:</strong> {{ formatDateForDisplay(selectedDecision.decisionDate) }}</p>
+        <h4>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.TITLE' | translate }}</h4>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.ID' | translate }}:</strong> {{ selectedDecision.id }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.NOTIFICATION_CODE' | translate }}:</strong> {{ selectedDecision.vesselVisitNotificationCode }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.STATUS' | translate }}:</strong> <span [class]="'status-' + (selectedDecision.status || '').toLowerCase()">{{ ('VESSEL_VISIT_DECISIONS.STATUS.' + (selectedDecision.status || '').toUpperCase()) | translate }}</span></p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.OFFICER_ID' | translate }}:</strong> {{ selectedDecision.officerId }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.RESPONSE_MESSAGE' | translate }}:</strong> {{ selectedDecision.responseMessage }}</p>
+        <p *ngIf="selectedDecision.decisionDate"><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.INFO.DECISION_DATE' | translate }}:</strong> {{ formatDateForDisplay(selectedDecision.decisionDate) }}</p>
       </div>
 
       <!-- Related Notification Info -->
       <div *ngIf="getNotificationDetails(selectedDecision.vesselVisitNotificationCode) as notification" class="info-section">
-        <h4>Related Notification Details</h4>
-        <p><strong>Vessel IMO:</strong> {{ notification.vesselIMO }}</p>
-        <p><strong>Representative:</strong> {{ notification.representativeCitizenID }}</p>
-        <p><strong>ETA:</strong> {{ formatDateForDisplay(notification.eta) }}</p>
-        <p><strong>ETD:</strong> {{ formatDateForDisplay(notification.etd) }}</p>
-        <p><strong>Cargo Type:</strong> {{ notification.cargoType }}</p>
-        <p><strong>Volume:</strong> {{ notification.volume }}</p>
-        <p><strong>Crew Members:</strong> {{ notification.numberOfCrewMembers }}</p>
-        <p><strong>Visit Status:</strong> {{ notification.visitStatus }}</p>
+        <h4>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.TITLE' | translate }}</h4>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.VESSEL_IMO' | translate }}:</strong> {{ notification.vesselIMO }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.REPRESENTATIVE' | translate }}:</strong> {{ notification.representativeCitizenID }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.ETA' | translate }}:</strong> {{ formatDateForDisplay(notification.eta) }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.ETD' | translate }}:</strong> {{ formatDateForDisplay(notification.etd) }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.CARGO_TYPE' | translate }}:</strong> {{ notification.cargoType }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.VOLUME' | translate }}:</strong> {{ notification.volume }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.CREW_MEMBERS' | translate }}:</strong> {{ notification.numberOfCrewMembers }}</p>
+        <p><strong>{{ 'VESSEL_VISIT_DECISIONS.DETAILS.RELATED_NOTIFICATION.VISIT_STATUS' | translate }}:</strong> {{ ('VESSEL_VISIT_NOTIFICATIONS.STATUS.' + (notification.visitStatus || '').toUpperCase()) | translate }}</p>
       </div>
     </div>
   </div>
@@ -127,10 +127,10 @@
 <!-- Create Decision Modal -->
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Create New Decision</h3>
-      <button type="button" class="close-btn" (click)="closeCreateModal()">×</button>
-    </div>
+      <div class="modal-header">
+        <h3>{{ 'VESSEL_VISIT_DECISIONS.CREATE_MODAL.TITLE' | translate }}</h3>
+        <button type="button" class="close-btn" (click)="closeCreateModal()">×</button>
+      </div>
 
     <form (ngSubmit)="onSaveNewDecision()" #createForm="ngForm">
       <div class="modal-body">
@@ -139,11 +139,11 @@
         </div>
 
         <div class="form-section">
-          <h4>Decision Information</h4>
+          <h4>{{ 'VESSEL_VISIT_DECISIONS.CREATE_MODAL.INFO.TITLE' | translate }}</h4>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="notificationCode">Vessel Visit Notification Code *</label>
+              <label for="notificationCode">{{ 'VESSEL_VISIT_DECISIONS.CREATE_MODAL.INFO.SELECT_NOTIFICATION' | translate }} *</label>
               <select
                 id="notificationCode"
                 name="notificationCode"
@@ -152,12 +152,12 @@
                 class="form-input"
                 [class.error]="hasFieldError('vesselVisitNotificationCode')"
               >
-                <option value="">Select a notification</option>
+                <option value="">{{ 'VESSEL_VISIT_DECISIONS.PLACEHOLDERS.SELECT_NOTIFICATION' | translate }}</option>
                 <option
                   *ngFor="let notification of getAvailableNotifications()"
                   [value]="notification.code"
                 >
-                  {{ notification.code }} - {{ notification.vesselIMO }} ({{ notification.visitStatus }})
+                  {{ notification.code }} - {{ notification.vesselIMO }} ({{ ('VESSEL_VISIT_NOTIFICATIONS.STATUS.' + (notification.visitStatus || '').toUpperCase()) | translate }})
                 </option>
               </select>
               <div *ngIf="hasFieldError('vesselVisitNotificationCode')" class="field-error">
@@ -166,7 +166,7 @@
             </div>
 
             <div class="form-group">
-              <label for="status">Decision Status *</label>
+              <label for="status">{{ 'VESSEL_VISIT_DECISIONS.PLACEHOLDERS.SELECT_STATUS' | translate }} *</label>
               <select
                 id="status"
                 name="status"
@@ -176,7 +176,7 @@
                 [class.error]="hasFieldError('status')"
               >
                 <option *ngFor="let status of getDecisionStatuses()" [value]="status">
-                  {{ status }}
+                  {{ ('VESSEL_VISIT_DECISIONS.STATUS.' + (status || '').toUpperCase()) | translate }}
                 </option>
               </select>
               <div *ngIf="hasFieldError('status')" class="field-error">
@@ -207,7 +207,7 @@
           <div class="form-row">
             <!-- Show dock dropdown if status is Approved -->
             <div class="form-group full-width" *ngIf="newDecision.status === 'Approved'">
-              <label for="dockSelect">Select Dock *</label>
+              <label for="dockSelect">{{ 'VESSEL_VISIT_DECISIONS.CREATE_MODAL.DOCK_SELECTION.TITLE' | translate }}</label>
               <select
                 id="dockSelect"
                 name="responseMessage"
@@ -216,7 +216,7 @@
                 class="form-input"
                 [class.error]="hasFieldError('responseMessage')"
               >
-                <option value="">Select a dock</option>
+                <option value="">{{ 'VESSEL_VISIT_DECISIONS.PLACEHOLDERS.SELECT_DOCK' | translate }}</option>
                 <option *ngFor="let dock of docks" [value]="dock.name">
                   {{ dock.name }} ({{ dock.location }})
                 </option>
@@ -227,7 +227,7 @@
             </div>
             <!-- Show textarea if status is Rejected -->
             <div class="form-group full-width" *ngIf="newDecision.status === 'Rejected'">
-              <label for="responseMessage">Response Message *</label>
+              <label for="responseMessage">{{ 'VESSEL_VISIT_DECISIONS.CREATE_MODAL.REJECTION.MESSAGE' | translate }}</label>
               <textarea
                 id="responseMessage"
                 name="responseMessage"
@@ -236,7 +236,7 @@
                 rows="4"
                 class="form-input"
                 [class.error]="hasFieldError('responseMessage')"
-                placeholder="Provide the reason for rejection..."
+                [placeholder]="'VESSEL_VISIT_DECISIONS.PLACEHOLDERS.RESPONSE_REJECTION' | translate"
               ></textarea>
               <div *ngIf="hasFieldError('responseMessage')" class="field-error">
                 {{ getFieldError('responseMessage') }}
@@ -246,13 +246,13 @@
         </div>
       </div>
 
-      <div class="modal-footer">
+        <div class="modal-footer">
         <button type="button" (click)="closeCreateModal()" class="btn btn-secondary" [disabled]="isCreating">
-          Cancel
+          {{ 'VESSEL_VISIT_DECISIONS.CREATE_MODAL.BUTTONS.CANCEL' | translate }}
         </button>
         <button type="submit" class="btn btn-primary" [disabled]="isCreating">
           <span *ngIf="isCreating" class="btn-spinner"></span>
-          {{ isCreating ? 'Creating...' : 'Create Decision' }}
+          {{ isCreating ? ('VESSEL_VISIT_DECISIONS.CREATE_MODAL.BUTTONS.CREATING' | translate) : ('VESSEL_VISIT_DECISIONS.CREATE_MODAL.BUTTONS.CREATE' | translate) }}
         </button>
       </div>
     </form>

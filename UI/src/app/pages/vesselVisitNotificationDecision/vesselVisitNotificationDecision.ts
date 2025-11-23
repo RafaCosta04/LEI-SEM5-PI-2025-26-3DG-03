@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { VesselVisitNotificationDecisionService } from '../../services/vesselVisitNotificationDecision.service';
@@ -16,7 +17,7 @@ import { DocksModel } from '../../models/docks.model';
 
 @Component({
   selector: 'app-vessel-visit-notification-decision',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './vesselVisitNotificationDecision.html',
   styleUrl: './vesselVisitNotificationDecision.css',
 })

@@ -76,6 +76,8 @@
       "DEPTH": "Profundidade (m) *",
       "MAX_DRAFT": "Calado Máximo (m) *",
       "VESSEL_TYPES": "Tipos de Embarcação",
+      "SELECT_VESSEL_TYPE": "Selecionar um Tipo de Embarcação",
+      "N_SELECTED": "{{count}} Tipos de Embarcação selecionados",
       "CANCEL": "Cancelar",
       "SUBMIT": "Criar Doca",
       "CREATING": "A criar..."
@@ -241,6 +243,7 @@
         "CAPACITY": "Capacidade Operacional *",
         "SETUP_TIME": "Tempo de Configuração (minutos)",
         "ASSIGNED_AREA": "Área Atribuída *",
+        "ASSIGNED_STORAGE_AREA": "Área de Armazenamento Atribuída *",
         "ASSIGNED_DOCK": "Doca Atribuída *",
         "QUALIFICATION": "Qualificação *",
         "ASSIGNED_AREA_OPTIONAL": "Área Atribuída (Opcional)",
@@ -255,6 +258,9 @@
         "CAPACITY": "Introduza a capacidade",
         "SETUP_TIME": "Introduza o tempo de configuração",
         "ASSIGNED_AREA": "Selecione uma área",
+        "ASSIGNED_DOCK": "Selecione uma Doca",
+        "ASSIGNED_STORAGE_AREA": "Selecione uma Área de Armazenamento",
+        "ASSIGNED_AREA_OPTIONAL": "Selecione uma área (opcional)",
         "QUALIFICATION": "Selecione uma qualificação",
         "KIND": "Selecione o tipo"
       }
@@ -292,9 +298,9 @@
   "SCHEDULE": {
     "TITLE": "Agenda",
 
-    "SEARCH_PLACEHOLDER": "Pesquisar notificações de visitas de navios...",
-    "NO_RESULTS": "Nenhuma notificação de visita de navio encontrada.",
-    "NO_RESULTS_FOR": "Nenhum resultado encontrado para \"{{term}}\"",
+    "SEARCH_PLACEHOLDER": "Pesquisar Notificações de Visitas de Embarcações...",
+    "NO_RESULTS": "Nenhuma Notificação de Visita de Embarcação encontrada.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
 
     "BUTTON": {
       "RUN": "Executar Escalonamento",
@@ -321,7 +327,7 @@
 
     "TABLE": {
       "CODE": "Código",
-      "IMO": "IMO do Navio",
+      "IMO": "IMO da Embarcação",
       "REPRESENTATIVE": "Representante",
       "ETA": "ETA",
       "ETD": "ETD",
@@ -718,6 +724,453 @@
       "LOADING": "A carregar Tipos de Embarcação...",
       "SUCCESS": "Operação concluída com sucesso.",
       "ERROR": "Ocorreu um erro."
+    }
+  },
+  "VESSEL_RECORDS": {
+    "TITLE": "Registos de Embarcações",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Registos de Embarcações...",
+    "NO_RESULTS": "Nenhum Registo de Embarcação encontrado.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Novo Registo de Embarcação",
+      "EDIT": "Editar Registo de Embarcação",
+      "CANCEL": "Cancelar",
+      "CLEAN_SEARCH": "Limpar pesquisa",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Desselecionar",
+      "CREATE": "Criar Registo de Embarcação",
+      "CREATING": "A criar...",
+      "UPDATE": "Atualizar Registo de Embarcação",
+      "UPDATING": "A atualizar..."
+    },
+
+    "TABLE": {
+      "IMO": "Número IMO",
+      "VESSEL_NAME": "Nome da Embarcação",
+      "VESSEL_TYPE": "Tipo de Embarcação",
+      "OPERATOR": "Operador",
+      "LAST_MODIFIED": "Última Modificação",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Registo de Embarcação Selecionado:",
+      "IMO": "Número IMO",
+      "VESSEL_NAME": "Nome da Embarcação",
+      "VESSEL_TYPE": "Tipo de Embarcação",
+      "OPERATOR": "Operador",
+      "LAST_MODIFIED": "Última Modificação"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Novo Registo de Embarcação",
+
+      "IMO": "Número IMO *",
+      "VESSEL_NAME": "Nome da Embarcação *",
+      "VESSEL_TYPE": "Tipo de Embarcação *",
+      "OPERATOR": "Operador *",
+
+      "PLACEHOLDER_IMO": "Introduza o número IMO de 7 dígitos (ex.: 9241061)",
+      "PLACEHOLDER_VESSEL_NAME": "Introduza o nome da Embarcação",
+      "PLACEHOLDER_OPERATOR": "Introduza o nome do Operador",
+      "PLACEHOLDER_VESSEL_TYPE": "Selecione o Tipo de Embarcação",
+      "HELP_IMO": "Tem de conter exatamente 7 dígitos"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Registo de Embarcação",
+
+      "IMO": "Número IMO (Só de leitura)",
+      "VESSEL_NAME": "Nome da Embarcação *",
+      "VESSEL_TYPE": "Tipo de Embarcação *",
+      "OPERATOR": "Operador *",
+
+      "PLACEHOLDER_VESSEL_NAME": "Introduza o nome da Embarcação",
+      "PLACEHOLDER_OPERATOR": "Introduza o nome do Operador",
+
+      "HELP_IMO": "O número IMO não pode ser alterado"
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar Registos de Embarcação...",
+      "SUCCESS": "Operação concluída com sucesso.",
+      "ERROR": "Ocorreu um erro."
+    }
+  },
+  "STORAGE_AREAS": {
+    "TITLE": "Áreas de Armazenamento",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Áreas de Armazenamento...",
+    "NO_RESULTS": "Nenhuma Área de Armazenamento encontrada.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Nova Área de Armazenamento",
+      "EDIT": "Editar Área de Armazenamento",
+      "CANCEL": "Cancelar",
+      "CLEAN_SEARCH": "Limpar pesquisa",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Desselecionar",
+      "CREATE": "Criar Área de Armazenamento",
+      "CREATING": "A criar...",
+      "UPDATE": "Atualizar Área de Armazenamento",
+      "UPDATING": "A atualizar...",
+      "ADD_DOCK": "Adicionar Doca",
+      "REMOVE": "Remover"
+    },
+
+    "TABLE": {
+      "CODE": "Código",
+      "LOCATION": "Localização",
+      "TYPE": "Tipo",
+      "MAX_CAPACITY": "Capacidade Máxima",
+      "CURRENT_CAPACITY": "Capacidade Atual",
+      "UTILIZATION": "Taxa de Utilização",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Área de Armazenamento Selecionada:",
+      "CODE": "Código",
+      "LOCATION": "Localização",
+      "TYPE": "Tipo",
+      "MAX_CAPACITY": "Capacidade Máxima",
+      "CURRENT_CAPACITY": "Capacidade Atual",
+      "UTILIZATION": "Taxa de Utilização",
+      "LAST_MODIFIED": "Última Modificação",
+      "ASSOCIATED_DOCKS": "Docas Associadas",
+      "DISTANCE": "Distância"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Nova Área de Armazenamento",
+
+      "CODE": "Código *",
+      "LOCATION": "Localização *",
+      "TYPE": "Tipo *",
+      "MAX_CAPACITY": "Capacidade Máxima *",
+      "CURRENT_CAPACITY": "Capacidade Atual",
+
+      "PLACEHOLDER_CODE": "Introduza o código da Área (alfanumérico)",
+      "PLACEHOLDER_LOCATION": "Introduza a localização",
+      "PLACEHOLDER_MAX_CAPACITY": "Introduza a capacidade máxima",
+      "PLACEHOLDER_CURRENT_CAPACITY": "Introduza a capacidade atual (padrão: 0)",
+
+      "STORAGE_TYPE": {
+        "YARD": "Pátio",
+        "WAREHOUSE": "Armazém"
+      },
+
+      "DOCKS": {
+        "TITLE": "Docas Associadas (Opcional)",
+        "ADD": "Adicionar Doca",
+        "SELECT_DOCK": "Selecione uma Doca",
+        "DISTANCE_PLACEHOLDER": "Distância (km)",
+        "LIST_TITLE": "Docas Associadas:",
+        "NO_DOCKS_AVAILABLE": "Nenhum Doca disponível. Crie Docas primeiro para as associar às Áreas de Armazenamento."
+      }
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Área de Armazenamento",
+
+      "CODE": "Código (Só de leitura)",
+      "LOCATION": "Localização *",
+      "TYPE": "Tipo (Só de leitura)",
+      "MAX_CAPACITY": "Capacidade Máxima *",
+      "CURRENT_CAPACITY": "Capacidade Atual",
+
+      "PLACEHOLDER_LOCATION": "Introduza a localização",
+      "PLACEHOLDER_MAX_CAPACITY": "Introduza a capacidade máxima",
+      "PLACEHOLDER_CURRENT_CAPACITY": "Introduza a capacidade atual",
+
+      "DOCKS": {
+        "TITLE": "Docas Associadas (Opcional)",
+        "ADD": "Adicionar Docas",
+        "SELECT_DOCK": "Selecione uma Doca",
+        "DISTANCE_PLACEHOLDER": "Distância (km)",
+        "LIST_TITLE": "Docas Associadas:",
+        "NO_DOCKS_AVAILABLE": "Nenhum Doca disponível. Crie Docas primeiro para as associar às Áreas de Armazenamento."
+      }
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar Áreas de Armazenamento...",
+      "SUCCESS": "Operação concluída com sucesso.",
+      "ERROR": "Ocorreu um erro."
+    }
+  },
+  "VESSEL_VISIT_NOTIFICATIONS": {
+    "TITLE": "Notificações de Visita de Embarcação",
+
+    "TABLE": {
+      "CODE": "Código",
+      "VESSEL_IMO": "IMO da Embarcação",
+      "REPRESENTATIVE": "Representante",
+      "ETA": "ETA",
+      "ETD": "ETD",
+      "CARGO_TYPE": "Tipo de Carga",
+      "VOLUME": "Volume",
+      "STATUS": "Estado",
+      "CREW_MEMBERS": "Tripulantes",
+      "ACTIONS": "Ações"
+    },
+
+    "ACTIONS": {
+      "NEW": "Nova Notificação",
+      "EDIT": "Editar Notificação",
+      "UNSELECT": "Deselecionar",
+      "SELECT": "Selecionar"
+    },
+
+    "PLACEHOLDERS": {
+      "SEARCH": "Pesquisar Notificações de Visita de Embarcação...",
+      "SELECT_REPRESENTATIVE": "Selecionar Representante",
+      "SELECT_CARGO_TYPE": "Selecionar Tipo de Carga",
+      "SELECT_VESSEL": "Selecionar Embarcação",
+      "SELECT_STATUS": "Selecionar Estado",
+      "ENTER_VOLUME": "Introduzir volume da carga",
+      "ENTER_CONTAINER": "Introduzir número do contentor",
+      "ENTER_STORAGE_AREA": "Introduzir código da Área",
+      "ENTER_ROW": "Número da linha",
+      "ENTER_BAY": "Número da baía",
+      "ENTER_TIER": "Número do nível",
+      "ENTER_CREW_NAME": "Introduzir nome do tripulante",
+      "ENTER_CREW_ID": "Introduzir ID do cidadão"
+    },
+
+    "STATUS": {
+      "INPROGRESS": "Em Progresso",
+      "SUBMITTED": "Submetido",
+      "APPROVED": "Aprovado",
+      "REJECTED": "Rejeitado"
+    },
+
+    "NO_RESULTS": {
+      "NONE_FOUND": "Nenhuma Notificação encontrada.",
+      "NO_MATCH": "Nenhum resultado encontrado para "
+    },
+
+    "DETAILS": {
+      "TITLE": "Notificação de Visita Selecionada",
+      "BASIC": {
+        "TITLE": "Informações Básicas",
+        "CODE": "Código",
+        "VESSEL_IMO": "IMO da Embarcação",
+        "REPRESENTATIVE": "ID do Representante",
+        "ETA": "ETA",
+        "ETD": "ETD",
+        "STATUS": "Estado",
+        "LAST_MODIFIED": "Última Modificação"
+      },
+      "CARGO": {
+        "TITLE": "Informações da Carga",
+        "CARGO_TYPE": "Tipo de Carga",
+        "VOLUME": "Volume"
+      },
+      "CREW": {
+        "TITLE": "Informações da Tripulação",
+        "COUNT": "Número de Tripulantes",
+        "LIST": "Tripulantes",
+        "ITEM": "{{name}} ({{rank}}) - {{nationality}} - {{citizenID}}"
+      },
+      "MANIFEST": {
+        "TITLE": "Manifestos de Carga",
+        "MANIFEST_LABEL": "Manifesto {{index}}",
+        "ENTRIES_COUNT": "Entradas ({{count}})",
+        "ENTRY": "Contentor: {{containerNumber}} | Linha: {{row}} | Baía: {{bay}} | Nível: {{tier}} | Área: {{storageAreaCode}}"
+      }
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Nova Notificação de Visita",
+
+      "BASIC": {
+        "TITLE": "Informações Básicas",
+        "VESSEL_IMO": "IMO da Embarcação *",
+        "REPRESENTATIVE": "ID do Representante *",
+        "ETA": "ETA *",
+        "ETD": "ETD *"
+      },
+
+      "CARGO": {
+        "TITLE": "Informações da Carga",
+        "CARGO_TYPE": "Tipo de Carga *",
+        "VOLUME": "Volume *"
+      },
+
+      "CREW": {
+        "TITLE": "Informações da Tripulação",
+        "REQUIREMENTS": "Obrigatório: 1 Capitão{{extra}}",
+        "ADD_MEMBER": "Adicionar Tripulante",
+        "LIST_TITLE": "Tripulantes Adicionados ({{count}})",
+        "REMOVE": "Remover"
+      },
+
+      "MANIFEST": {
+        "TITLE": "Manifesto de Carga",
+        "MANIFEST_TYPE": "Tipo de Manifesto",
+        "ADD_ENTRY": "Adicionar Entrada de Contentor",
+        "LOADING_TITLE": "Manifesto de Carregamento ({{count}} contentores)",
+        "UNLOADING_TITLE": "Manifesto de Descarregamento ({{count}} contentores)",
+        "REMOVE": "Remover"
+      },
+
+      "BUTTONS": {
+        "CANCEL": "Cancelar",
+        "CREATE": "Criar Notificação",
+        "CREATING": "A Criar..."
+      }
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Notificação de Visita",
+
+      "BASIC": {
+        "TITLE": "Informações Básicas",
+        "CODE": "Código (Só de Leitura)",
+        "VESSEL_IMO": "IMO da Embarcação *",
+        "REPRESENTATIVE": "ID do Representante *",
+        "ETA": "ETA *",
+        "ETD": "ETD *",
+        "STATUS": "Estado da Visita *"
+      },
+
+      "CARGO": {
+        "TITLE": "Informações da Carga",
+        "CARGO_TYPE": "Tipo de Carga *",
+        "VOLUME": "Volume *"
+      },
+
+      "CREW": {
+        "TITLE": "Informações da Tripulação",
+        "REQUIREMENTS": "Obrigatório: 1 Capitão{{extra}}",
+        "ADD_MEMBER": "Adicionar Tripulante",
+        "LIST_TITLE": "Tripulantes ({{count}})",
+        "REMOVE": "Remover"
+      },
+
+      "MANIFEST": {
+        "TITLE": "Manifesto de Carga",
+        "MANIFEST_TYPE": "Tipo de Manifesto",
+        "ADD_ENTRY": "Adicionar Entrada de Contentor",
+        "LOADING_TITLE": "Manifesto de Carregamento ({{count}} contentores)",
+        "UNLOADING_TITLE": "Manifesto de Descarregamento ({{count}} contentores)",
+        "REMOVE": "Remover"
+      },
+
+      "BUTTONS": {
+        "CANCEL": "Cancelar",
+        "UPDATE": "Atualizar Notificação",
+        "UPDATING": "A Atualizar..."
+      }
+    },
+
+    "MESSAGES": {
+      "ERROR": "Ocorreu um erro",
+      "SUCCESS_CREATE": "Notificação criada com sucesso.",
+      "SUCCESS_UPDATE": "Notificação atualizada com sucesso."
+    }
+  },
+  "VESSEL_VISIT_DECISIONS": {
+    "TITLE": "Decisões de Notificações de Visita",
+    "LOADING": "A carregar Decisões...",
+
+    "TABLE": {
+      "ID": "ID",
+      "NOTIFICATION_CODE": "Código da Notificação",
+      "STATUS": "Estado",
+      "OFFICER_ID": "ID do Oficial",
+      "RESPONSE_MESSAGE": "Mensagem de Resposta",
+      "DECISION_DATE": "Data da Decisão",
+      "ACTIONS": "Ações"
+    },
+
+    "ACTIONS": {
+      "NEW": "Nova Decisão",
+      "REFRESH": "Recarregar Lista",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Deselecionar"
+    },
+
+    "PLACEHOLDERS": {
+      "SEARCH": "Pesquisar Decisões...",
+      "RESPONSE_REJECTION": "Indique o motivo da rejeição...",
+      "SELECT_NOTIFICATION": "Selecionar Notificação",
+      "SELECT_STATUS": "Selecionar Estado",
+      "SELECT_DOCK": "Selecionar Doca"
+    },
+
+    "STATUS": {
+      "APPROVED": "Aprovada",
+      "REJECTED": "Rejeitada"
+    },
+
+    "NO_RESULTS": {
+      "NONE_FOUND": "Nenhuma Decisão encontrada.",
+      "NO_MATCH": "Nenhum resultado encontrado para "
+    },
+
+    "DETAILS": {
+      "TITLE": "Decisão Selecionada:",
+      "INFO": {
+        "TITLE": "Detalhes da Decisão",
+        "ID": "ID",
+        "NOTIFICATION_CODE": "Código da Notificação",
+        "STATUS": "Estado",
+        "OFFICER_ID": "ID do Oficial",
+        "RESPONSE_MESSAGE": "Mensagem de Resposta",
+        "DECISION_DATE": "Data da Decisão"
+      },
+      "RELATED_NOTIFICATION": {
+        "TITLE": "Detalhes da Notificação Associada",
+        "VESSEL_IMO": "IMO da Embarcação",
+        "REPRESENTATIVE": "Representante",
+        "ETA": "ETA",
+        "ETD": "ETD",
+        "CARGO_TYPE": "Tipo de Carga",
+        "VOLUME": "Volume",
+        "CREW_MEMBERS": "Tripulantes",
+        "VISIT_STATUS": "Estado da Visita"
+      }
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Nova Decisão",
+
+      "INFO": {
+        "TITLE": "Informações da Decisão",
+        "NOTIFICATION": "Código da Notificação de Visita *",
+        "STATUS": "Estado da Decisão *",
+        "OFFICER_ID": "ID do Oficial *",
+        "SELECT_NOTIFICATION": "Selecionar Notificação"
+      },
+
+      "STATUS_TYPES": {
+        "APPROVED": "Aprovada",
+        "REJECTED": "Rejeitada"
+      },
+
+      "DOCK_SELECTION": {
+        "TITLE": "Selecionar Doca *"
+      },
+
+      "REJECTION": {
+        "MESSAGE": "Motivo da Rejeição *"
+      },
+
+      "BUTTONS": {
+        "CANCEL": "Cancelar",
+        "CREATE": "Criar Decisão",
+        "CREATING": "A criar..."
+      }
+    },
+
+    "MESSAGES": {
+      "SUCCESS_CREATE": "Decisão criada com sucesso.",
+      "ERROR": "Ocorreu um erro ao processar a decisão."
     }
   }
 

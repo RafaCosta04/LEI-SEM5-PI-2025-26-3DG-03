@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { VesselVisitNotificationService } from '../../services/vesselVisitNotification.service';
 import { VesselService } from '../../services/vessel.service';
@@ -21,7 +22,7 @@ import {
 
 @Component({
   selector: 'app-vessel-visit-notification',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './vesselVisitNotification.html',
   styleUrl: './vesselVisitNotification.css',
 })

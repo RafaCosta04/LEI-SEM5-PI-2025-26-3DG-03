@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { DocksService } from '../../services/docks.service';
@@ -81,6 +81,8 @@ export class Docks implements OnInit, OnDestroy {
     private docksService: DocksService,
     private vesselTypeService: VesselTypeService,
     private router: Router
+    ,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -303,12 +305,13 @@ export class Docks implements OnInit, OnDestroy {
   }
 
   getVesselTypeDisplayText(): string {
-    if (this.selectedVesselTypes.length === 0) {
-      return 'Select vessel types';
-    } else if (this.selectedVesselTypes.length === 1) {
+    const count = this.selectedVesselTypes.length;
+    if (count === 0) {
+      return this.translate.instant('DOCKS.CREATE.SELECT_VESSEL_TYPE');
+    } else if (count === 1) {
       return this.selectedVesselTypes[0];
     } else {
-      return `${this.selectedVesselTypes.length} vessel types selected`;
+      return this.translate.instant('DOCKS.CREATE.N_SELECTED', { count });
     }
   }
 
@@ -462,12 +465,13 @@ export class Docks implements OnInit, OnDestroy {
   }
 
   getEditVesselTypeDisplayText(): string {
-    if (this.editSelectedVesselTypes.length === 0) {
-      return 'Select vessel types';
-    } else if (this.editSelectedVesselTypes.length === 1) {
+    const count = this.editSelectedVesselTypes.length;
+    if (count === 0) {
+      return this.translate.instant('DOCKS.CREATE.SELECT_VESSEL_TYPE');
+    } else if (count === 1) {
       return this.editSelectedVesselTypes[0];
     } else {
-      return `${this.editSelectedVesselTypes.length} vessel types selected`;
+      return this.translate.instant('DOCKS.CREATE.N_SELECTED', { count });
     }
   }
 

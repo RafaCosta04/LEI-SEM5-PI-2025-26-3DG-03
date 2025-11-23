@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { VesselService } from '../../services/vessel.service';
 import { VesselTypeService } from '../../services/vesselType.service';
@@ -10,7 +11,7 @@ import { VesselTypeModel } from '../../models/vesselType.model';
 
 @Component({
   selector: 'app-vessel',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './vessel.html',
   styleUrl: './vessel.css',
 })
@@ -58,7 +59,8 @@ export class Vessel implements OnInit, OnDestroy {
   constructor(
     private vesselService: VesselService,
     private vesselTypeService: VesselTypeService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {

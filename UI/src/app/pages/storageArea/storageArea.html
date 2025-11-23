@@ -1,5 +1,5 @@
 <div class="page-container">
-  <h1 class="page-title">Storage Areas</h1>
+  <h1 class="page-title">{{ 'STORAGE_AREAS.TITLE' | translate }}</h1>
 
   <div class="top-bar">
     <div class="search-container">
@@ -7,14 +7,14 @@
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search for storage areas..."
+        [placeholder]="'STORAGE_AREAS.SEARCH_PLACEHOLDER' | translate"
         class="search-input"
       >
       <button
         *ngIf="searchTerm"
         (click)="clearSearch()"
         class="clear-button"
-        title="Clean search"
+        [title]="'STORAGE_AREAS.BUTTON.CLEAN_SEARCH' | translate"
       >
         ✕
       </button>
@@ -24,17 +24,17 @@
       <button
         (click)="onCreateNew()"
         class="btn btn-primary"
-        title="Create new storage area"
+        [title]="'STORAGE_AREAS.BUTTON.NEW' | translate"
       >
-        New Storage Area
+        {{ 'STORAGE_AREAS.BUTTON.NEW' | translate }}
       </button>
       <button
         (click)="onUpdate()"
         class="btn btn-secondary"
         [disabled]="!selectedStorageArea"
-        title="Edit selected storage area"
+        [title]="'STORAGE_AREAS.BUTTON.EDIT' | translate"
       >
-        Edit Storage Area
+        {{ 'STORAGE_AREAS.BUTTON.EDIT' | translate }}
       </button>
     </div>
   </div>
@@ -45,20 +45,20 @@
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    Loading Storage Areas...
+    {{ 'STORAGE_AREAS.LOADING' | translate }}
   </div>
 
   <div *ngIf="!isLoading" class="table-container">
     <table class="data-table">
       <thead>
-        <tr>
-          <th>Code</th>
-          <th>Location</th>
-          <th>Type</th>
-          <th>Max Capacity</th>
-          <th>Current Capacity</th>
-          <th>Utilization</th>
-          <th>Actions</th>
+          <tr>
+          <th>{{ 'STORAGE_AREAS.TABLE.CODE' | translate }}</th>
+          <th>{{ 'STORAGE_AREAS.TABLE.LOCATION' | translate }}</th>
+          <th>{{ 'STORAGE_AREAS.TABLE.TYPE' | translate }}</th>
+          <th>{{ 'STORAGE_AREAS.TABLE.MAX_CAPACITY' | translate }}</th>
+          <th>{{ 'STORAGE_AREAS.TABLE.CURRENT_CAPACITY' | translate }}</th>
+          <th>{{ 'STORAGE_AREAS.TABLE.UTILIZATION' | translate }}</th>
+          <th>{{ 'STORAGE_AREAS.TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -91,7 +91,7 @@
               class="btn-select"
               [class.selected]="selectedStorageArea?.id === storageArea.id"
             >
-              {{ selectedStorageArea?.id === storageArea.id ? 'Unselect' : 'Select' }}
+              {{ selectedStorageArea?.id === storageArea.id ? ('STORAGE_AREAS.BUTTON.UNSELECT' | translate) : ('STORAGE_AREAS.BUTTON.SELECT' | translate) }}
             </button>
           </td>
         </tr>
@@ -100,27 +100,27 @@
 
     <!-- Message when no results are found -->
     <div *ngIf="filteredStorageAreas.length === 0 && !isLoading" class="no-results">
-      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No storage areas found.' }}</p>
+      <p>{{ searchTerm ? (('STORAGE_AREAS.NO_RESULTS_FOR' | translate) + '"' + searchTerm + '"') : ('STORAGE_AREAS.NO_RESULTS' | translate) }}</p>
     </div>
   </div>
 
   <!-- Information of selected storage area -->
   <div *ngIf="selectedStorageArea" class="selected-info">
-    <h3>Selected Storage Area:</h3>
+    <h3>{{ 'STORAGE_AREAS.DETAILS.TITLE' | translate }}</h3>
     <div class="info-card">
-      <p><strong>Code:</strong> {{ selectedStorageArea.code }}</p>
-      <p><strong>Location:</strong> {{ selectedStorageArea.location }}</p>
-      <p><strong>Type:</strong> {{ selectedStorageArea.storageAreaType }}</p>
-      <p><strong>Max Capacity:</strong> {{ selectedStorageArea.maxCapacity }}</p>
-      <p><strong>Current Capacity:</strong> {{ selectedStorageArea.currentCapacity }}</p>
-      <p><strong>Utilization:</strong>
+      <p><strong>{{ 'STORAGE_AREAS.DETAILS.CODE' | translate }}:</strong> {{ selectedStorageArea.code }}</p>
+      <p><strong>{{ 'STORAGE_AREAS.DETAILS.LOCATION' | translate }}:</strong> {{ selectedStorageArea.location }}</p>
+      <p><strong>{{ 'STORAGE_AREAS.DETAILS.TYPE' | translate }}:</strong> {{ selectedStorageArea.storageAreaType }}</p>
+      <p><strong>{{ 'STORAGE_AREAS.DETAILS.MAX_CAPACITY' | translate }}:</strong> {{ selectedStorageArea.maxCapacity }}</p>
+      <p><strong>{{ 'STORAGE_AREAS.DETAILS.CURRENT_CAPACITY' | translate }}:</strong> {{ selectedStorageArea.currentCapacity }}</p>
+      <p><strong>{{ 'STORAGE_AREAS.DETAILS.UTILIZATION' | translate }}:</strong>
         {{ selectedStorageArea.maxCapacity ? ((selectedStorageArea.currentCapacity! / selectedStorageArea.maxCapacity * 100) | number:'1.0-1') : 0 }}%
       </p>
-      <p *ngIf="selectedStorageArea.lastModifiedAt"><strong>Last Modified:</strong>
+      <p *ngIf="selectedStorageArea.lastModifiedAt"><strong>{{ 'STORAGE_AREAS.DETAILS.LAST_MODIFIED' | translate }}:</strong>
         {{ selectedStorageArea.lastModifiedAt | date:'medium' }}
       </p>
       <div *ngIf="selectedStorageArea.storageAreaDocks && selectedStorageArea.storageAreaDocks.length > 0">
-        <strong>Associated Docks:</strong>
+        <strong>{{ 'STORAGE_AREAS.DETAILS.ASSOCIATED_DOCKS' | translate }}:</strong>
         <ul>
           <li *ngFor="let dock of selectedStorageArea.storageAreaDocks">
             {{ dock.dockName }} (Distance: {{ dock.distance }}km)
@@ -135,7 +135,7 @@
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Create New Storage Area</h2>
+      <h2>{{ 'STORAGE_AREAS.CREATE_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeCreateModal()">✕</button>
     </div>
 
@@ -147,7 +147,7 @@
 
       <form (ngSubmit)="onSaveNewStorageArea()" #storageAreaForm="ngForm">
         <div class="form-group">
-          <label for="code">Code *</label>
+          <label for="code">{{ 'STORAGE_AREAS.CREATE_MODAL.CODE' | translate }}</label>
           <input
             type="text"
             id="code"
@@ -157,7 +157,7 @@
             pattern="^[a-zA-Z0-9]+$"
             class="form-input"
             [class.error]="hasFieldError('code')"
-            placeholder="Enter storage area code (alphanumeric)"
+            [placeholder]="'STORAGE_AREAS.CREATE_MODAL.PLACEHOLDER_CODE' | translate"
           >
           <div *ngIf="hasFieldError('code')" class="field-error">
             {{ getFieldError('code') }}
@@ -165,7 +165,7 @@
         </div>
 
         <div class="form-group">
-          <label for="location">Location *</label>
+          <label for="location">{{ 'STORAGE_AREAS.CREATE_MODAL.LOCATION' | translate }}</label>
           <input
             type="text"
             id="location"
@@ -174,7 +174,7 @@
             required
             class="form-input"
             [class.error]="hasFieldError('location')"
-            placeholder="Enter storage area location"
+            [placeholder]="'STORAGE_AREAS.CREATE_MODAL.PLACEHOLDER_LOCATION' | translate"
           >
           <div *ngIf="hasFieldError('location')" class="field-error">
             {{ getFieldError('location') }}
@@ -182,7 +182,7 @@
         </div>
 
         <div class="form-group">
-          <label for="storageAreaType">Type *</label>
+          <label for="storageAreaType">{{ 'STORAGE_AREAS.CREATE_MODAL.TYPE' | translate }}</label>
           <select
             id="storageAreaType"
             name="storageAreaType"
@@ -191,8 +191,8 @@
             class="form-input"
             [class.error]="hasFieldError('storageAreaType')"
           >
-            <option [value]="StorageAreaType.Yard">Yard</option>
-            <option [value]="StorageAreaType.Warehouse">Warehouse</option>
+            <option [value]="StorageAreaType.Yard">{{ 'STORAGE_AREAS.CREATE_MODAL.STORAGE_TYPE.YARD' | translate }}</option>
+            <option [value]="StorageAreaType.Warehouse">{{ 'STORAGE_AREAS.CREATE_MODAL.STORAGE_TYPE.WAREHOUSE' | translate }}</option>
           </select>
           <div *ngIf="hasFieldError('storageAreaType')" class="field-error">
             {{ getFieldError('storageAreaType') }}
@@ -200,7 +200,7 @@
         </div>
 
         <div class="form-group">
-          <label for="maxCapacity">Max Capacity *</label>
+          <label for="maxCapacity">{{ 'STORAGE_AREAS.CREATE_MODAL.MAX_CAPACITY' | translate }}</label>
           <input
             type="number"
             id="maxCapacity"
@@ -219,7 +219,7 @@
         </div>
 
         <div class="form-group">
-          <label for="currentCapacity">Current Capacity</label>
+          <label for="currentCapacity">{{ 'STORAGE_AREAS.CREATE_MODAL.CURRENT_CAPACITY' | translate }}</label>
           <input
             type="number"
             id="currentCapacity"
@@ -238,7 +238,7 @@
 
         <!-- Associated Docks Section -->
         <div class="form-group">
-          <label>Associated Docks (Optional)</label>
+          <label>{{ 'STORAGE_AREAS.CREATE_MODAL.DOCKS.TITLE' | translate }}</label>
           <div class="dock-association-section">
             <div class="dock-input-row">
               <select
@@ -247,7 +247,7 @@
                 name="newDockName"
                 [disabled]="isLoadingDocks"
               >
-                <option value="">{{ isLoadingDocks ? 'Loading docks...' : 'Select a dock' }}</option>
+                <option value="">{{ isLoadingDocks ? ('DOCKS.LOADING' | translate) : ('STORAGE_AREAS.CREATE_MODAL.DOCKS.SELECT_DOCK' | translate) }}</option>
                 <option
                   *ngFor="let dockName of getAvailableDockNames()"
                   [value]="dockName"
@@ -258,7 +258,7 @@
               <input
                 type="number"
                 [(ngModel)]="newDockAssociation.distance"
-                placeholder="Distance (km)"
+                [placeholder]="'STORAGE_AREAS.CREATE_MODAL.DOCKS.DISTANCE_PLACEHOLDER' | translate"
                 min="0"
                 step="0.1"
                 class="form-input dock-distance-input"
@@ -270,12 +270,12 @@
                 class="btn btn-sm btn-secondary"
                 [disabled]="!newDockAssociation.dockName || newDockAssociation.distance < 0 || isLoadingDocks"
               >
-                Add Dock
+                {{ 'STORAGE_AREAS.CREATE_MODAL.DOCKS.ADD' | translate }}
               </button>
             </div>
 
             <div *ngIf="newStorageArea.storageAreaDocks && newStorageArea.storageAreaDocks.length > 0" class="dock-list">
-              <h4>Associated Docks:</h4>
+              <h4>{{ 'STORAGE_AREAS.CREATE_MODAL.DOCKS.LIST_TITLE' | translate }}</h4>
               <ul class="dock-associations">
                 <li *ngFor="let dock of newStorageArea.storageAreaDocks; let i = index" class="dock-item">
                   <span>{{ dock.dockName }} ({{ dock.distance }}km)</span>
@@ -292,7 +292,7 @@
             </div>
 
             <div *ngIf="availableDocks.length === 0 && !isLoadingDocks" class="no-docks-message">
-              <small class="text-muted">No docks available. Create docks first to associate them with storage areas.</small>
+              <small class="text-muted">{{ 'STORAGE_AREAS.CREATE_MODAL.DOCKS.NO_DOCKS_AVAILABLE' | translate }}</small>
             </div>
           </div>
         </div>
@@ -304,14 +304,14 @@
             class="btn btn-secondary"
             [disabled]="isCreating"
           >
-            Cancel
+            {{ 'STORAGE_AREAS.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isCreating || !storageAreaForm.form.valid"
           >
-            {{ isCreating ? 'Creating...' : 'Create Storage Area' }}
+            {{ isCreating ? ('STORAGE_AREAS.BUTTON.CREATING' | translate) : ('STORAGE_AREAS.BUTTON.CREATE' | translate) }}
           </button>
         </div>
       </form>
@@ -323,7 +323,7 @@
 <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Edit Storage Area</h2>
+      <h2>{{ 'STORAGE_AREAS.EDIT_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeEditModal()">✕</button>
     </div>
 
@@ -335,7 +335,7 @@
 
       <form (ngSubmit)="onSaveEditStorageArea()" #editStorageAreaForm="ngForm">
         <div class="form-group">
-          <label for="editCode">Code (Read-only)</label>
+          <label for="editCode">{{ 'STORAGE_AREAS.EDIT_MODAL.CODE' | translate }}</label>
           <input
             type="text"
             id="editCode"
@@ -343,12 +343,12 @@
             [value]="editStorageArea.code"
             readonly
             class="form-input readonly"
-            placeholder="Storage area code"
+            [placeholder]="'STORAGE_AREAS.CREATE_MODAL.PLACEHOLDER_CODE' | translate"
           >
         </div>
 
         <div class="form-group">
-          <label for="editLocation">Location *</label>
+          <label for="editLocation">{{ 'STORAGE_AREAS.EDIT_MODAL.LOCATION' | translate }}</label>
           <input
             type="text"
             id="editLocation"
@@ -357,7 +357,7 @@
             required
             class="form-input"
             [class.error]="hasEditFieldError('location')"
-            placeholder="Enter storage area location"
+            [placeholder]="'STORAGE_AREAS.CREATE_MODAL.PLACEHOLDER_LOCATION' | translate"
           >
           <div *ngIf="hasEditFieldError('location')" class="field-error">
             {{ getEditFieldError('location') }}
@@ -365,16 +365,16 @@
         </div>
 
         <div class="form-group">
-          <label for="editStorageAreaType">Type (Read-only)</label>
+          <label for="editStorageAreaType">{{ 'STORAGE_AREAS.EDIT_MODAL.TYPE' | translate }}</label>
           <select
             id="editStorageAreaType"
             name="editStorageAreaType"
-            [value]="editStorageArea.storageAreaType"
+            [(ngModel)]="editStorageArea.storageAreaType"
             disabled
             class="form-input readonly"
           >
-            <option [value]="StorageAreaType.Yard">Yard</option>
-            <option [value]="StorageAreaType.Warehouse">Warehouse</option>
+            <option [ngValue]="StorageAreaType.Yard">{{ 'STORAGE_AREAS.CREATE_MODAL.STORAGE_TYPE.YARD' | translate }}</option>
+            <option [ngValue]="StorageAreaType.Warehouse">{{ 'STORAGE_AREAS.CREATE_MODAL.STORAGE_TYPE.WAREHOUSE' | translate }}</option>
           </select>
           <div *ngIf="hasEditFieldError('storageAreaType')" class="field-error">
             {{ getEditFieldError('storageAreaType') }}
@@ -382,7 +382,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editMaxCapacity">Max Capacity *</label>
+          <label for="editMaxCapacity">{{ 'STORAGE_AREAS.EDIT_MODAL.MAX_CAPACITY' | translate }}</label>
           <input
             type="number"
             id="editMaxCapacity"
@@ -401,7 +401,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editCurrentCapacity">Current Capacity</label>
+          <label for="editCurrentCapacity">{{ 'STORAGE_AREAS.EDIT_MODAL.CURRENT_CAPACITY' | translate }}</label>
           <input
             type="number"
             id="editCurrentCapacity"
@@ -420,7 +420,7 @@
 
         <!-- Associated Docks Section for Edit -->
         <div class="form-group">
-          <label>Associated Docks (Optional)</label>
+          <label>{{ 'STORAGE_AREAS.EDIT_MODAL.DOCKS.TITLE' | translate }}</label>
           <div class="dock-association-section">
             <div class="dock-input-row">
               <select
@@ -429,7 +429,7 @@
                 name="editDockName"
                 [disabled]="isLoadingDocks"
               >
-                <option value="">{{ isLoadingDocks ? 'Loading docks...' : 'Select a dock' }}</option>
+                <option value="">{{ isLoadingDocks ? ('DOCKS.LOADING' | translate) : ('STORAGE_AREAS.EDIT_MODAL.DOCKS.SELECT_DOCK' | translate) }}</option>
                 <option
                   *ngFor="let dockName of getAvailableDockNamesForEdit()"
                   [value]="dockName"
@@ -452,12 +452,12 @@
                 class="btn btn-sm btn-secondary"
                 [disabled]="!editDockAssociation.dockName || editDockAssociation.distance < 0 || isLoadingDocks"
               >
-                Add Dock
+                {{ 'STORAGE_AREAS.EDIT_MODAL.DOCKS.ADD' | translate }}
               </button>
             </div>
 
             <div *ngIf="editStorageArea.storageAreaDocks && editStorageArea.storageAreaDocks.length > 0" class="dock-list">
-              <h4>Associated Docks:</h4>
+              <h4>{{ 'STORAGE_AREAS.EDIT_MODAL.DOCKS.LIST_TITLE' | translate }}</h4>
               <ul class="dock-associations">
                 <li *ngFor="let dock of editStorageArea.storageAreaDocks; let i = index" class="dock-item">
                   <span>{{ dock.dockName }} ({{ dock.distance }}km)</span>
@@ -474,7 +474,7 @@
             </div>
 
             <div *ngIf="availableDocks.length === 0 && !isLoadingDocks" class="no-docks-message">
-              <small class="text-muted">No docks available. Create docks first to associate them with storage areas.</small>
+              <small class="text-muted">{{ 'STORAGE_AREAS.CREATE_MODAL.DOCKS.NO_DOCKS_AVAILABLE' | translate }}</small>
             </div>
           </div>
         </div>
@@ -486,14 +486,14 @@
             class="btn btn-secondary"
             [disabled]="isEditing"
           >
-            Cancel
+            {{ 'STORAGE_AREAS.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isEditing || !editStorageAreaForm.form.valid || !isEditDirty()"
           >
-            {{ isEditing ? 'Updating...' : 'Update Storage Area' }}
+            {{ isEditing ? ('STORAGE_AREAS.BUTTON.UPDATING' | translate) : ('STORAGE_AREAS.BUTTON.UPDATE' | translate) }}
           </button>
         </div>
       </form>

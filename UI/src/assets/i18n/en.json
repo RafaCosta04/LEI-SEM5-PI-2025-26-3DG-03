@@ -77,6 +77,8 @@
       "DEPTH": "Depth (m) *",
       "MAX_DRAFT": "Max Draft (m) *",
       "VESSEL_TYPES": "Vessel Types",
+      "SELECT_VESSEL_TYPE": "Select a Vessel Type",
+      "N_SELECTED": "{{count}} Vessel Types selected",
       "CANCEL": "Cancel",
       "SUBMIT": "Create Dock",
       "CREATING": "Creating..."
@@ -242,6 +244,7 @@
         "CAPACITY": "Operational Capacity *",
         "SETUP_TIME": "Setup Time (minutes)",
         "ASSIGNED_AREA": "Assigned Area *",
+        "ASSIGNED_STORAGE_AREA": "Assigned Storage Area *",
         "ASSIGNED_DOCK": "Assigned Dock *",
         "QUALIFICATION": "Qualification *",
         "ASSIGNED_AREA_OPTIONAL": "Assigned Area (Optional)",
@@ -256,6 +259,9 @@
         "CAPACITY": "Enter capacity",
         "SETUP_TIME": "Enter setup time",
         "ASSIGNED_AREA": "Select an area",
+        "ASSIGNED_DOCK": "Select a dock",
+        "ASSIGNED_STORAGE_AREA": "Select a storage area",
+        "ASSIGNED_AREA_OPTIONAL": "Select an area (optional)",
         "QUALIFICATION": "Select a qualification",
         "KIND": "Select kind"
       }
@@ -720,6 +726,453 @@
       "LOADING": "Loading Vessel Types...",
       "SUCCESS": "Operation completed successfully.",
       "ERROR": "An error occurred."
+    }
+  },
+  "VESSEL_RECORDS": {
+    "TITLE": "Vessel Records",
+
+    "SEARCH_PLACEHOLDER": "Search for Vessel Records...",
+    "NO_RESULTS": "No Vessel Records found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New Vessel Record",
+      "EDIT": "Edit Vessel Record",
+      "CANCEL": "Cancel",
+      "CLEAN_SEARCH": "Clean search",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect",
+      "CREATE": "Create Vessel Record",
+      "CREATING": "Creating...",
+      "UPDATE": "Update Vessel Record",
+      "UPDATING": "Updating..."
+    },
+
+    "TABLE": {
+      "IMO": "IMO Number",
+      "VESSEL_NAME": "Vessel Name",
+      "VESSEL_TYPE": "Vessel Type",
+      "OPERATOR": "Operator",
+      "LAST_MODIFIED": "Last Modified",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Vessel Record:",
+      "IMO": "IMO Number",
+      "VESSEL_NAME": "Vessel Name",
+      "VESSEL_TYPE": "Vessel Type",
+      "OPERATOR": "Operator",
+      "LAST_MODIFIED": "Last Modified"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Vessel Record",
+
+      "IMO": "IMO Number *",
+      "VESSEL_NAME": "Vessel Name *",
+      "VESSEL_TYPE": "Vessel Type *",
+      "OPERATOR": "Operator *",
+
+      "PLACEHOLDER_IMO": "Enter 7-digit IMO number (e.g., 9241061)",
+      "PLACEHOLDER_VESSEL_NAME": "Enter Vessel name",
+      "PLACEHOLDER_OPERATOR": "Enter Operator name",
+      "PLACEHOLDER_VESSEL_TYPE": "Select Vessel type",
+      "HELP_IMO": "Must be exactly 7 digits"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit Vessel Record",
+
+      "IMO": "IMO Number (Read-only)",
+      "VESSEL_NAME": "Vessel Name *",
+      "VESSEL_TYPE": "Vessel Type *",
+      "OPERATOR": "Operator *",
+
+      "PLACEHOLDER_VESSEL_NAME": "Enter Vessel name",
+      "PLACEHOLDER_OPERATOR": "Enter Operator name",
+
+      "HELP_IMO": "IMO number cannot be changed"
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading Vessel Records...",
+      "SUCCESS": "Operation completed successfully.",
+      "ERROR": "An error occurred."
+    }
+  },
+  "STORAGE_AREAS": {
+    "TITLE": "Storage Areas",
+
+    "SEARCH_PLACEHOLDER": "Search for Storage Areas...",
+    "NO_RESULTS": "No Storage Areas found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New Storage Area",
+      "EDIT": "Edit Storage Area",
+      "CANCEL": "Cancel",
+      "CLEAN_SEARCH": "Clean search",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect",
+      "CREATE": "Create Storage Area",
+      "CREATING": "Creating...",
+      "UPDATE": "Update Storage Area",
+      "UPDATING": "Updating...",
+      "ADD_DOCK": "Add Dock",
+      "REMOVE": "Remove"
+    },
+
+    "TABLE": {
+      "CODE": "Code",
+      "LOCATION": "Location",
+      "TYPE": "Type",
+      "MAX_CAPACITY": "Max Capacity",
+      "CURRENT_CAPACITY": "Current Capacity",
+      "UTILIZATION": "Utilization",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Storage Area:",
+      "CODE": "Code",
+      "LOCATION": "Location",
+      "TYPE": "Type",
+      "MAX_CAPACITY": "Max Capacity",
+      "CURRENT_CAPACITY": "Current Capacity",
+      "UTILIZATION": "Utilization",
+      "LAST_MODIFIED": "Last Modified",
+      "ASSOCIATED_DOCKS": "Associated Docks",
+      "DISTANCE": "Distance"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Storage Area",
+
+      "CODE": "Code *",
+      "LOCATION": "Location *",
+      "TYPE": "Type *",
+      "MAX_CAPACITY": "Max Capacity *",
+      "CURRENT_CAPACITY": "Current Capacity",
+
+      "PLACEHOLDER_CODE": "Enter Storage Area code (alphanumeric)",
+      "PLACEHOLDER_LOCATION": "Enter Storage Area location",
+      "PLACEHOLDER_MAX_CAPACITY": "Enter maximum capacity",
+      "PLACEHOLDER_CURRENT_CAPACITY": "Enter current capacity (default: 0)",
+
+      "STORAGE_TYPE": {
+        "YARD": "Yard",
+        "WAREHOUSE": "Warehouse"
+      },
+
+      "DOCKS": {
+        "TITLE": "Associated Docks (Optional)",
+        "ADD": "Add Dock",
+        "SELECT_DOCK": "Select a dock",
+        "DISTANCE_PLACEHOLDER": "Distance (km)",
+        "LIST_TITLE": "Associated Docks:",
+        "NO_DOCKS_AVAILABLE": "No Docks available. Create Docks first to associate them with Storage Areas."
+      }
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit Storage Area",
+
+      "CODE": "Code (Read-only)",
+      "LOCATION": "Location *",
+      "TYPE": "Type (Read-only)",
+      "MAX_CAPACITY": "Max Capacity *",
+      "CURRENT_CAPACITY": "Current Capacity",
+
+      "PLACEHOLDER_LOCATION": "Enter Storage Area location",
+      "PLACEHOLDER_MAX_CAPACITY": "Enter maximum capacity",
+      "PLACEHOLDER_CURRENT_CAPACITY": "Enter current capacity",
+
+      "DOCKS": {
+        "TITLE": "Associated Docks (Optional)",
+        "ADD": "Add Dock",
+        "SELECT_DOCK": "Select a dock",
+        "DISTANCE_PLACEHOLDER": "Distance (km)",
+        "LIST_TITLE": "Associated Docks:",
+        "NO_DOCKS_AVAILABLE": "No Socks available. Create Docks first to associate them with Storage Areas."
+      }
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading Storage Areas...",
+      "SUCCESS": "Operation completed successfully.",
+      "ERROR": "An error occurred."
+    }
+  },
+  "VESSEL_VISIT_NOTIFICATIONS": {
+    "TITLE": "Vessel Visit Notifications",
+
+    "TABLE": {
+      "CODE": "Code",
+      "VESSEL_IMO": "Vessel IMO",
+      "REPRESENTATIVE": "Representative",
+      "ETA": "ETA",
+      "ETD": "ETD",
+      "CARGO_TYPE": "Cargo Type",
+      "VOLUME": "Volume",
+      "STATUS": "Status",
+      "CREW_MEMBERS": "Crew Members",
+      "ACTIONS": "Actions"
+    },
+
+    "ACTIONS": {
+      "NEW": "New Notification",
+      "EDIT": "Edit Notification",
+      "UNSELECT": "Unselect",
+      "SELECT": "Select"
+    },
+
+    "PLACEHOLDERS": {
+      "SEARCH": "Search for Vessel Visit Notifications...",
+      "SELECT_REPRESENTATIVE": "Select Representative",
+      "SELECT_CARGO_TYPE": "Select Cargo Type",
+      "SELECT_VESSEL": "Select Vessel",
+      "SELECT_STATUS": "Select Status",
+      "ENTER_VOLUME": "Enter Cargo volume",
+      "ENTER_CONTAINER": "Enter Container number",
+      "ENTER_STORAGE_AREA": "Enter Storage Area code",
+      "ENTER_ROW": "Row number",
+      "ENTER_BAY": "Bay number",
+      "ENTER_TIER": "Tier number",
+      "ENTER_CREW_NAME": "Enter Crew Member name",
+      "ENTER_CREW_ID": "Enter Citizen ID"
+    },
+
+    "STATUS": {
+      "INPROGRESS": "In Progress",
+      "SUBMITTED": "Submitted",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+
+    "NO_RESULTS": {
+      "NONE_FOUND": "No Vessel Visit Notifications found.",
+      "NO_MATCH": "No results found for "
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Vessel Visit Notification",
+      "BASIC": {
+        "TITLE": "Basic Information",
+        "CODE": "Code",
+        "VESSEL_IMO": "Vessel IMO",
+        "REPRESENTATIVE": "Representative Citizen ID",
+        "ETA": "ETA",
+        "ETD": "ETD",
+        "STATUS": "Status",
+        "LAST_MODIFIED": "Last Modified"
+      },
+      "CARGO": {
+        "TITLE": "Cargo Information",
+        "CARGO_TYPE": "Cargo Type",
+        "VOLUME": "Volume"
+      },
+      "CREW": {
+        "TITLE": "Crew Information",
+        "COUNT": "Number of Crew Members",
+        "LIST": "Crew Members:",
+        "ITEM": "{{name}} ({{rank}}) - {{nationality}} - {{citizenID}}"
+      },
+      "MANIFEST": {
+        "TITLE": "Cargo Manifests",
+        "MANIFEST_LABEL": "Manifest {{index}}",
+        "ENTRIES_COUNT": "Entries ({{count}})",
+        "ENTRY": "Container: {{containerNumber}} | Row: {{row}} | Bay: {{bay}} | Tier: {{tier}} | Storage Area: {{storageAreaCode}}"
+      }
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Vessel Visit Notification",
+
+      "BASIC": {
+        "TITLE": "Basic Information",
+        "VESSEL_IMO": "Vessel IMO *",
+        "REPRESENTATIVE": "Representative Citizen ID *",
+        "ETA": "ETA *",
+        "ETD": "ETD *"
+      },
+
+      "CARGO": {
+        "TITLE": "Cargo Information",
+        "CARGO_TYPE": "Cargo Type *",
+        "VOLUME": "Volume *"
+      },
+
+      "CREW": {
+        "TITLE": "Crew Information",
+        "REQUIREMENTS": "Required: 1 Captain{{extra}}",
+        "ADD_MEMBER": "Add Crew Member",
+        "LIST_TITLE": "Added Crew Members ({{count}})",
+        "REMOVE": "Remove"
+      },
+
+      "MANIFEST": {
+        "TITLE": "Cargo Manifest",
+        "MANIFEST_TYPE": "Manifest Type",
+        "ADD_ENTRY": "Add Container Entry",
+        "LOADING_TITLE": "Loading Manifest ({{count}} containers)",
+        "UNLOADING_TITLE": "Unloading Manifest ({{count}} containers)",
+        "REMOVE": "Remove"
+      },
+
+      "BUTTONS": {
+        "CANCEL": "Cancel",
+        "CREATE": "Create Notification",
+        "CREATING": "Creating..."
+      }
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit Vessel Visit Notification",
+
+      "BASIC": {
+        "TITLE": "Basic Information",
+        "CODE": "Code (Read-only)",
+        "VESSEL_IMO": "Vessel IMO *",
+        "REPRESENTATIVE": "Representative Citizen ID *",
+        "ETA": "ETA *",
+        "ETD": "ETD *",
+        "STATUS": "Visit Status *"
+      },
+
+      "CARGO": {
+        "TITLE": "Cargo Information",
+        "CARGO_TYPE": "Cargo Type *",
+        "VOLUME": "Volume *"
+      },
+
+      "CREW": {
+        "TITLE": "Crew Information",
+        "REQUIREMENTS": "Required: 1 Captain{{extra}}",
+        "ADD_MEMBER": "Add Crew Member",
+        "LIST_TITLE": "Crew Members ({{count}})",
+        "REMOVE": "Remove"
+      },
+
+      "MANIFEST": {
+        "TITLE": "Cargo Manifest",
+        "MANIFEST_TYPE": "Manifest Type",
+        "ADD_ENTRY": "Add Container Entry",
+        "LOADING_TITLE": "Loading Manifest ({{count}} containers)",
+        "UNLOADING_TITLE": "Unloading Manifest ({{count}} containers)",
+        "REMOVE": "Remove"
+      },
+
+      "BUTTONS": {
+        "CANCEL": "Cancel",
+        "UPDATE": "Update Notification",
+        "UPDATING": "Updating..."
+      }
+    },
+
+    "MESSAGES": {
+      "ERROR": "An error occurred",
+      "SUCCESS_CREATE": "Notification created successfully.",
+      "SUCCESS_UPDATE": "Notification updated successfully."
+    }
+  },
+  "VESSEL_VISIT_DECISIONS": {
+    "TITLE": "Vessel Visit Notification Decisions",
+    "LOADING": "Loading Decisions...",
+
+    "TABLE": {
+      "ID": "ID",
+      "NOTIFICATION_CODE": "Notification Code",
+      "STATUS": "Status",
+      "OFFICER_ID": "Officer ID",
+      "RESPONSE_MESSAGE": "Response Message",
+      "DECISION_DATE": "Decision Date",
+      "ACTIONS": "Actions"
+    },
+
+    "ACTIONS": {
+      "NEW": "New Decision",
+      "REFRESH": "Refresh List",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect"
+    },
+
+    "PLACEHOLDERS": {
+      "SEARCH": "Search Decisions...",
+      "RESPONSE_REJECTION": "Provide the reason for rejection...",
+      "SELECT_NOTIFICATION": "Select Notification",
+      "SELECT_STATUS": "Select Status",
+      "SELECT_DOCK": "Select Dock"
+    },
+
+    "STATUS": {
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+
+    "NO_RESULTS": {
+      "NONE_FOUND": "No Decisions found.",
+      "NO_MATCH": "No results found for "
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Decision:",
+      "INFO": {
+        "TITLE": "Decision Details",
+        "ID": "ID",
+        "NOTIFICATION_CODE": "Notification Code",
+        "STATUS": "Status",
+        "OFFICER_ID": "Officer ID",
+        "RESPONSE_MESSAGE": "Response Message",
+        "DECISION_DATE": "Decision Date"
+      },
+      "RELATED_NOTIFICATION": {
+        "TITLE": "Related Notification Details",
+        "VESSEL_IMO": "Vessel IMO",
+        "REPRESENTATIVE": "Representative",
+        "ETA": "ETA",
+        "ETD": "ETD",
+        "CARGO_TYPE": "Cargo Type",
+        "VOLUME": "Volume",
+        "CREW_MEMBERS": "Crew Members",
+        "VISIT_STATUS": "Visit Status"
+      }
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Decision",
+
+      "INFO": {
+        "TITLE": "Decision Information",
+        "NOTIFICATION": "Vessel Visit Notification Code *",
+        "STATUS": "Decision Status *",
+        "OFFICER_ID": "Officer ID *",
+        "SELECT_NOTIFICATION": "Select Notification"
+      },
+
+      "STATUS_TYPES": {
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected"
+      },
+
+      "DOCK_SELECTION": {
+        "TITLE": "Select Dock *"
+      },
+
+      "REJECTION": {
+        "MESSAGE": "Rejection Reason *"
+      },
+
+      "BUTTONS": {
+        "CANCEL": "Cancel",
+        "CREATE": "Create Decision",
+        "CREATING": "Creating..."
+      }
+    },
+
+    "MESSAGES": {
+      "SUCCESS_CREATE": "Decision successfully created.",
+      "ERROR": "An error occurred while processing the decision."
     }
   }
 }

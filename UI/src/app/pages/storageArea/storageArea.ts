@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { StorageAreaService } from '../../services/storageArea.service';
@@ -10,7 +11,7 @@ import { DocksModel } from '../../models/docks.model';
 
 @Component({
   selector: 'app-storage-area',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './storageArea.html',
   styleUrl: './storageArea.css',
 })
@@ -89,7 +90,8 @@ export class StorageArea implements OnInit, OnDestroy {
   constructor(
     private storageAreaService: StorageAreaService,
     private docksService: DocksService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
