@@ -172,7 +172,12 @@ public class SystemUserService
     }
     public async Task<bool> SendActivationEmail(SystemUserDTO user)
     {
-        string activationLink = GenerateActivationLink(user.Code);
+        // Generate token in memory and send it via email (no persistence)
+        var token = Guid.NewGuid().ToString();
+        string activationLink = GenerateActivationLink(token, user.Code!);
+
+        // Log activation link so developers can test without SMTP
+        Console.WriteLine($"[SystemUserService] Activation link for {user.Email}: {activationLink}");
 
         await _emailService.SendEmailAsync(user.Email!, "Ative sua conta",
             $"Clique aqui para ativar sua conta: <a href='{activationLink}'>Ativar</a>");
@@ -180,12 +185,11 @@ public class SystemUserService
         return true;
     }
 
-    private string GenerateActivationLink(string userCode)
+    private string GenerateActivationLink(string token, string userCode)
     {
-        var token = Guid.NewGuid().ToString();
-
         return $"{_configuration["AppSettings:ActivationBaseUrl"]}?token={token}&code={userCode}";
     }
+
     public async Task<bool> SystemUserExistsByCode(string code)
     {
         return await _systemUserRepository.SystemUserExistsByCode(code);

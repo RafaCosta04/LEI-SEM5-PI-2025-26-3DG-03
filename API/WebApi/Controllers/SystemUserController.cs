@@ -181,16 +181,20 @@ public class SystemUserController : ControllerBase
 
         try
         {
+            Console.WriteLine($"SendActivationEmail called for user {user.Email} (code={user.Code})");
             bool emailSent = await _systemUserService.SendActivationEmail(user);
             if (!emailSent)
             {
+                Console.WriteLine("SendActivationEmail failed: emailService returned false");
                 return StatusCode(500, "Failed to send activation email.");
             }
 
+            Console.WriteLine("SendActivationEmail succeeded");
             return Ok($"Activation email sent to {user.Email}.");
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"SendActivationEmail exception: {ex}");
             return StatusCode(500, $"Error sending activation email: {ex.Message}");
         }
     }
