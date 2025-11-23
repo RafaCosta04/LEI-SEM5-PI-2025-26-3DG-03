@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { SystemUserService } from '../../services/systemUser.service';
 
 @Component({
   selector: 'app-system-user',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './systemUser.html',
   styleUrl: './systemUser.css'
 })

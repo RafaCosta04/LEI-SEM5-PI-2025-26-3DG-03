@@ -1,5 +1,5 @@
 <div class="page-container">
-  <h1 class="page-title">Vessel Types</h1>
+  <h1 class="page-title">{{ 'VESSEL_TYPES.TITLE' | translate }}</h1>
 
 
   <div class="top-bar">
@@ -8,7 +8,7 @@
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search for vessel types..."
+        placeholder="{{ 'VESSEL_TYPES.SEARCH_PLACEHOLDER' | translate }}"
         class="search-input"
       >
       <button
@@ -25,17 +25,17 @@
       <button
         (click)="onCreateNew()"
         class="btn btn-primary"
-        title="Create new vessel type"
+        title="{{ 'VESSEL_TYPES.BUTTON.NEW' | translate }}"
       >
-        New Vessel Type
+        {{ 'VESSEL_TYPES.BUTTON.NEW' | translate }}
       </button>
       <button
         (click)="onUpdate()"
         class="btn btn-secondary"
         [disabled]="!selectedVesselType"
-        title="Edit selected vessel type"
+        title="{{ 'VESSEL_TYPES.BUTTON.EDIT' | translate }}"
       >
-        Edit Vessel Type
+        {{ 'VESSEL_TYPES.BUTTON.EDIT' | translate }}
       </button>
     </div>
   </div>
@@ -47,20 +47,20 @@
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    Loading Vessel Types...
+    {{ 'VESSEL_TYPES.MESSAGES.LOADING' | translate }}
   </div>
 
   <div *ngIf="!isLoading" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Capacity</th>
-          <th>Max Rows</th>
-          <th>Max Bays</th>
-          <th>Max Tiers</th>
-          <th>Actions</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.NAME' | translate }}</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.DESCRIPTION' | translate }}</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.CAPACITY' | translate }}</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.MAX_ROWS' | translate }}</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.MAX_BAYS' | translate }}</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.MAX_TIERS' | translate }}</th>
+          <th>{{ 'VESSEL_TYPES.TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -75,13 +75,13 @@
           <td>{{ vesselType.maxRows }}</td>
           <td>{{ vesselType.maxBays }}</td>
           <td>{{ vesselType.maxTiers }}</td>
-          <td>
+            <td>
             <button
               (click)="selectVesselType(vesselType); $event.stopPropagation()"
               class="btn-select"
               [class.selected]="selectedVesselType?.id === vesselType.id"
             >
-              {{ selectedVesselType?.id === vesselType.id ? 'Unselect' : 'Select' }}
+              {{ selectedVesselType?.id === vesselType.id ? ('VESSEL_TYPES.BUTTON.UNSELECT' | translate) : ('VESSEL_TYPES.BUTTON.SELECT' | translate) }}
             </button>
           </td>
         </tr>
@@ -90,20 +90,25 @@
 
     <!-- Message when no results are found -->
     <div *ngIf="filteredVesselTypes.length === 0 && !isLoading" class="no-results">
-      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No vessel types found.' }}</p>
+      <p>
+        <ng-container *ngIf="searchTerm; else noVesselTypes">
+          {{ 'VESSEL_TYPES.NO_RESULTS_FOR' | translate }} "{{ searchTerm }}"
+        </ng-container>
+        <ng-template #noVesselTypes>{{ 'VESSEL_TYPES.NO_RESULTS' | translate }}</ng-template>
+      </p>
     </div>
   </div>
 
   <!-- Information of selected vessel type -->
   <div *ngIf="selectedVesselType" class="selected-info">
-    <h3>Selected Vessel Type:</h3>
+    <h3>{{ 'VESSEL_TYPES.DETAILS.TITLE' | translate }}</h3>
     <div class="info-card">
-      <p><strong>Name:</strong> {{ selectedVesselType.name }}</p>
-      <p><strong>Description:</strong> {{ selectedVesselType.description }}</p>
-      <p><strong>Capacity:</strong> {{ selectedVesselType.capacity }}</p>
-      <p><strong>Max Rows:</strong> {{ selectedVesselType.maxRows }}</p>
-      <p><strong>Max Bays:</strong> {{ selectedVesselType.maxBays }}</p>
-      <p><strong>Max Tiers:</strong> {{ selectedVesselType.maxTiers }}</p>
+      <p><strong>{{ 'VESSEL_TYPES.TABLE.NAME' | translate }}:</strong> {{ selectedVesselType.name }}</p>
+      <p><strong>{{ 'VESSEL_TYPES.TABLE.DESCRIPTION' | translate }}:</strong> {{ selectedVesselType.description }}</p>
+      <p><strong>{{ 'VESSEL_TYPES.TABLE.CAPACITY' | translate }}:</strong> {{ selectedVesselType.capacity }}</p>
+      <p><strong>{{ 'VESSEL_TYPES.TABLE.MAX_ROWS' | translate }}:</strong> {{ selectedVesselType.maxRows }}</p>
+      <p><strong>{{ 'VESSEL_TYPES.TABLE.MAX_BAYS' | translate }}:</strong> {{ selectedVesselType.maxBays }}</p>
+      <p><strong>{{ 'VESSEL_TYPES.TABLE.MAX_TIERS' | translate }}:</strong> {{ selectedVesselType.maxTiers }}</p>
     </div>
   </div>
 </div>
@@ -112,7 +117,7 @@
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Create New Vessel Type</h2>
+      <h2>{{ 'VESSEL_TYPES.CREATE_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeCreateModal()">✕</button>
     </div>
 
@@ -124,7 +129,7 @@
 
       <form (ngSubmit)="onSaveNewVesselType()" #vesselTypeForm="ngForm">
         <div class="form-group">
-          <label for="name">Name *</label>
+          <label for="name">{{ 'VESSEL_TYPES.CREATE_MODAL.NAME' | translate }}</label>
           <input
             type="text"
             id="name"
@@ -133,7 +138,7 @@
             required
             class="form-input"
             [class.error]="hasFieldError('name')"
-            placeholder="Enter vessel type name"
+            placeholder="{{ 'VESSEL_TYPES.CREATE_MODAL.PLACEHOLDER_NAME' | translate }}"
           >
           <div *ngIf="hasFieldError('name')" class="field-error">
             {{ getFieldError('name') }}
@@ -141,7 +146,7 @@
         </div>
 
         <div class="form-group">
-          <label for="description">Description *</label>
+          <label for="description">{{ 'VESSEL_TYPES.CREATE_MODAL.DESCRIPTION' | translate }}</label>
           <textarea
             id="description"
             name="description"
@@ -149,7 +154,7 @@
             required
             class="form-textarea"
             [class.error]="hasFieldError('description')"
-            placeholder="Enter vessel type description"
+            placeholder="{{ 'VESSEL_TYPES.CREATE_MODAL.PLACEHOLDER_DESCRIPTION' | translate }}"
             rows="3"
           ></textarea>
           <div *ngIf="hasFieldError('description')" class="field-error">
@@ -158,7 +163,7 @@
         </div>
 
         <div class="form-group">
-          <label for="capacity">Capacity *</label>
+          <label for="capacity">{{ 'VESSEL_TYPES.CREATE_MODAL.CAPACITY' | translate }}</label>
           <input
             type="number"
             id="capacity"
@@ -168,7 +173,7 @@
             min="1"
             class="form-input"
             [class.error]="hasFieldError('capacity')"
-            placeholder="Enter vessel capacity"
+            placeholder="{{ 'VESSEL_TYPES.CREATE_MODAL.PLACEHOLDER_CAPACITY' | translate }}"
           >
           <div *ngIf="hasFieldError('capacity')" class="field-error">
             {{ getFieldError('capacity') }}
@@ -176,7 +181,7 @@
         </div>
 
         <div class="form-group">
-          <label for="maxRows">Max Rows *</label>
+          <label for="maxRows">{{ 'VESSEL_TYPES.CREATE_MODAL.MAX_ROWS' | translate }}</label>
           <input
             type="number"
             id="maxRows"
@@ -186,7 +191,7 @@
             min="1"
             class="form-input"
             [class.error]="hasFieldError('maxRows')"
-            placeholder="Enter maximum rows"
+            placeholder="{{ 'VESSEL_TYPES.CREATE_MODAL.PLACEHOLDER_MAX_ROWS' | translate }}"
           >
           <div *ngIf="hasFieldError('maxRows')" class="field-error">
             {{ getFieldError('maxRows') }}
@@ -194,7 +199,7 @@
         </div>
 
         <div class="form-group">
-          <label for="maxBays">Max Bays *</label>
+          <label for="maxBays">{{ 'VESSEL_TYPES.CREATE_MODAL.MAX_BAYS' | translate }}</label>
           <input
             type="number"
             id="maxBays"
@@ -204,7 +209,7 @@
             min="1"
             class="form-input"
             [class.error]="hasFieldError('maxBays')"
-            placeholder="Enter maximum bays"
+            placeholder="{{ 'VESSEL_TYPES.CREATE_MODAL.PLACEHOLDER_MAX_BAYS' | translate }}"
           >
           <div *ngIf="hasFieldError('maxBays')" class="field-error">
             {{ getFieldError('maxBays') }}
@@ -212,7 +217,7 @@
         </div>
 
         <div class="form-group">
-          <label for="maxTiers">Max Tiers *</label>
+          <label for="maxTiers">{{ 'VESSEL_TYPES.CREATE_MODAL.MAX_TIERS' | translate }}</label>
           <input
             type="number"
             id="maxTiers"
@@ -222,7 +227,7 @@
             min="1"
             class="form-input"
             [class.error]="hasFieldError('maxTiers')"
-            placeholder="Enter maximum tiers"
+            placeholder="{{ 'VESSEL_TYPES.CREATE_MODAL.PLACEHOLDER_MAX_TIERS' | translate }}"
           >
           <div *ngIf="hasFieldError('maxTiers')" class="field-error">
             {{ getFieldError('maxTiers') }}
@@ -236,14 +241,14 @@
             class="btn btn-secondary"
             [disabled]="isCreating"
           >
-            Cancel
+            {{ 'VESSEL_TYPES.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isCreating || !vesselTypeForm.form.valid"
           >
-            {{ isCreating ? 'Creating...' : 'Create Vessel Type' }}
+            {{ isCreating ? ('VESSEL_TYPES.BUTTON.CREATING' | translate) : ('VESSEL_TYPES.BUTTON.CREATE' | translate) }}
           </button>
         </div>
       </form>
@@ -255,7 +260,7 @@
 <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Edit Vessel Type</h2>
+      <h2>{{ 'VESSEL_TYPES.EDIT_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeEditModal()">✕</button>
     </div>
 
@@ -267,7 +272,7 @@
 
       <form (ngSubmit)="onSaveEditVesselType()" #editVesselTypeForm="ngForm">
         <div class="form-group">
-          <label for="editName">Name *</label>
+          <label for="editName">{{ 'VESSEL_TYPES.EDIT_MODAL.NAME' | translate }}</label>
           <input
             type="text"
             id="editName"
@@ -276,7 +281,7 @@
             required
             class="form-input"
             [class.error]="hasEditFieldError('name')"
-            placeholder="Enter vessel type name"
+            placeholder="{{ 'VESSEL_TYPES.EDIT_MODAL.PLACEHOLDER_NAME' | translate }}"
           >
           <div *ngIf="hasEditFieldError('name')" class="field-error">
             {{ getEditFieldError('name') }}
@@ -284,7 +289,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editDescription">Description *</label>
+          <label for="editDescription">{{ 'VESSEL_TYPES.EDIT_MODAL.DESCRIPTION' | translate }}</label>
           <textarea
             id="editDescription"
             name="editDescription"
@@ -292,7 +297,7 @@
             required
             class="form-textarea"
             [class.error]="hasEditFieldError('description')"
-            placeholder="Enter vessel type description"
+            placeholder="{{ 'VESSEL_TYPES.EDIT_MODAL.PLACEHOLDER_DESCRIPTION' | translate }}"
             rows="3"
           ></textarea>
           <div *ngIf="hasEditFieldError('description')" class="field-error">
@@ -301,7 +306,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editCapacity">Capacity *</label>
+          <label for="editCapacity">{{ 'VESSEL_TYPES.EDIT_MODAL.CAPACITY' | translate }}</label>
           <input
             type="number"
             id="editCapacity"
@@ -311,7 +316,7 @@
             min="1"
             class="form-input"
             [class.error]="hasEditFieldError('capacity')"
-            placeholder="Enter vessel capacity"
+            placeholder="{{ 'VESSEL_TYPES.EDIT_MODAL.PLACEHOLDER_CAPACITY' | translate }}"
           >
           <div *ngIf="hasEditFieldError('capacity')" class="field-error">
             {{ getEditFieldError('capacity') }}
@@ -319,7 +324,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editMaxRows">Max Rows *</label>
+          <label for="editMaxRows">{{ 'VESSEL_TYPES.EDIT_MODAL.MAX_ROWS' | translate }}</label>
           <input
             type="number"
             id="editMaxRows"
@@ -329,7 +334,7 @@
             min="1"
             class="form-input"
             [class.error]="hasEditFieldError('maxRows')"
-            placeholder="Enter maximum rows"
+            placeholder="{{ 'VESSEL_TYPES.EDIT_MODAL.PLACEHOLDER_MAX_ROWS' | translate }}"
           >
           <div *ngIf="hasEditFieldError('maxRows')" class="field-error">
             {{ getEditFieldError('maxRows') }}
@@ -337,7 +342,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editMaxBays">Max Bays *</label>
+          <label for="editMaxBays">{{ 'VESSEL_TYPES.EDIT_MODAL.MAX_BAYS' | translate }}</label>
           <input
             type="number"
             id="editMaxBays"
@@ -347,7 +352,7 @@
             min="1"
             class="form-input"
             [class.error]="hasEditFieldError('maxBays')"
-            placeholder="Enter maximum bays"
+            placeholder="{{ 'VESSEL_TYPES.EDIT_MODAL.PLACEHOLDER_MAX_BAYS' | translate }}"
           >
           <div *ngIf="hasEditFieldError('maxBays')" class="field-error">
             {{ getEditFieldError('maxBays') }}
@@ -355,7 +360,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editMaxTiers">Max Tiers *</label>
+          <label for="editMaxTiers">{{ 'VESSEL_TYPES.EDIT_MODAL.MAX_TIERS' | translate }}</label>
           <input
             type="number"
             id="editMaxTiers"
@@ -365,7 +370,7 @@
             min="1"
             class="form-input"
             [class.error]="hasEditFieldError('maxTiers')"
-            placeholder="Enter maximum tiers"
+            placeholder="{{ 'VESSEL_TYPES.EDIT_MODAL.PLACEHOLDER_MAX_TIERS' | translate }}"
           >
           <div *ngIf="hasEditFieldError('maxTiers')" class="field-error">
             {{ getEditFieldError('maxTiers') }}
@@ -379,14 +384,14 @@
             class="btn btn-secondary"
             [disabled]="isEditing"
           >
-            Cancel
+            {{ 'VESSEL_TYPES.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isEditing || !editVesselTypeForm.form.valid || !isEditDirty()"
           >
-            {{ isEditing ? 'Updating...' : 'Update Vessel Type' }}
+            {{ isEditing ? ('VESSEL_TYPES.BUTTON.UPDATING' | translate) : ('VESSEL_TYPES.BUTTON.UPDATE' | translate) }}
           </button>
         </div>
       </form>

@@ -341,5 +341,385 @@
     },
 
     "LOADING": "Loading Schedule..."
+  },
+  "SYSTEM_USERS": {
+    "TITLE": "System Users",
+
+    "SEARCH_PLACEHOLDER": "Search System Users...",
+    "NO_RESULTS": "No System Users found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New System User",
+      "EDIT": "Edit System User",
+      "CLOSE": "Close",
+      "CANCEL": "Cancel",
+      "CREATE": "Create System User",
+      "CREATING": "Creating...",
+      "SAVE": "Update System User",
+      "SAVING": "Updating...",
+      "UNSELECT": "Unselect",
+      "SELECT": "Select",
+      "CLEAN_SEARCH": "Clean search"
+    },
+
+    "STATUS": {
+      "ACTIVE": "Active",
+      "DEACTIVATED": "Deactivated",
+      "PENDING": "Pending"
+    },
+
+    "TABLE": {
+      "CODE": "Code",
+      "USERNAME": "Username",
+      "EMAIL": "Email",
+      "ROLE": "Role",
+      "STATUS": "Status",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected User:",
+      "CODE": "Code",
+      "USERNAME": "Username",
+      "EMAIL": "Email",
+      "ROLE": "Role",
+      "STATUS": "Status",
+      "FIRST_TIME": "First Time",
+      "YES": "Yes",
+      "NO": "No"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create User",
+      "CODE": "Code *",
+      "USERNAME": "Username *",
+      "EMAIL": "Email *",
+      "ROLE": "Role",
+      "STATUS": "Status",
+      "READONLY": "Read-only field"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit User",
+      "CODE": "Code",
+      "EMAIL": "Email",
+      "USERNAME": "Username",
+      "ROLE": "Role",
+      "STATUS": "Status"
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading users...",
+      "ERROR": "An error occurred.",
+      "SUCCESS": "Operation completed successfully."
+    }
+  },
+  "REPRESENTATIVES": {
+    "TITLE": "Representatives",
+
+    "SEARCH_PLACEHOLDER": "Search for Representatives...",
+    "NO_RESULTS": "No Representatives found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New Representative",
+      "EDIT": "Edit Representative",
+      "CANCEL": "Cancel",
+      "CLOSE": "Close",
+      "CREATE": "Create Representative",
+      "CREATING": "Creating...",
+      "UPDATE": "Update Representative",
+      "UPDATING": "Updating...",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect",
+      "CLEAN_SEARCH": "Clean search"
+    },
+
+    "TABLE": {
+      "NAME": "Name",
+      "ORGANIZATION": "Organization",
+      "CITIZEN_ID": "Citizen ID",
+      "NATIONALITY": "Nationality",
+      "EMAIL": "Email",
+      "PHONE": "Phone Number",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Representative:",
+      "NAME": "Name",
+      "ORGANIZATION": "Organization",
+      "CITIZEN_ID": "Citizen ID",
+      "NATIONALITY": "Nationality",
+      "EMAIL": "Email",
+      "PHONE": "Phone Number"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Representative",
+      "ORGANIZATION": "Organization Name *",
+      "NAME": "Name *",
+      "CITIZEN_ID": "Citizen ID *",
+      "NATIONALITY": "Nationality *",
+      "EMAIL": "Email *",
+      "PHONE": "Phone Number *",
+      "SELECT_ORGANIZATION": "Select organization",
+      "SELECT_NATIONALITY": "Select nationality"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit Representative",
+      "ORGANIZATION": "Organization Name *",
+      "NAME": "Name *",
+      "CITIZEN_ID": "Citizen ID (Read-only)",
+      "NATIONALITY": "Nationality *",
+      "EMAIL": "Email *",
+      "PHONE": "Phone Number *"
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading Representatives...",
+      "SUCCESS": "Operation completed successfully.",
+      "ERROR": "An error occurred."
+    }
+  },
+  "QUALIFICATIONS": {
+    "TITLE": "Qualifications",
+
+    "SEARCH_PLACEHOLDER": "Search for Qualifications...",
+    "NO_RESULTS": "No Qualifications found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New Qualification",
+      "EDIT": "Edit Qualification",
+      "CANCEL": "Cancel",
+      "CLEAN_SEARCH": "Clean search",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect",
+      "CREATE": "Create Qualification",
+      "CREATING": "Creating...",
+      "UPDATE": "Update Qualification",
+      "UPDATING": "Updating..."
+    },
+
+    "TABLE": {
+      "CODE": "Code",
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Qualification:",
+      "CODE": "Code",
+      "NAME": "Name",
+      "DESCRIPTION": "Description"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Qualification",
+      "CODE": "Code *",
+      "NAME": "Name *",
+      "DESCRIPTION": "Description *",
+      "PLACEHOLDER_CODE": "Enter Qualification code",
+      "PLACEHOLDER_NAME": "Enter Qualification name",
+      "PLACEHOLDER_DESCRIPTION": "Enter Qualification description"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit Qualification",
+      "CODE": "Code (Read-only)",
+      "NAME": "Name *",
+      "DESCRIPTION": "Description *",
+      "PLACEHOLDER_NAME": "Enter Qualification name",
+      "PLACEHOLDER_DESCRIPTION": "Enter Qualification description"
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading Qualifications...",
+      "SUCCESS": "Operation completed successfully.",
+      "ERROR": "An error occurred."
+    }
+  },
+  "STAFF": {
+    "TITLE": "Staff",
+
+    "SEARCH_PLACEHOLDER": "Search for Staff...",
+    "NO_RESULTS": "No Staff found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New Staff",
+      "EDIT": "Edit Staff",
+      "CANCEL": "Cancel",
+      "CLEAN_SEARCH": "Clean search",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect",
+      "CREATE": "Create Staff",
+      "CREATING": "Creating...",
+      "UPDATE": "Update Staff",
+      "UPDATING": "Updating..."
+    },
+
+    "TABLE": {
+      "NAME": "Name",
+      "EMAIL": "Email",
+      "QUALIFICATIONS": "Qualifications",
+      "STATUS": "Status",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Staff:",
+      "NAME": "Name",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "QUALIFICATIONS": "Qualifications",
+      "OPERATIONAL_WINDOW": "Operational Window",
+      "STATUS": "Status"
+    },
+
+    "PLACEHOLDER": {
+      "SELECT_QUALIFICATIONS": "Select Qualifications",
+      "N_SELECTED": "{{count}} Qualifications selected"
+    },
+
+    "CREATE_MODEL": {
+      "TITLE": "Create New Staff",
+
+      "NAME": "Name *",
+      "EMAIL": "Email *",
+      "PHONE": "Phone *",
+
+      "PLACEHOLDER_NAME": "Enter name",
+      "PLACEHOLDER_EMAIL": "Enter email",
+      "PLACEHOLDER_PHONE": "Enter phone",
+
+      "QUALIFICATIONS": "Qualifications *",
+      "QUALIFICATIONS_HINT": "Click to toggle selection (multiple selections allowed)",
+
+      "OPERATIONAL_WINDOW": {
+        "START_DAY": "Start Day *",
+        "END_DAY": "End Day *",
+        "START_TIME": "Start Time *",
+        "END_TIME": "End Time *"
+      },
+
+      "STATUS": "Status *",
+      "STATUS_AVAILABLE": "Available",
+      "STATUS_UNAVAILABLE": "Unavailable"
+    },
+
+    "EDIT_MODEL": {
+      "TITLE": "Edit Staff",
+
+      "NAME": "Name *",
+      "EMAIL": "Email *",
+      "PHONE": "Phone *",
+
+      "QUALIFICATIONS": "Qualifications",
+      "QUALIFICATIONS_HINT": "Click to toggle selection (multiple selections allowed)",
+
+      "OPERATIONAL_WINDOW": {
+        "START_DAY": "Start Day",
+        "END_DAY": "End Day",
+        "START_TIME": "Start Time",
+        "END_TIME": "End Time"
+      },
+
+      "STATUS": "Status",
+      "STATUS_AVAILABLE": "Available",
+      "STATUS_UNAVAILABLE": "Unavailable"
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading Staff...",
+      "SUCCESS": "Operation completed successfully.",
+      "ERROR": "An error occurred."
+    }
+  },
+  "VESSEL_TYPES": {
+    "TITLE": "Vessel Types",
+
+    "SEARCH_PLACEHOLDER": "Search for Vessel Types...",
+    "NO_RESULTS": "No Vessel Types found.",
+    "NO_RESULTS_FOR": "No results found for ",
+
+    "BUTTON": {
+      "NEW": "New Vessel Type",
+      "EDIT": "Edit Vessel Type",
+      "CANCEL": "Cancel",
+      "CLEAN_SEARCH": "Clean search",
+      "SELECT": "Select",
+      "UNSELECT": "Unselect",
+      "CREATE": "Create Vessel Type",
+      "CREATING": "Creating...",
+      "UPDATE": "Update Vessel Type",
+      "UPDATING": "Updating..."
+    },
+
+    "TABLE": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CAPACITY": "Capacity",
+      "MAX_ROWS": "Max Rows",
+      "MAX_BAYS": "Max Bays",
+      "MAX_TIERS": "Max Tiers",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Selected Vessel Type:",
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CAPACITY": "Capacity",
+      "MAX_ROWS": "Max Rows",
+      "MAX_BAYS": "Max Bays",
+      "MAX_TIERS": "Max Tiers"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Create New Vessel Type",
+
+      "NAME": "Name *",
+      "DESCRIPTION": "Description *",
+      "CAPACITY": "Capacity *",
+      "MAX_ROWS": "Max Rows *",
+      "MAX_BAYS": "Max Bays *",
+      "MAX_TIERS": "Max Tiers *",
+
+      "PLACEHOLDER_NAME": "Enter name",
+      "PLACEHOLDER_DESCRIPTION": "Enter description",
+      "PLACEHOLDER_CAPACITY": "Enter capacity",
+      "PLACEHOLDER_MAX_ROWS": "Enter maximum rows",
+      "PLACEHOLDER_MAX_BAYS": "Enter maximum bays",
+      "PLACEHOLDER_MAX_TIERS": "Enter maximum tiers"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Edit Vessel Type",
+
+      "NAME": "Name *",
+      "DESCRIPTION": "Description *",
+      "CAPACITY": "Capacity *",
+      "MAX_ROWS": "Max Rows *",
+      "MAX_BAYS": "Max Bays *",
+      "MAX_TIERS": "Max Tiers *",
+
+      "PLACEHOLDER_NAME": "Enter name",
+      "PLACEHOLDER_DESCRIPTION": "Enter description",
+      "PLACEHOLDER_CAPACITY": "Enter capacity",
+      "PLACEHOLDER_MAX_ROWS": "Enter maximum rows",
+      "PLACEHOLDER_MAX_BAYS": "Enter maximum bays",
+      "PLACEHOLDER_MAX_TIERS": "Enter maximum tiers"
+    },
+
+    "MESSAGES": {
+      "LOADING": "Loading Vessel Types...",
+      "SUCCESS": "Operation completed successfully.",
+      "ERROR": "An error occurred."
+    }
   }
 }

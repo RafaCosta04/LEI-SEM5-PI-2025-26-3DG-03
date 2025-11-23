@@ -1,5 +1,5 @@
 <div class="page-container">
-  <h1 class="page-title">Qualifications</h1>
+  <h1 class="page-title">{{ 'QUALIFICATIONS.TITLE' | translate }}</h1>
 
 
   <div class="top-bar">
@@ -8,14 +8,14 @@
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search for qualifications..."
+        [placeholder]="'QUALIFICATIONS.SEARCH_PLACEHOLDER' | translate"
         class="search-input"
       >
       <button
         *ngIf="searchTerm"
         (click)="clearSearchAndNotify()"
         class="clear-button"
-        title="Clean search"
+        [title]="'QUALIFICATIONS.BUTTON.CLEAN_SEARCH' | translate"
       >
         ✕
       </button>
@@ -25,17 +25,17 @@
       <button
         (click)="onCreateNew()"
         class="btn btn-primary"
-        title="Create new qualification"
+        [title]="'QUALIFICATIONS.BUTTON.CREATE' | translate"
       >
-        New Qualification
+        {{ 'QUALIFICATIONS.BUTTON.NEW' | translate }}
       </button>
       <button
         (click)="onUpdate()"
         class="btn btn-secondary"
         [disabled]="!selectedQualification"
-        title="Edit selected qualification"
+        [title]="'QUALIFICATIONS.BUTTON.EDIT' | translate"
       >
-        Edit Qualification
+        {{ 'QUALIFICATIONS.BUTTON.EDIT' | translate }}
       </button>
     </div>
   </div>
@@ -47,17 +47,17 @@
   </div>
 
   <div *ngIf="isLoading" class="loading">
-    Loading Qualifications...
+    {{ 'QUALIFICATIONS.MESSAGES.LOADING' | translate }}
   </div>
 
   <div *ngIf="!isLoading" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Code</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Actions</th>
+          <th>{{ 'QUALIFICATIONS.TABLE.CODE' | translate }}</th>
+          <th>{{ 'QUALIFICATIONS.TABLE.NAME' | translate }}</th>
+          <th>{{ 'QUALIFICATIONS.TABLE.DESCRIPTION' | translate }}</th>
+          <th>{{ 'QUALIFICATIONS.TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -75,7 +75,7 @@
               class="btn-select"
               [class.selected]="selectedQualification?.id === qualification.id"
             >
-              {{ selectedQualification?.id === qualification.id ? 'Unselect' : 'Select' }}
+              {{ selectedQualification?.id === qualification.id ? ('QUALIFICATIONS.BUTTON.UNSELECT' | translate) : ('QUALIFICATIONS.BUTTON.SELECT' | translate) }}
             </button>
           </td>
         </tr>
@@ -84,17 +84,22 @@
 
     <!-- Message when no results are found -->
     <div *ngIf="filteredQualifications.length === 0 && !isLoading" class="no-results">
-      <p>{{ searchTerm ? 'No results found for "' + searchTerm + '"' : 'No qualifications found.' }}</p>
+      <ng-container *ngIf="searchTerm; else noneFound">
+        <p>{{ 'QUALIFICATIONS.NO_RESULTS_FOR' | translate }} "{{ searchTerm }}"</p>
+      </ng-container>
+      <ng-template #noneFound>
+        <p>{{ 'QUALIFICATIONS.NO_RESULTS' | translate }}</p>
+      </ng-template>
     </div>
   </div>
 
   <!-- Information of selected qualification -->
   <div *ngIf="selectedQualification" class="selected-info">
-    <h3>Selected Qualification:</h3>
+    <h3>{{ 'QUALIFICATIONS.DETAILS.TITLE' | translate }}</h3>
     <div class="info-card">
-      <p><strong>Code:</strong> {{ selectedQualification.code }}</p>
-      <p><strong>Name:</strong> {{ selectedQualification.name }}</p>
-      <p><strong>Description:</strong> {{ selectedQualification.description }}</p>
+      <p><strong>{{ 'QUALIFICATIONS.DETAILS.CODE' | translate }}:</strong> {{ selectedQualification.code }}</p>
+      <p><strong>{{ 'QUALIFICATIONS.DETAILS.NAME' | translate }}:</strong> {{ selectedQualification.name }}</p>
+      <p><strong>{{ 'QUALIFICATIONS.DETAILS.DESCRIPTION' | translate }}:</strong> {{ selectedQualification.description }}</p>
     </div>
   </div>
 </div>
@@ -103,7 +108,7 @@
 <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Create New Qualification</h2>
+      <h2>{{ 'QUALIFICATIONS.CREATE_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeCreateModal()">✕</button>
     </div>
 
@@ -114,7 +119,7 @@
 
       <form (ngSubmit)="onSaveNewQualification()" #qualificationForm="ngForm">
         <div class="form-group">
-          <label for="code">Code *</label>
+          <label for="code">{{ 'QUALIFICATIONS.CREATE_MODAL.CODE' | translate }}</label>
           <input
             type="text"
             id="code"
@@ -123,7 +128,7 @@
             required
             class="form-input"
             [class.error]="hasFieldError('code')"
-            placeholder="Enter qualification code"
+            [placeholder]="'QUALIFICATIONS.CREATE_MODAL.PLACEHOLDER_CODE' | translate"
           >
           <div *ngIf="hasFieldError('code')" class="field-error">
             {{ getFieldError('code') }}
@@ -131,7 +136,7 @@
         </div>
 
         <div class="form-group">
-          <label for="name">Name *</label>
+          <label for="name">{{ 'QUALIFICATIONS.CREATE_MODAL.NAME' | translate }}</label>
           <input
             type="text"
             id="name"
@@ -140,7 +145,7 @@
             required
             class="form-input"
             [class.error]="hasFieldError('name')"
-            placeholder="Enter qualification name"
+            [placeholder]="'QUALIFICATIONS.CREATE_MODAL.PLACEHOLDER_NAME' | translate"
           >
           <div *ngIf="hasFieldError('name')" class="field-error">
             {{ getFieldError('name') }}
@@ -148,7 +153,7 @@
         </div>
 
         <div class="form-group">
-          <label for="description">Description *</label>
+          <label for="description">{{ 'QUALIFICATIONS.CREATE_MODAL.DESCRIPTION' | translate }}</label>
           <textarea
             id="description"
             name="description"
@@ -156,7 +161,7 @@
             required
             class="form-textarea"
             [class.error]="hasFieldError('description')"
-            placeholder="Enter qualification description"
+            [placeholder]="'QUALIFICATIONS.CREATE_MODAL.PLACEHOLDER_DESCRIPTION' | translate"
             rows="3"
           ></textarea>
           <div *ngIf="hasFieldError('description')" class="field-error">
@@ -171,14 +176,14 @@
             class="btn btn-secondary"
             [disabled]="isCreating"
           >
-            Cancel
+            {{ 'QUALIFICATIONS.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isCreating || !qualificationForm.form.valid"
           >
-            {{ isCreating ? 'Creating...' : 'Create Qualification' }}
+            {{ isCreating ? ('QUALIFICATIONS.BUTTON.CREATING' | translate) : ('QUALIFICATIONS.BUTTON.CREATE' | translate) }}
           </button>
         </div>
       </form>
@@ -190,7 +195,7 @@
 <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Edit Qualification</h2>
+      <h2>{{ 'QUALIFICATIONS.EDIT_MODAL.TITLE' | translate }}</h2>
       <button class="close-button" (click)="closeEditModal()">✕</button>
     </div>
 
@@ -202,7 +207,7 @@
 
       <form (ngSubmit)="onSaveEditQualification()" #editQualificationForm="ngForm">
         <div class="form-group">
-          <label for="editCode">Code (Read-only)</label>
+          <label for="editCode">{{ 'QUALIFICATIONS.EDIT_MODAL.CODE' | translate }}</label>
           <input
             type="text"
             id="editCode"
@@ -210,12 +215,12 @@
             [value]="editQualification.code"
             readonly
             class="form-input readonly"
-            placeholder="Qualification code"
+            [placeholder]="'QUALIFICATIONS.EDIT_MODAL.CODE' | translate"
           >
         </div>
 
         <div class="form-group">
-          <label for="editName">Name *</label>
+          <label for="editName">{{ 'QUALIFICATIONS.EDIT_MODAL.NAME' | translate }}</label>
           <input
             type="text"
             id="editName"
@@ -224,7 +229,7 @@
             required
             class="form-input"
             [class.error]="hasEditFieldError('name')"
-            placeholder="Enter qualification name"
+            [placeholder]="'QUALIFICATIONS.EDIT_MODAL.PLACEHOLDER_NAME' | translate"
           >
           <div *ngIf="hasEditFieldError('name')" class="field-error">
             {{ getEditFieldError('name') }}
@@ -232,7 +237,7 @@
         </div>
 
         <div class="form-group">
-          <label for="editDescription">Description *</label>
+          <label for="editDescription">{{ 'QUALIFICATIONS.EDIT_MODAL.DESCRIPTION' | translate }}</label>
           <textarea
             id="editDescription"
             name="editDescription"
@@ -240,7 +245,7 @@
             required
             class="form-textarea"
             [class.error]="hasEditFieldError('description')"
-            placeholder="Enter qualification description"
+            [placeholder]="'QUALIFICATIONS.EDIT_MODAL.PLACEHOLDER_DESCRIPTION' | translate"
             rows="3"
           ></textarea>
           <div *ngIf="hasEditFieldError('description')" class="field-error">
@@ -255,14 +260,14 @@
             class="btn btn-secondary"
             [disabled]="isEditing"
           >
-            Cancel
+            {{ 'QUALIFICATIONS.BUTTON.CANCEL' | translate }}
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="isEditing || !editQualificationForm.form.valid || !isEditDirty()"
           >
-            {{ isEditing ? 'Updating...' : 'Update Qualification' }}
+            {{ isEditing ? ('QUALIFICATIONS.BUTTON.UPDATING' | translate) : ('QUALIFICATIONS.BUTTON.UPDATE' | translate) }}
           </button>
         </div>
       </form>

@@ -14,7 +14,7 @@
     "VVN_CREATE": "Criar/Editar Notificação",
     "VVN_DECISION": "Decisão da Notificação",
 
-    "STAFF": "Staff",
+    "STAFF": "Colaborador",
     "PHYSICAL_RESOURCES": "Recursos Físico",
     "QUALIFICATION": "Qualificação",
 
@@ -34,22 +34,6 @@
   }
   ,"LANG_EN": "Inglês",
   "LANG_PT": "Português",
-  "VESSEL_TYPE": {
-    "TITLE": "Tipos de Embarcação",
-    "NAME": "Nome",
-    "DESCRIPTION": "Drescrição",
-    "CAPACITY": "Capacidade",
-    "MAX_ROWS": "Max Linhas",
-    "MAX_BAYS": "Max Baias",
-    "MAX_TIERS": "Max Níveis",
-    "ACTIONS": "Ações",
-    "BUT_NEW": "Novo Tipo de Embarcação",
-    "BUT_EDIT": "Editar Tipo de Embarcação",
-    "SELECT": "Selecionar",
-    "UNSELECT": "Desselecionar",
-    "SEARCH": "Pesquisar Tipo de Embarcação...",
-    "SELECTED": "Tipo de Embarcação Selecionado"
-  },
   "DOCKS": {
     "TITLE": "Docas",
 
@@ -355,6 +339,387 @@
     },
 
     "LOADING": "A carregar Agenda..."
+  },
+  "SYSTEM_USERS": {
+    "TITLE": "Utilizadores do Sistema",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Utilizadores...",
+    "NO_RESULTS": "Nenhum Utilizador encontrado.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Novo Utilizador",
+      "EDIT": "Editar Utilizador",
+      "CLOSE": "Fechar",
+      "CANCEL": "Cancelar",
+      "CREATE": "Criar Utilizador",
+      "CREATING": "A criar...",
+      "SAVE": "Atualizar Utilizador",
+      "SAVING": "A guardar...",
+      "UNSELECT": "Desselecionar",
+      "SELECT": "Selecionar",
+      "CLEAN_SEARCH": "Limpar pesquisa"
+    },
+
+    "STATUS": {
+      "ACTIVE": "Ativo",
+      "DEACTIVATED": "Desativado",
+      "PENDING": "Pendente"
+    },
+
+    "TABLE": {
+      "CODE": "Código",
+      "USERNAME": "Nome de Utilizador",
+      "EMAIL": "Email",
+      "ROLE": "Função",
+      "STATUS": "Estado",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Utilizador Selecionado:",
+      "CODE": "Código",
+      "USERNAME": "Nome de Utilizador",
+      "EMAIL": "Email",
+      "ROLE": "Função",
+      "STATUS": "Estado",
+      "FIRST_TIME": "Primeira Vez",
+      "YES": "Sim",
+      "NO": "Não"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Utilizador",
+      "CODE": "Código *",
+      "USERNAME": "Nome de Utilizador *",
+      "EMAIL": "Email *",
+      "ROLE": "Função",
+      "STATUS": "Estado",
+      "READONLY": "Campo de leitura apenas"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Utilizador",
+      "CODE": "Código",
+      "EMAIL": "Email",
+      "USERNAME": "Nome de Utilizador",
+      "ROLE": "Função",
+      "STATUS": "Estado"
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar utilizadores...",
+      "ERROR": "Ocorreu um erro.",
+      "SUCCESS": "Operação concluída com sucesso."
+    }
+  },
+  "REPRESENTATIVES": {
+    "TITLE": "Representantes",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Representantes...",
+    "NO_RESULTS": "Nenhum Representante encontrado.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Novo Representante",
+      "EDIT": "Editar Representante",
+      "CANCEL": "Cancelar",
+      "CLOSE": "Fechar",
+      "CREATE": "Criar Representante",
+      "CREATING": "A criar...",
+      "UPDATE": "Atualizar Representante",
+      "UPDATING": "A atualizar...",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Desselecionar",
+      "CLEAN_SEARCH": "Limpar pesquisa"
+    },
+
+    "TABLE": {
+      "NAME": "Nome",
+      "ORGANIZATION": "Organização",
+      "CITIZEN_ID": "Cartão de Cidadão",
+      "NATIONALITY": "Nacionalidade",
+      "EMAIL": "Email",
+      "PHONE": "Telefone",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Representante Selecionado:",
+      "NAME": "Nome",
+      "ORGANIZATION": "Organização",
+      "CITIZEN_ID": "Cartão de Cidadão",
+      "NATIONALITY": "Nacionalidade",
+      "EMAIL": "Email",
+      "PHONE": "Telefone"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Novo Representante",
+      "ORGANIZATION": "Nome da Organização *",
+      "NAME": "Nome *",
+      "CITIZEN_ID": "Cartão de Cidadão *",
+      "NATIONALITY": "Nacionalidade *",
+      "EMAIL": "Email *",
+      "PHONE": "Telefone *",
+      "SELECT_ORGANIZATION": "Selecionar organização",
+      "SELECT_NATIONALITY": "Selecionar nacionalidade"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Representante",
+      "ORGANIZATION": "Nome da Organização *",
+      "NAME": "Nome *",
+      "CITIZEN_ID": "Cartão de Cidadão (Read-only)",
+      "NATIONALITY": "Nacionalidade *",
+      "EMAIL": "Email *",
+      "PHONE": "Telefone *"
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar representantes...",
+      "SUCCESS": "Operação concluída com sucesso.",
+      "ERROR": "Ocorreu um erro."
+    }
+  },
+  "QUALIFICATIONS": {
+    "TITLE": "Qualificações",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Qualificações...",
+    "NO_RESULTS": "Nenhuma Qualificação encontrada.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Nova Qualificação",
+      "EDIT": "Editar Qualificação",
+      "CANCEL": "Cancelar",
+      "CLEAN_SEARCH": "Limpar pesquisa",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Desselecionar",
+      "CREATE": "Criar Qualificação",
+      "CREATING": "A criar...",
+      "UPDATE": "Atualizar Qualificação",
+      "UPDATING": "A atualizar..."
+    },
+
+    "TABLE": {
+      "CODE": "Código",
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Qualificação Selecionada:",
+      "CODE": "Código",
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Nova Qualificação",
+      "CODE": "Código *",
+      "NAME": "Nome *",
+      "DESCRIPTION": "Descrição *",
+      "PLACEHOLDER_CODE": "Introduza o código da Qualificação",
+      "PLACEHOLDER_NAME": "Introduza o nome da Qualificação",
+      "PLACEHOLDER_DESCRIPTION": "Introduza a descrição da Qualificação"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Qualificação",
+      "CODE": "Código (Só leitura)",
+      "NAME": "Nome *",
+      "DESCRIPTION": "Descrição *",
+      "PLACEHOLDER_NAME": "Introduza o nome da Qualificação",
+      "PLACEHOLDER_DESCRIPTION": "Introduza a descrição da Qualificação"
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar Qualificações...",
+      "SUCCESS": "Operação concluída com sucesso.",
+      "ERROR": "Ocorreu um erro."
+    }
+  },
+  "STAFF": {
+    "TITLE": "Colaboradores",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Colaboradores...",
+    "NO_RESULTS": "Nenhum Colaborador encontrado.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Novo Colaborador",
+      "EDIT": "Editar Colaborador",
+      "CANCEL": "Cancelar",
+      "CLEAN_SEARCH": "Limpar pesquisa",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Desselecionar",
+      "CREATE": "Criar Colaborador",
+      "CREATING": "A criar...",
+      "UPDATE": "Atualizar Colaborador",
+      "UPDATING": "A atualizar..."
+    },
+
+    "TABLE": {
+      "NAME": "Nome",
+      "EMAIL": "Email",
+      "QUALIFICATIONS": "Qualificações",
+      "STATUS": "Estado",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Colaborador Selecionado:",
+      "NAME": "Nome",
+      "EMAIL": "Email",
+      "PHONE": "Telefone",
+      "QUALIFICATIONS": "Qualificações",
+      "OPERATIONAL_WINDOW": "Janela Operacional",
+      "STATUS": "Estado"
+    },
+
+    "PLACEHOLDER": {
+      "SELECT_QUALIFICATIONS": "Selecione Qualificações",
+      "N_SELECTED": "{{count}} Qualificações selecionadas"
+    },
+
+    "CREATE_MODEL": {
+      "TITLE": "Criar Novo Colaborador",
+
+      "NAME": "Nome *",
+      "EMAIL": "Email *",
+      "PHONE": "Telefone *",
+
+      "PLACEHOLDER_NAME": "Introduza o nome",
+      "PLACEHOLDER_EMAIL": "Introduza o email",
+      "PLACEHOLDER_PHONE": "Introduza o telefone",
+
+      "QUALIFICATIONS": "Qualificações *",
+      "QUALIFICATIONS_HINT": "Clique para selecionar (seleção múltipla permitida)",
+
+      "OPERATIONAL_WINDOW": {
+        "START_DAY": "Dia Inicial *",
+        "END_DAY": "Dia Final *",
+        "START_TIME": "Hora Inicial *",
+        "END_TIME": "Hora Final *"
+      },
+
+      "STATUS": "Estado *",
+      "STATUS_AVAILABLE": "Disponível",
+      "STATUS_UNAVAILABLE": "Indisponível"
+    },
+
+    "EDIT_MODEL": {
+      "TITLE": "Editar Colaborador",
+
+      "NAME": "Nome *",
+      "EMAIL": "Email *",
+      "PHONE": "Telefone *",
+
+      "QUALIFICATIONS": "Qualificações",
+      "QUALIFICATIONS_HINT": "Clique para selecionar (seleção múltipla permitida)",
+
+      "OPERATIONAL_WINDOW": {
+        "START_DAY": "Dia Inicial",
+        "END_DAY": "Dia Final",
+        "START_TIME": "Hora Inicial",
+        "END_TIME": "Hora Final"
+      },
+
+      "STATUS": "Estado",
+      "STATUS_AVAILABLE": "Disponível",
+      "STATUS_UNAVAILABLE": "Indisponível"
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar Colaboradores...",
+      "SUCCESS": "Operação concluída com sucesso.",
+      "ERROR": "Ocorreu um erro."
+    }
+  },
+  "VESSEL_TYPES": {
+    "TITLE": "Tipos de Embarcação",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar Tipos de Embarcação...",
+    "NO_RESULTS": "Nenhum Tipo de Embarcação encontrado.",
+    "NO_RESULTS_FOR": "Nenhum resultado encontrado para ",
+
+    "BUTTON": {
+      "NEW": "Novo Tipo de Embarcação",
+      "EDIT": "Editar Tipo de Embarcação",
+      "CANCEL": "Cancelar",
+      "CLEAN_SEARCH": "Limpar pesquisa",
+      "SELECT": "Selecionar",
+      "UNSELECT": "Desselecionar",
+      "CREATE": "Criar Tipo de Embarcação",
+      "CREATING": "A criar...",
+      "UPDATE": "Atualizar Tipo de Embarcação",
+      "UPDATING": "A atualizar..."
+    },
+
+    "TABLE": {
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "CAPACITY": "Capacidade",
+      "MAX_ROWS": "Máx. Filas",
+      "MAX_BAYS": "Máx. Baias",
+      "MAX_TIERS": "Máx. Níveis",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Tipo de Embarcação Selecionado:",
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "CAPACITY": "Capacidade",
+      "MAX_ROWS": "Máx. Filas",
+      "MAX_BAYS": "Máx. Baias",
+      "MAX_TIERS": "Máx. Níveis"
+    },
+
+    "CREATE_MODAL": {
+      "TITLE": "Criar Novo Tipo de Embarcação",
+
+      "NAME": "Nome *",
+      "DESCRIPTION": "Descrição *",
+      "CAPACITY": "Capacidade *",
+      "MAX_ROWS": "Máx. Filas *",
+      "MAX_BAYS": "Máx. Baias *",
+      "MAX_TIERS": "Máx. Níveis *",
+
+      "PLACEHOLDER_NAME": "Introduza o nome ",
+      "PLACEHOLDER_DESCRIPTION": "Introduza a descrição ",
+      "PLACEHOLDER_CAPACITY": "Introduza a capacidade",
+      "PLACEHOLDER_MAX_ROWS": "Introduza o número máximo de filas",
+      "PLACEHOLDER_MAX_BAYS": "Introduza o número máximo de baias",
+      "PLACEHOLDER_MAX_TIERS": "Introduza o número máximo de níveis"
+    },
+
+    "EDIT_MODAL": {
+      "TITLE": "Editar Tipo de Embarcação",
+
+      "NAME": "Nome *",
+      "DESCRIPTION": "Descrição *",
+      "CAPACITY": "Capacidade *",
+      "MAX_ROWS": "Máx. Filas *",
+      "MAX_BAYS": "Máx. Baias *",
+      "MAX_TIERS": "Máx. Níveis *",
+
+      "PLACEHOLDER_NAME": "Introduza o nome ",
+      "PLACEHOLDER_DESCRIPTION": "Introduza a descrição",
+      "PLACEHOLDER_CAPACITY": "Introduza a capacidade",
+      "PLACEHOLDER_MAX_ROWS": "Introduza o número máximo de filas",
+      "PLACEHOLDER_MAX_BAYS": "Introduza o número máximo de baias",
+      "PLACEHOLDER_MAX_TIERS": "Introduza o número máximo de níveis"
+    },
+
+    "MESSAGES": {
+      "LOADING": "A carregar Tipos de Embarcação...",
+      "SUCCESS": "Operação concluída com sucesso.",
+      "ERROR": "Ocorreu um erro."
+    }
   }
+
 
 }

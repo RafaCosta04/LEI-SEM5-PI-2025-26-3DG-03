@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { StaffService } from '../../services/staff.service';
 import { StaffModel } from '../../models/staff.model';
@@ -9,7 +10,7 @@ import { QualificationModel } from '../../models/qualification.model';
 
 @Component({
   selector: 'app-staff',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './staff.html',
   styleUrl: './staff.css'
 })
@@ -50,7 +51,7 @@ export class Staff implements OnInit, OnDestroy {
   private searchSubject$ = new Subject<string>();
 
 
-  constructor(private staffService: StaffService, private qualificationService: QualificationService) {}
+  constructor(private staffService: StaffService, private qualificationService: QualificationService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.loadStaffs();
@@ -327,15 +328,17 @@ export class Staff implements OnInit, OnDestroy {
 
 
   getQualificationDisplayNewText(): string {
-    if (!this.selectedQualificationsNew || this.selectedQualificationsNew.length === 0) return 'Select qualifications';
+    const t = this.translate;
+    if (!this.selectedQualificationsNew || this.selectedQualificationsNew.length === 0) return t.instant('STAFF.PLACEHOLDER.SELECT_QUALIFICATIONS');
     if (this.selectedQualificationsNew.length === 1) return this.selectedQualificationsNew[0];
-    return `${this.selectedQualificationsNew.length} qualifications selected`;
+    return t.instant('STAFF.PLACEHOLDER.N_SELECTED', { count: this.selectedQualificationsNew.length });
   }
 
   getQualificationDisplayEditText(): string {
-    if (!this.selectedQualificationsEdit || this.selectedQualificationsEdit.length === 0) return 'Select qualifications';
+    const t = this.translate;
+    if (!this.selectedQualificationsEdit || this.selectedQualificationsEdit.length === 0) return t.instant('STAFF.PLACEHOLDER.SELECT_QUALIFICATIONS');
     if (this.selectedQualificationsEdit.length === 1) return this.selectedQualificationsEdit[0];
-    return `${this.selectedQualificationsEdit.length} qualifications selected`;
+    return t.instant('STAFF.PLACEHOLDER.N_SELECTED', { count: this.selectedQualificationsEdit.length });
   }
 
 

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, timeout } from 'rxjs';
 import { RepresentativeService } from '../../services/representative.service';
@@ -10,7 +11,7 @@ import { ShippingAgentOrganizationWithRepresentativeModel } from '../../models/o
 
 @Component({
   selector: 'app-representative',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './representative.html',
   styleUrl: './representative.css',
 })
