@@ -131,11 +131,14 @@ count_cargo([M|Rest], TypeAtom, Count) :-
     count_cargo(Rest, TypeAtom, OtherCount),
     Count is ThisCount + OtherCount.
 
-% Calcula tempos de carga/descarga
+% Calcula tempos de carga/descarga (mínimo de 1 hora para operações não-zero)
 compute_loading_unloading(NLoading, NUnloading, CraneCapacity, LoadingTime, UnloadingTime) :-
     (CraneCapacity =:= 0 -> EffectiveCap = 1 ; EffectiveCap = CraneCapacity),
-    LoadingTime is NLoading / EffectiveCap,
-    UnloadingTime is NUnloading / EffectiveCap.
+    LoadingTimeRaw is NLoading / EffectiveCap,
+    UnloadingTimeRaw is NUnloading / EffectiveCap,
+    % Se há containers mas o tempo é < 1, usar 1 hora como mínimo
+    (NLoading > 0, LoadingTimeRaw < 1 -> LoadingTime = 1 ; LoadingTime = LoadingTimeRaw),
+    (NUnloading > 0, UnloadingTimeRaw < 1 -> UnloadingTime = 1 ; UnloadingTime = UnloadingTimeRaw).
 
 
 datetime_to_hour(DateTimeStr, HourDecimal) :-

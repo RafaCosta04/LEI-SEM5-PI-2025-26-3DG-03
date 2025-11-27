@@ -7,11 +7,11 @@ vessel(ve, 36, 70, 12, 0).
 vessel(vf, 40, 60, 8, 6).
 vessel(vg, 52, 80, 9, 10).
 vessel(vi, 61, 90, 13, 8).
-%vessel(vj, 74, 100, 7, 7).
-%vessel(vk, 81, 110, 6, 8).
-%vessel(vl, 90, 140, 22, 18).
-%vessel(vm, 112, 140, 8, 7).
-%vessel(vn, 82, 135, 13, 12).
+vessel(vj, 74, 100, 7, 7).
+vessel(vk, 81, 110, 6, 8).
+vessel(vl, 90, 140, 22, 18).
+vessel(vm, 112, 140, 8, 7).
+vessel(vn, 82, 135, 13, 12).
 
 % Safe logging helper: avoid exceptions if user_error/CGI stream is unavailable
 safe_log_improved(Format, Args) :-

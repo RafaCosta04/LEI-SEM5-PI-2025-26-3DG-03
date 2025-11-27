@@ -143,15 +143,15 @@ public class SchedulingService
             {
                 string vesselIMO = item.GetProperty("vessel").GetString() ?? string.Empty;
 
-                // parse start (may be number, string, or array) — extract first integer, supporting nested arrays
-                int startHours;
+                // parse start (may be number, string, or array) — extract first number, supporting nested arrays
+                double startHours;
                 var startEl = item.GetProperty("start");
-                if (!TryExtractFirstInt(startEl, out startHours)) { errorMessages.Add("Invalid 'start' element in schedule entry"); return null; }
+                if (!TryExtractFirstNumber(startEl, out startHours)) { errorMessages.Add("Invalid 'start' element in schedule entry"); return null; }
 
-                // parse end (may be number, string, or array) — extract first integer, supporting nested arrays
-                int endHours;
+                // parse end (may be number, string, or array) — extract first number, supporting nested arrays
+                double endHours;
                 var endEl = item.GetProperty("end");
-                if (!TryExtractFirstInt(endEl, out endHours)) { errorMessages.Add("Invalid 'end' element in schedule entry"); return null; }
+                if (!TryExtractFirstNumber(endEl, out endHours)) { errorMessages.Add("Invalid 'end' element in schedule entry"); return null; }
                 DateTime startTime = targetDay.AddHours(startHours);
                 DateTime endTime = targetDay.AddHours(endHours);
                 string vesselName = GetVesselNameByIMO(vesselIMO).Result;
@@ -187,32 +187,49 @@ public class SchedulingService
         return vesselRecord!.VesselName!;
     }
 
-    // Tries to extract the first integer value from a JsonElement.
+    // Tries to extract the first numeric value (int or double) from a JsonElement.
     // Supports Number, String (parseable), Array (including nested arrays).
-    private bool TryExtractFirstInt(JsonElement el, out int value)
+    // Returns the first number found, even if it's a decimal like 9.6
+    private bool TryExtractFirstNumber(JsonElement el, out double value)
     {
         value = 0;
         try
         {
             if (el.ValueKind == JsonValueKind.Number)
             {
-                value = el.GetInt32();
+                value = el.GetDouble();
                 return true;
             }
             if (el.ValueKind == JsonValueKind.String)
             {
-                if (int.TryParse(el.GetString(), out var v)) { value = v; return true; }
+                if (double.TryParse(el.GetString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v)) 
+                { 
+                    value = v; 
+                    return true; 
+                }
                 return false;
             }
             if (el.ValueKind == JsonValueKind.Array)
             {
                 foreach (var e in el.EnumerateArray())
                 {
-                    if (e.ValueKind == JsonValueKind.Number) { value = e.GetInt32(); return true; }
-                    if (e.ValueKind == JsonValueKind.String && int.TryParse(e.GetString(), out var v2)) { value = v2; return true; }
+                    if (e.ValueKind == JsonValueKind.Number) 
+                    { 
+                        value = e.GetDouble(); 
+                        return true; 
+                    }
+                    if (e.ValueKind == JsonValueKind.String && double.TryParse(e.GetString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v2)) 
+                    { 
+                        value = v2; 
+                        return true; 
+                    }
                     if (e.ValueKind == JsonValueKind.Array)
                     {
-                        if (TryExtractFirstInt(e, out var nested)) { value = nested; return true; }
+                        if (TryExtractFirstNumber(e, out var nested)) 
+                        { 
+                            value = nested; 
+                            return true; 
+                        }
                     }
                 }
             }

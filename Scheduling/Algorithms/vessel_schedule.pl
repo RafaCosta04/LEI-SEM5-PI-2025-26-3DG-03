@@ -231,7 +231,9 @@ sequence_temporization_multi([(V, TIn, _TEnd, _ExecBase)|VTs], [N|NCs], [(V, TIn
     % vessel(Name, TIn, TDep, TUnload, TLoad, MaxC)
     vessel(V, _, _, TUnload, TLoad, _),
     Total is TUnload + TLoad,
-    ExecTime is (Total + N - 1) // N, % ceil division
+    ExecTimeRaw is (Total + N - 1) // N, % ceil division
+    % Garantir que ExecTime seja pelo menos 1 (mínimo de 1 hora de operação)
+    (ExecTimeRaw < 1 -> ExecTime = 1 ; ExecTime = ExecTimeRaw),
     TInUnload is TIn,
     TEndLoad is TInUnload + ExecTime - 1,
     sequence_temporization_multi(VTs, NCs, SeqQuad).
