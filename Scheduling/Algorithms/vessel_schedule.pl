@@ -17,9 +17,9 @@ sequence_temporization1(_, [], []).
 sequence_temporization1(EndPrevSeq, [V|LV], [(V, TInUnload, TEndLoad, ExecTime)|SeqTriplets]) :-
     % vessel(Name, TIn, TDep, TUnload, TLoad, MaxC)
     vessel(V, TIn, _TDep, TUnload, TLoad, _MaxC),
-    (TIn > EndPrevSeq -> TInUnload = TIn ; TInUnload is EndPrevSeq + 1),
+    (TIn > EndPrevSeq -> TInUnload = TIn ; TInUnload is EndPrevSeq),
     ExecTime is TUnload + TLoad,
-    TEndLoad is TInUnload + ExecTime - 1,
+    TEndLoad is TInUnload + ExecTime,
     sequence_temporization1(TEndLoad, LV, SeqTriplets).
 
 % sum_delays/2: calcula o atraso total (soma de atrasos por navio)

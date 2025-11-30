@@ -16,4 +16,20 @@ export class ScheduleService {
       return this.apiService.get<ScheduleModel>(`/Scheduling?targetDay=${encoded}&algorithm=${alg}`);
     }
 
+    getScheduleWithGeneticAlgorithm(
+      targetDay: string,
+      populationSize: number,
+      generations: number,
+      crossoverRate: number,
+      mutationRate: number,
+      desiredTime: number,
+      stableGenerations: number,
+      enableMultiCrane: boolean
+    ): Observable<ScheduleModel> {
+      const encoded = encodeURIComponent(targetDay);
+      return this.apiService.get<ScheduleModel>(
+        `/Scheduling/GeneticAlgorithm?targetDay=${encoded}&populationSize=${populationSize}&generations=${generations}&crossoverRate=${crossoverRate}&mutationRate=${mutationRate}&desiredTime=${desiredTime}&stableGenerations=${stableGenerations}&enableMultiCrane=${enableMultiCrane}`
+      );
+    }
+
 }

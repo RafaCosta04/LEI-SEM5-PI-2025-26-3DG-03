@@ -310,17 +310,34 @@
     },
 
     "ALGORITHM": {
-      "LABEL": "Heuristics Algorithm:",
-      "IMPROVED": "Improved",
-      "STANDARD": "Standard",
-      "STANDARD_D": ""
+      "LABEL": "Algorithm:",
+      "DEFAULT": "Default",
+      "HEURISTIC": "Heuristic",
+      "GENETIC": "Genetic"
+    },
+
+    "GENETIC": {
+      "TITLE": "Genetic Algorithm Parameters",
+      "POPULATION_SIZE": "Population Size",
+      "GENERATIONS": "Number of Generations",
+      "CROSSOVER_RATE": "Crossover Rate (0-1)",
+      "MUTATION_RATE": "Mutation Rate (0-1)",
+      "DESIRED_TIME": "Desired Time (-1 for none)",
+      "STABLE_GENERATIONS": "Stable Generations (0 for none)",
+      "ENABLE_MULTI_CRANE": "Enable Multi-Crane",
+      "ON": "ON",
+      "OFF": "OFF"
     },
 
     "MODAL": {
       "TITLE": "Daily Schedule",
       "NO_ENTRIES": "No schedule entries returned.",
-      "CRANE": "Crane",
+      "VESSEL_OPERATION": "Vessel Operation",
+      "ARRIVAL": "Arrival",
+      "DEPARTURE": "Departure",
+      "CRANE": "Cranes",
       "STAFF": "Staff",
+      "NO_RESOURCES": "No resources assigned",
       "TOTAL_DELAY": "Total delay",
       "EXECUTION_TIME": "Execution time",
       "HOURS": "Hours",

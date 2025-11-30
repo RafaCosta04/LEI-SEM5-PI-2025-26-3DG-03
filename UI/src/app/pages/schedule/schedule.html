@@ -16,17 +16,53 @@
     <div class="schedule-controls">
       <div class="algorithm-select">
         <label class="alg-label">{{ 'SCHEDULE.ALGORITHM.LABEL' | translate }}</label>
-        <div class="toggle-wrap">
-          <label class="switch">
-            <input type="checkbox" [(ngModel)]="isImproved" (ngModelChange)="onToggle($event)" />
-            <span class="slider"></span>
-          </label>
-        </div>
+        <select [(ngModel)]="selectedAlgorithm" (ngModelChange)="onAlgorithmChange($event)" class="algorithm-dropdown">
+          <option value="default">{{ 'SCHEDULE.ALGORITHM.DEFAULT' | translate }}</option>
+          <option value="improved">{{ 'SCHEDULE.ALGORITHM.HEURISTIC' | translate }}</option>
+          <option value="genetic">{{ 'SCHEDULE.ALGORITHM.GENETIC' | translate }}</option>
+        </select>
       </div>
 
       <input id="targetDay" type="datetime-local" [(ngModel)]="targetDayLocal" class="form-input" />
 
       <button class="btn btn-primary" (click)="runSchedule()">{{ 'SCHEDULE.BUTTON.RUN' | translate }}</button>
+    </div>
+  </div>
+
+  <!-- Genetic Algorithm Parameters -->
+  <div *ngIf="showGeneticParams" class="genetic-params" [class.hiding]="geneticParamsHiding">
+    <h3>{{ 'SCHEDULE.GENETIC.TITLE' | translate }}</h3>
+    <div class="params-grid">
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.POPULATION_SIZE' | translate }}</label>
+        <input type="number" [(ngModel)]="populationSize" min="1" class="form-input" />
+      </div>
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.GENERATIONS' | translate }}</label>
+        <input type="number" [(ngModel)]="generations" min="1" class="form-input" />
+      </div>
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.CROSSOVER_RATE' | translate }}</label>
+        <input type="number" [(ngModel)]="crossoverRate" min="0" max="1" step="0.01" class="form-input" />
+      </div>
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.MUTATION_RATE' | translate }}</label>
+        <input type="number" [(ngModel)]="mutationRate" min="0" max="1" step="0.01" class="form-input" />
+      </div>
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.DESIRED_TIME' | translate }}</label>
+        <input type="number" [(ngModel)]="desiredTime" class="form-input" />
+      </div>
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.STABLE_GENERATIONS' | translate }}</label>
+        <input type="number" [(ngModel)]="stableGenerations" min="0" class="form-input" />
+      </div>
+      <div class="param-group">
+        <label>{{ 'SCHEDULE.GENETIC.ENABLE_MULTI_CRANE' | translate }}</label>
+        <div class="toggle-switch" [class.active]="enableMultiCrane" (click)="enableMultiCrane = !enableMultiCrane">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -49,19 +85,71 @@
 
         <div *ngIf="scheduleModel && scheduleModel.scheduleEntries && scheduleModel.scheduleEntries.length > 0">
 
+          <!-- Timeline Header -->
+          <div class="timeline-header">
+            <div class="timeline-legend">
+              <div class="legend-item">
+                <span class="legend-color" style="background: linear-gradient(90deg,#0d6efd,#4dabf7);"></span>
+                <span>{{ 'SCHEDULE.MODAL.VESSEL_OPERATION' | translate }}</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-icon arrival-icon">▼</span>
+                <span>{{ 'SCHEDULE.MODAL.ARRIVAL' | translate }}</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-icon departure-icon">▲</span>
+                <span>{{ 'SCHEDULE.MODAL.DEPARTURE' | translate }}</span>
+              </div>
+            </div>
+          </div>
 
           <div class="timeline-track">
-            <div *ngFor="let entry of scheduleModel.scheduleEntries" class="timeline-row">
-              <div class="timeline-info">
-                <div class="timeline-name">{{ entry.vesselName || '—' }}</div>
-                <div class="timeline-times">{{ formatTimeForDisplay(entry.arrivalTime) }} — {{ formatTimeForDisplay(entry.departureTime) }}</div>
+            <div *ngFor="let entry of scheduleModel.scheduleEntries; let i = index" class="timeline-row">
+              <div class="timeline-vessel-info">
+                <div class="vessel-header">
+                  <span class="vessel-number">#{{ i + 1 }}</span>
+                  <span class="vessel-name">{{ entry.vesselName || '—' }}</span>
+                </div>
+                <div class="vessel-time-details">
+                  <div class="time-detail arrival">
+                    <span class="time-icon arrival-icon">▼</span>
+                    <div>
+                      <div class="time-label">{{ 'SCHEDULE.MODAL.ARRIVAL' | translate }}</div>
+                      <div class="time-value">{{ formatTimeForDisplay(entry.arrivalTime) }}</div>
+                    </div>
+                  </div>
+                  <div class="time-detail departure">
+                    <span class="time-icon departure-icon">▲</span>
+                    <div>
+                      <div class="time-label">{{ 'SCHEDULE.MODAL.DEPARTURE' | translate }}</div>
+                      <div class="time-value">{{ formatTimeForDisplay(entry.departureTime) }}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="timeline-bar-container">
-                <div class="timeline-bar" [ngStyle]="getEntryStyle(entry)"></div>
+              <div class="timeline-visual">
+                <div class="timeline-bar-container">
+                  <div class="timeline-bar" [ngStyle]="getEntryStyle(entry)">
+                    <span class="bar-label">{{ getDuration(entry) }}</span>
+                  </div>
+                </div>
               </div>
-              <div class="timeline-assigned">
-                <div *ngIf="entry.assignedCrane && entry.assignedCrane.length">{{ 'SCHEDULE.MODAL.CRANE' | translate }}: {{ joinAssignedCranes(entry) }}</div>
-                <div *ngIf="entry.assignedStaff && entry.assignedStaff.length">{{ 'SCHEDULE.MODAL.STAFF' | translate }}: {{ joinAssignedStaff(entry) }}</div>
+              <div class="timeline-resources">
+                <div class="resource-section" *ngIf="entry.assignedCrane && entry.assignedCrane.length">
+                  <div class="resource-details">
+                    <div class="resource-label">{{ 'SCHEDULE.MODAL.CRANE' | translate }}</div>
+                    <div class="resource-value">{{ joinAssignedCranes(entry) }}</div>
+                  </div>
+                </div>
+                <div class="resource-section" *ngIf="entry.assignedStaff && entry.assignedStaff.length">
+                  <div class="resource-details">
+                    <div class="resource-label">{{ 'SCHEDULE.MODAL.STAFF' | translate }}</div>
+                    <div class="resource-value">{{ joinAssignedStaff(entry) }}</div>
+                  </div>
+                </div>
+                <div class="no-resources" *ngIf="(!entry.assignedCrane || entry.assignedCrane.length === 0) && (!entry.assignedStaff || entry.assignedStaff.length === 0)">
+                  {{ 'SCHEDULE.MODAL.NO_RESOURCES' | translate }}
+                </div>
               </div>
             </div>
           </div>

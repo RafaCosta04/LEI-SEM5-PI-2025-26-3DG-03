@@ -5,10 +5,13 @@
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_json)).
 :- use_module(library(http/http_parameters)).
+:- use_module('Modules/genetic_controller.pl').
 :- consult('Algorithms/vessel_schedule.pl').
 :- consult('Algorithms/improved_vessel_schedule.pl').
 
+
 :- http_handler(root(api/scheduling/compute), handle_scheduling_request, []).
+:- http_handler(root(api/scheduling/genetic), handle_genetic_request, []).
 
 handle_scheduling_request(Request) :-
     catch(handle_scheduling_request_inner(Request), Error,
@@ -136,9 +139,23 @@ compute_loading_unloading(NLoading, NUnloading, CraneCapacity, LoadingTime, Unlo
     (CraneCapacity =:= 0 -> EffectiveCap = 1 ; EffectiveCap = CraneCapacity),
     LoadingTimeRaw is NLoading / EffectiveCap,
     UnloadingTimeRaw is NUnloading / EffectiveCap,
+
+    (NLoading > 0 ->
+        ceiling(LoadingTimeRaw, LoadingTime1)
+    ;
+        LoadingTime1 = 0
+    ),
+
+    (NUnloading > 0 ->
+        ceiling(UnloadingTimeRaw, UnloadingTime1)
+    ;
+        UnloadingTime1 = 0
+    ),
+
+
     % Se há containers mas o tempo é < 1, usar 1 hora como mínimo
-    (NLoading > 0, LoadingTimeRaw < 1 -> LoadingTime = 1 ; LoadingTime = LoadingTimeRaw),
-    (NUnloading > 0, UnloadingTimeRaw < 1 -> UnloadingTime = 1 ; UnloadingTime = UnloadingTimeRaw).
+    (NLoading > 0, LoadingTime1 < 1 -> LoadingTime = 1 ; LoadingTime = LoadingTime1),
+    (NUnloading > 0, UnloadingTime1 < 1 -> UnloadingTime = 1 ; UnloadingTime = UnloadingTime1).
 
 
 datetime_to_hour(DateTimeStr, HourDecimal) :-

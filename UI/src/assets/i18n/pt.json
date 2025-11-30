@@ -309,16 +309,34 @@
     },
 
     "ALGORITHM": {
-      "LABEL": "Algoritmo Heurístico:",
-      "IMPROVED": "Melhorado",
-      "STANDARD": "Padrão"
+      "LABEL": "Algoritmo:",
+      "DEFAULT": "Padrão",
+      "HEURISTIC": "Heurístico",
+      "GENETIC": "Genético"
+    },
+
+    "GENETIC": {
+      "TITLE": "Parâmetros do Algoritmo Genético",
+      "POPULATION_SIZE": "Tamanho da População",
+      "GENERATIONS": "Número de Gerações",
+      "CROSSOVER_RATE": "Taxa de Crossover (0-1)",
+      "MUTATION_RATE": "Taxa de Mutação (0-1)",
+      "DESIRED_TIME": "Tempo Desejado (-1 para nenhum)",
+      "STABLE_GENERATIONS": "Gerações Estáveis (0 para nenhum)",
+      "ENABLE_MULTI_CRANE": "Ativar Multi-Crane",
+      "ON": "LIGADO",
+      "OFF": "DESLIGADO"
     },
 
     "MODAL": {
       "TITLE": "Agenda Diária",
       "NO_ENTRIES": "Nenhuma entrada de agenda retornada.",
-      "CRANE": "Guindaste",
+      "VESSEL_OPERATION": "Operação do Navio",
+      "ARRIVAL": "Chegada",
+      "DEPARTURE": "Partida",
+      "CRANE": "Guindastes",
       "STAFF": "Equipa",
+      "NO_RESOURCES": "Sem recursos atribuídos",
       "TOTAL_DELAY": "Atraso total",
       "EXECUTION_TIME": "Tempo de execução",
       "HOURS": "Horas",

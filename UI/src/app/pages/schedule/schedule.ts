@@ -25,7 +25,18 @@ import { ScheduleModel, ScheduleEntryModel } from '../../models/schedule.model';
 })
 export class Schedule implements OnInit, OnDestroy {
   isLoading: boolean = false;
-  isImproved: boolean = false;
+  selectedAlgorithm: string = 'default';
+  showGeneticParams: boolean = false;
+  geneticParamsHiding: boolean = false;
+
+  // Genetic algorithm parameters
+  populationSize: number = 10;
+  generations: number = 100;
+  crossoverRate: number = 0.8;
+  mutationRate: number = 0.1;
+  desiredTime: number = -1;
+  stableGenerations: number = 0;
+  enableMultiCrane: boolean = false;
 
   CargoType = CargoType;
   VisitStatus = VisitStatus;
@@ -170,11 +181,27 @@ export class Schedule implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    const algo = this.isImproved ? 'improved' : 'default';
-    this.scheduleService.getScheduleByTargetDay(targetIso, algo)
-      .pipe(takeUntil(this.destroy$))
+    const algo = this.selectedAlgorithm;
+
+    let scheduleObservable: any;
+    if (algo === 'genetic') {
+      scheduleObservable = this.scheduleService.getScheduleWithGeneticAlgorithm(
+        targetIso,
+        this.populationSize,
+        this.generations,
+        this.crossoverRate,
+        this.mutationRate,
+        this.desiredTime,
+        this.stableGenerations,
+        this.enableMultiCrane
+      );
+    } else {
+      scheduleObservable = this.scheduleService.getScheduleByTargetDay(targetIso, algo);
+    }
+
+    scheduleObservable.pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (schedule) => {
+        next: (schedule: any) => {
           const normalized: any = schedule || { entries: [], totalDelay: 0 };
 
           const rawEntries = normalized.entries || normalized.scheduleEntries || normalized.schedule?.schedule || [];
@@ -189,7 +216,8 @@ export class Schedule implements OnInit, OnDestroy {
           const totalDelay = normalized.totalDelay ?? normalized.TotalDelay ?? normalized.schedule?.totalDelay ?? 0;
           const executionTime = normalized.executionTime ?? normalized.ExecutionTime ?? normalized.schedule?.executionTime ?? 0;
           const messages = normalized.messages ?? normalized.Messages ?? normalized.schedule?.messages ?? [];
-          const algorithmLabel = this.isImproved ? 'Improved algorithm' : 'Default algorithm';
+          const algorithmLabel = this.selectedAlgorithm === 'improved' ? 'Heuristic algorithm' :
+                                 this.selectedAlgorithm === 'genetic' ? 'Genetic algorithm' : 'Default algorithm';
 
           if (!entries || entries.length === 0) {
             // No vessels for selected day -> show auto-hiding error similar to Qualifications page
@@ -207,7 +235,7 @@ export class Schedule implements OnInit, OnDestroy {
           this.showScheduleModal = true;
           this.isLoading = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           // Try to extract a useful message from the controller/backend
           let msg = 'Error running schedule';
           try {
@@ -237,8 +265,20 @@ export class Schedule implements OnInit, OnDestroy {
       });
   }
 
-  onToggle(value: boolean) {
-    this.isImproved = !!value;
+  onAlgorithmChange(value: string) {
+    if (value === 'genetic' && !this.showGeneticParams) {
+      // Mostrar parâmetros genéticos
+      this.showGeneticParams = true;
+      this.geneticParamsHiding = false;
+    } else if (value !== 'genetic' && this.showGeneticParams) {
+      // Esconder com animação
+      this.geneticParamsHiding = true;
+      setTimeout(() => {
+        this.showGeneticParams = false;
+        this.geneticParamsHiding = false;
+      }, 300); // Tempo da animação
+    }
+    this.selectedAlgorithm = value;
   }
 
   closeSchedule() {
@@ -310,6 +350,18 @@ export class Schedule implements OnInit, OnDestroy {
       })
       .filter((n: string) => !!n)
       .join(', ');
+  }
+
+  getDuration(entry: ScheduleEntryModel): string {
+    if (!entry.arrivalTime || !entry.departureTime) return '';
+    const start = new Date(entry.arrivalTime).getTime();
+    const end = new Date(entry.departureTime).getTime();
+    const diffMs = end - start;
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 0 && minutes > 0) return `${hours}h ${minutes}m`;
+    if (hours > 0) return `${hours}h`;
+    return `${minutes}m`;
   }
 
 
