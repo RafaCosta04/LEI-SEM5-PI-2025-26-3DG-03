@@ -1,0 +1,6 @@
+@OEM_HostAddress = http://localhost:5252
+
+GET {{OEM_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
