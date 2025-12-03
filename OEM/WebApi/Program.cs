@@ -16,7 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 // ----------------------
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
-        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    {
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 
 
@@ -59,6 +62,9 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowSpecificOrigin");
+
+// Seed inicial da base de dados
+// WebApi.Helpers.Utilities.InitializeDatabase(app); // Comentado para evitar conflitos nos testes
 
 // ----------------------
 //     Routing

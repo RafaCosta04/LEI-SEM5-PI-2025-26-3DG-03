@@ -27,7 +27,7 @@ public class IncidentTypeController : ControllerBase
         return Ok(incidentTypes);
     }
 
-    [HttpGet("/ById/{id}")]
+    [HttpGet("ById/{id}")]
     public async Task<ActionResult<IncidentTypeDTO>> GetIncidentTypeById(long id)
     {
         IncidentTypeDTO? incidentType = await _incidentTypeService.GetIncidentTypeByIdAsync(id);
@@ -38,7 +38,7 @@ public class IncidentTypeController : ControllerBase
         return Ok(incidentType);
     }
 
-    [HttpGet("/ByCode/{code}")]
+    [HttpGet("ByCode/{code}")]
     public async Task<ActionResult<IncidentTypeDTO>> GetIncidentTypeByCode(string code)
     {
         IncidentTypeDTO? incidentType = await _incidentTypeService.GetIncidentTypeByCodeAsync(code);
@@ -49,14 +49,14 @@ public class IncidentTypeController : ControllerBase
         return Ok(incidentType);
     }
 
-    [HttpGet("/ByClassification/{classification}")]
+    [HttpGet("ByClassification/{classification}")]
     public async Task<ActionResult<IEnumerable<IncidentTypeDTO>>> GetIncidentTypesByClassification(string classification)
     {
         IEnumerable<IncidentTypeDTO> incidentTypes = await _incidentTypeService.GetIncidentTypesByClassificationAsync(Enum.Parse<Domain.Model.IncidentClassification>(classification));
         return Ok(incidentTypes);
     }
 
-    [HttpGet("/ByParent/{code}")]
+    [HttpGet("ByParent/{code}")]
     public async Task<ActionResult<IEnumerable<IncidentTypeDTO>>> GetIncidentTypesByParent(string code)
     {
         IEnumerable<IncidentTypeDTO> incidentTypes = await _incidentTypeService.GetIncidentTypesByParentAsync(code);
