@@ -9,14 +9,14 @@ public class OperationPlan
 
     public List<OperationEntry>? OperationList { get; private set; }
 
-    public DateTime? TargetDay { get; private set; }
+    public DateTime TargetDay { get; private set; }
 
     public string? Author { get; private set; }
 
     public string? Algorithm { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
-    public DateTime LastModifiedAt { get; private set; } 
+    public DateTime LastModifiedAt { get; set; } 
 
 
     private OperationPlan() { }

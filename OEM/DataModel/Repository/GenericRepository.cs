@@ -7,8 +7,8 @@ namespace DataModel.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly DbContext _context;
-        public GenericRepository(DbContext context)
+        protected readonly OEMContext _context;
+        public GenericRepository(OEMContext context)
         {
             _context = context;
         }

@@ -4,7 +4,7 @@ using Domain.Model;
 
 public interface IOperationPlanRepository : IGenericRepository<OperationPlan>
 {
-    Task<IEnumerable<OperationPlan>> GetOperationPlansAsync();
+    Task<IEnumerable<OperationPlan>> GetAllOperationPlansAsync();
 
     Task<OperationPlan?> GetOperationPlanByIdAsync(long id);
 

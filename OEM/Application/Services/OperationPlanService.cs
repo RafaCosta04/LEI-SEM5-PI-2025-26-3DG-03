@@ -21,7 +21,7 @@ public class OperationPlanService
 
     public async Task<IEnumerable<OperationPlanDTO>> GetAllOperationPlans()
     {
-        IEnumerable<OperationPlan> operationPlans = await _operationPlanRepository.GetOperationPlansAsync();
+        IEnumerable<OperationPlan> operationPlans = await _operationPlanRepository.GetAllOperationPlansAsync();
         IEnumerable<OperationPlanDTO> operationPlanDTOs = OperationPlanDTO.ToDTO(operationPlans);
         return operationPlanDTOs;
     }

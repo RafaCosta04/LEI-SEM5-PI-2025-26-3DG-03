@@ -34,7 +34,7 @@ public class OperationPlanDTO
     {
         try
         {
-            OperationPlanDTO operationPlanDTO = new OperationPlanDTO(operationPlan.Id, operationPlan.OperationList!, operationPlan.TargetDay!.Value, operationPlan.Author!, operationPlan.Algorithm!, operationPlan.CreatedAt);
+            OperationPlanDTO operationPlanDTO = new OperationPlanDTO(operationPlan.Id, operationPlan.OperationList!, operationPlan.TargetDay!, operationPlan.Author!, operationPlan.Algorithm!, operationPlan.CreatedAt);
             operationPlanDTO.LastModifiedAt = operationPlan.LastModifiedAt;
             return operationPlanDTO;
         }
