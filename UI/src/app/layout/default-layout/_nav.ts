@@ -109,6 +109,12 @@ export const navItems: IExtendedNavData[] = [
     roles: ['Admin', 'LogisticOperator']
   },
   {
+    name: 'NAV.REBALANCING',
+    url: '/rebalancing',
+    icon: 'nav-img nav-img-schedule',
+    roles: ['Admin', 'PortAuthorityOfficer']
+  },
+  {
     name: 'NAV.SYSTEM_USER',
     url: '/user',
     icon: 'nav-img nav-img-systemuser',

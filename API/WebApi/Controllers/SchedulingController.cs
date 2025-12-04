@@ -63,5 +63,23 @@ public class SchedulingController : ControllerBase
         return Ok(notifications);
     }
 
-
+    [HttpGet("RebalancingAlgorithm")]
+    public async Task<ActionResult<RebalancingDTO>> GetDocksAssingedWithRebalancingAlgorithm(DateTime targetDay, DateTime endDay)
+    {
+        RebalancingDTO? notifications = await _schedulingService.GetSchedulingWithRebalancingAlgorithm(targetDay, endDay, _errorMessages);
+        if (_errorMessages.Count > 0)
+        {
+            var msg = string.Join("; ", _errorMessages);
+            if (_errorMessages.Any(m => m.Contains("No vessel visit notifications found", StringComparison.OrdinalIgnoreCase)))
+            {
+                return NotFound(new { message = "Vessel Visit Notification not found" });
+            }
+            if (_errorMessages.Any(m => m.Contains("No available STS Crane found", StringComparison.OrdinalIgnoreCase)))
+            {
+                return Conflict(new { message = msg });
+            }
+            return BadRequest(new { message = msg });
+        }
+        return Ok(notifications);
+    }
 }

@@ -1,0 +1,139 @@
+<div class="page-container">
+  <h1 class="page-title">Rebalancing</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search for Vessel Visit Notifications..."
+        class="search-input"
+      />
+      <button *ngIf="searchTerm" (click)="clearSearchAndNotify()" class="clear-button">✕</button>
+    </div>
+
+    <div class="schedule-controls">
+      <!-- removed algorithm selector and date input for simplified page -->
+      <button class="btn btn-primary" (click)="openRebalancing()">Rebalance</button>
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <!-- Rebalancing modal is reused from schedule component logic -->
+  <div *ngIf="showRebalanceModal" class="modal-overlay">
+    <div class="modal-content medium-modal">
+      <div class="modal-header">
+        <h2>Rebalance Schedule</h2>
+        <div class="header-controls">
+          <button *ngIf="!rebalancingShowResults" class="close-button" (click)="closeRebalancing()">✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="!rebalancingShowResults">
+          <div class="form-row" style="display:flex; gap:12px;">
+            <div style="flex:1">
+              <label>Target Day</label>
+              <input type="datetime-local" [(ngModel)]="rebalancingTargetDayLocal" class="form-input" />
+            </div>
+            <div style="flex:1">
+              <label>End Day</label>
+              <input type="datetime-local" [(ngModel)]="rebalancingEndDayLocal" class="form-input" />
+            </div>
+          </div>
+          <div *ngIf="rebalancingLoading">Generating rebalancing...</div>
+          <div *ngIf="rebalancingError" class="error-message">{{ rebalancingError }}</div>
+        </div>
+
+        
+          <div *ngIf="rebalancingShowResults" class="results-vertical">
+            <div class="results-column initial">
+              <h3>Initial Assignments</h3>
+              <div *ngIf="rebalancingResult?.initialEntries && rebalancingResult.initialEntries.length > 0; else noInitial2">
+                <div *ngFor="let e of rebalancingResult.initialEntries" class="rebalance-dock" style="margin-bottom:12px;">
+                  <h4>{{ e.dockName }} <small>(Cranes: {{ e.numberOfCranes }}, Capacity: {{ e.operationalCapacity }})</small></h4>
+                  <div class="timeline-bar-container">
+                    <div *ngFor="let vt of e.vesselTimes"
+                         class="timeline-bar blue"
+                         [ngStyle]="getDockBarStyle(vt)"
+                         [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure)">
+                      <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noInitial2><p>No initial entries returned.</p></ng-template>
+            </div>
+
+            <div class="results-column rebalanced">
+              <h3>Rebalanced Assignments</h3>
+              <div *ngIf="rebalancingResult?.rebalancedEntries && rebalancingResult.rebalancedEntries.length > 0; else noRebalanced2">
+                <div *ngFor="let e of rebalancingResult.rebalancedEntries" class="rebalance-dock" style="margin-bottom:12px;">
+                  <h4>{{ e.dockName }} <small>(Cranes: {{ e.numberOfCranes }}, Capacity: {{ e.operationalCapacity }})</small></h4>
+                  <div class="timeline-bar-container">
+                    <div *ngFor="let vt of e.vesselTimes"
+                         class="timeline-bar green"
+                         [ngStyle]="getDockBarStyle(vt)"
+                         [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure)">
+                      <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noRebalanced2><p>No rebalanced entries returned.</p></ng-template>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <ng-container *ngIf="!rebalancingShowResults">
+          <div class="single-center">
+            <button type="button" class="btn btn-primary generate-centered" (click)="submitRebalancing()" [disabled]="rebalancingLoading">Generate</button>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="rebalancingShowResults">
+          <div class="two-buttons">
+            <button class="btn btn-success" (click)="acceptRebalancing()">Accept</button>
+            <button class="btn btn-danger" (click)="rejectRebalancing()">Reject</button>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading...</div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>IMO</th>
+          <th>Representative</th>
+          <th>ETA</th>
+          <th>ETD</th>
+          <th>Cargo Type</th>
+          <th>Volume</th>
+          <th>Status</th>
+          <th>Crew</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let notification of filteredNotifications">
+          <td>{{ notification.code }}</td>
+          <td>{{ notification.vesselIMO }}</td>
+          <td>{{ notification.representativeCitizenID }}</td>
+          <td>{{ formatDateForDisplay(notification.eta) }}</td>
+          <td>{{ formatDateForDisplay(notification.etd) }}</td>
+          <td>{{ notification.cargoType }}</td>
+          <td>{{ notification.volume }}</td>
+          <td>{{ notification.visitStatus }}</td>
+          <td>{{ notification.numberOfCrewMembers }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

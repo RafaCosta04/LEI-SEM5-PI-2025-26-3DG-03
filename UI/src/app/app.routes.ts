@@ -78,6 +78,11 @@ export const routes: Routes = [
         loadChildren: () => import('./routing/schedule.routes').then((m) => m.routes)
       },
       {
+        path: 'rebalancing',
+        data: { title: 'Rebalancing', breadcrumb: 'Rebalancing' },
+        loadChildren: () => import('./routing/rebalancing.routes').then((m) => m.routes)
+      },
+      {
         path: 'user',
         data: { title: 'System User', breadcrumb: 'System User'},
         loadChildren: () => import('./routing/systemUser.routes').then((m) => m.routes)

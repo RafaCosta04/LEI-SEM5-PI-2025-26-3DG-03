@@ -6,6 +6,7 @@
 :- use_module(library(http/http_json)).
 :- use_module(library(http/http_parameters)).
 :- use_module('Modules/genetic_controller.pl').
+:- use_module('Modules/rebalancing_controller.pl').
 :- consult('Algorithms/vessel_schedule.pl').
 :- consult('Algorithms/improved_vessel_schedule.pl').
 
