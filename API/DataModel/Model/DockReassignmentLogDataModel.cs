@@ -13,7 +13,7 @@ public class DockReassignmentLogDataModel
     public DockDataModel? OriginalDock { get; set; } = null;
 
     public DockDataModel UpdatedDock { get; set; } = null!;
-    
+
     public long VesselVisitNotificationId { get; set; }
 
     public VesselVisitNotificationDataModel? VesselVisitNotification { get; set; }

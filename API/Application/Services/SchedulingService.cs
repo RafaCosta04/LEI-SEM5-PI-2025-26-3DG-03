@@ -255,7 +255,7 @@ public class SchedulingService
                 int operationalCapacity = dockDto.MedianOperationalCapacity;
                 double meanOpCap = GetAverageOperationalCapacity(resourcesForDock);
                 double effectiveCap = meanOpCap > 0 ? meanOpCap : (operationalCapacity > 0 ? operationalCapacity : 1.0);
-                if (effectiveCap <= 0) effectiveCap = 1.0; 
+                if (effectiveCap <= 0) effectiveCap = 1.0;
 
                 foreach (var n in assignedNotifications)
                 {
@@ -279,14 +279,14 @@ public class SchedulingService
                         totalContainers = 0;
                     }
 
-                        if (totalContainers <= 0)
-                        {
-                            // fallback: estimate containers equal to one hour of capacity
-                            totalContainers = (int)Math.Max(1, Math.Ceiling(effectiveCap));
-                        }
+                    if (totalContainers <= 0)
+                    {
+                        // fallback: estimate containers equal to one hour of capacity
+                        totalContainers = (int)Math.Max(1, Math.Ceiling(effectiveCap));
+                    }
 
-                        // duration in hours using mean operational capacity (containers per hour)
-                        double durationHours = Math.Ceiling(totalContainers / effectiveCap);
+                    // duration in hours using mean operational capacity (containers per hour)
+                    double durationHours = Math.Ceiling(totalContainers / effectiveCap);
                     if (durationHours < 1) durationHours = 1; // minimum 1 hour
 
                     DateTime adjustedArrival = eta;

@@ -40,7 +40,7 @@ namespace Domain.Tests
                 1000,
                 CreateValidCrew(),
                 10,
-                new List<DockReassignmentLog>() 
+                new List<DockReassignmentLog>()
             );
 
             Assert.Equal("2025-PA-000001", vvn.Code);
