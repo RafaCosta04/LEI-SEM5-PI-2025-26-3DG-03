@@ -28,6 +28,9 @@ public class VesselVisitNotificationDTO
 
     public int NumberOfCrewMembers { get; set; }
 
+    public DockDTO? AssignedDock { get; set; } = null;
+    public List<DockReassignmentLogDTO> DockReassignmentLogs { get; set; } = new List<DockReassignmentLogDTO>();
+
 
     private VesselVisitNotificationDTO() { }
 
@@ -80,6 +83,16 @@ public class VesselVisitNotificationDTO
             ).ToList();
             VesselVisitNotificationDTO vesselVisitNotificationDTO = new VesselVisitNotificationDTO(vesselVisitNotification.Id, vesselVisitNotification.Code, vesselVisitNotification.Vessel.IMONumber!, vesselVisitNotification.Representative.CitizenId!, vesselVisitNotification.ETA, vesselVisitNotification.ETD, cargoManifestDTOs, vesselVisitNotification.CargoType, vesselVisitNotification.Volume, crewMemberDTOs, vesselVisitNotification.VisitStatus, vesselVisitNotification.NumberOfCrewMembers);
             vesselVisitNotificationDTO.LastModifiedAt = vesselVisitNotification.LastModifiedAt;
+
+            if (vesselVisitNotification.AssignedDock != null)
+            {
+                vesselVisitNotificationDTO.AssignedDock = DockDTO.ToDTO(vesselVisitNotification.AssignedDock);
+            }
+
+            if (vesselVisitNotification.DockReassignmentLogs != null && vesselVisitNotification.DockReassignmentLogs.Count > 0)
+            {
+                vesselVisitNotificationDTO.DockReassignmentLogs = DockReassignmentLogDTO.ToDTO(vesselVisitNotification.DockReassignmentLogs).ToList();
+            }
             return vesselVisitNotificationDTO;
         }
         catch (ArgumentOutOfRangeException ex)

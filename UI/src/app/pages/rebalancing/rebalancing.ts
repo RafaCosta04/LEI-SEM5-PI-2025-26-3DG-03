@@ -129,16 +129,103 @@ export class Rebalancing implements OnInit, OnDestroy {
   }
 
   acceptRebalancing() {
-    this.showRebalanceModal = false;
-    this.rebalancingShowResults = false;
-    this.rebalancingLoading = false;
+    if (!this.rebalancingResult) {
+      this.rebalancingError = 'No rebalancing result to accept.';
+      return;
+    }
+    if (!this.rebalancingTargetDayLocal || !this.rebalancingEndDayLocal) {
+      this.rebalancingError = 'Missing target or end day.';
+      return;
+    }
+    let targetIso: string;
+    let endIso: string;
+    try {
+      targetIso = new Date(this.rebalancingTargetDayLocal).toISOString();
+      endIso = new Date(this.rebalancingEndDayLocal).toISOString();
+    } catch (e) {
+      this.rebalancingError = 'Invalid date format.';
+      return;
+    }
+
+    this.rebalancingLoading = true;
     this.rebalancingError = '';
-    this.rebalancingResult = null;
+    const backendBase = this.apiService.getBaseUrl();
+    const url = `${backendBase}/Scheduling/Rebalancing/Apply?targetDay=${encodeURIComponent(targetIso)}&endDay=${encodeURIComponent(endIso)}`;
+
+    // POST the rebalancing DTO returned by the backend earlier
+    this.http.post(url, this.rebalancingResult).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.rebalancingLoading = false;
+        this.rebalancingShowResults = false;
+        this.showRebalanceModal = false;
+        this.rebalancingResult = null;
+        this.statusMessageType = 'success';
+        this.statusMessage = (res && res.message) ? res.message : 'Rebalancing applied successfully.';
+        this.statusHiding = false;
+        // Refresh notifications to reflect new assignments
+        this.loadVesselVisitNotifications();
+        if (this.statusTimeout) { clearTimeout(this.statusTimeout); }
+        this.statusTimeout = setTimeout(() => this.clearStatusMessage(), 3000);
+      },
+      error: (err: any) => {
+        this.rebalancingLoading = false;
+        let serverMsg = 'Unknown error';
+        try {
+          if (err && err.error) {
+            if (typeof err.error === 'string') serverMsg = err.error;
+            else if (err.error.message) serverMsg = err.error.message;
+            else serverMsg = JSON.stringify(err.error);
+          } else if (err && err.message) {
+            serverMsg = err.message;
+          } else if (err && err.status) {
+            serverMsg = `${err.status} ${err.statusText || ''}`.trim();
+          }
+        } catch (e) {
+          serverMsg = 'Failed to parse error response';
+        }
+        this.rebalancingError = `Failed to apply rebalancing: ${serverMsg}`;
+        console.error('Apply rebalancing error', err);
+      }
+    });
   }
 
   rejectRebalancing() {
-    this.rebalancingShowResults = false;
+    this.rebalancingLoading = true;
     this.rebalancingError = '';
+    const backendBase = this.apiService.getBaseUrl();
+    const url = `${backendBase}/Scheduling/Rebalancing/Reject`;
+    this.http.post(url, {}).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.rebalancingLoading = false;
+        this.rebalancingShowResults = false;
+        this.showRebalanceModal = false;
+        this.rebalancingResult = null;
+        this.statusMessageType = 'success';
+        this.statusMessage = (res && res.message) ? res.message : 'Rebalancing rejected.';
+        this.statusHiding = false;
+        if (this.statusTimeout) { clearTimeout(this.statusTimeout); }
+        this.statusTimeout = setTimeout(() => this.clearStatusMessage(), 3000);
+      },
+      error: (err: any) => {
+        this.rebalancingLoading = false;
+        let serverMsg = 'Unknown error';
+        try {
+          if (err && err.error) {
+            if (typeof err.error === 'string') serverMsg = err.error;
+            else if (err.error.message) serverMsg = err.error.message;
+            else serverMsg = JSON.stringify(err.error);
+          } else if (err && err.message) {
+            serverMsg = err.message;
+          } else if (err && err.status) {
+            serverMsg = `${err.status} ${err.statusText || ''}`.trim();
+          }
+        } catch (e) {
+          serverMsg = 'Failed to parse error response';
+        }
+        this.rebalancingError = `Failed to reject rebalancing: ${serverMsg}`;
+        console.error('Reject rebalancing error', err);
+      }
+    });
   }
 
   ngOnInit() {

@@ -4,6 +4,7 @@ using DataModel.Model;
 
 using Domain.Model;
 using Domain.Factory;
+using System.Linq;
 using DataModel.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,14 +18,16 @@ public class VesselVisitNotificationMapper
 
     private readonly VesselRecordMapper _vesselRecordMapper;
     private readonly StorageAreaMapper _storageAreaMapper;
+    private readonly DockReassignmentLogMapper _dockReassignmentLogMapper;
 
-    public VesselVisitNotificationMapper(IVesselVisitNotificationFactory vesselVisitNotificationFactory, RepresentativeMapper representativeMapper, DockMapper dockMapper, VesselRecordMapper vesselRecordMapper, StorageAreaMapper storageAreaMapper)
+    public VesselVisitNotificationMapper(IVesselVisitNotificationFactory vesselVisitNotificationFactory, RepresentativeMapper representativeMapper, DockMapper dockMapper, VesselRecordMapper vesselRecordMapper, StorageAreaMapper storageAreaMapper, DockReassignmentLogMapper dockReassignmentLogMapper)
     {
         _vesselVisitNotificationFactory = vesselVisitNotificationFactory;
         _representativeMapper = representativeMapper;
         _dockMapper = dockMapper;
         _vesselRecordMapper = vesselRecordMapper;
         _storageAreaMapper = storageAreaMapper;
+        _dockReassignmentLogMapper = dockReassignmentLogMapper;
     }
 
     public VesselVisitNotification ToDomain(VesselVisitNotificationDataModel vesselVisitDM)
@@ -42,6 +45,15 @@ public class VesselVisitNotificationMapper
             }
         }
 
+        List<DockReassignmentLog>? dockReassignmentLogs = null;
+        if (vesselVisitDM.DockReassignmentLogs != null && vesselVisitDM.DockReassignmentLogs.Count > 0)
+        {
+            dockReassignmentLogs = vesselVisitDM.DockReassignmentLogs
+                .Where(l => l != null)
+                .Select(l => _dockReassignmentLogMapper.ToDomain(l))
+                .ToList();
+        }
+
         VesselVisitNotification vesselVisitDomain = _vesselVisitNotificationFactory.NewVesselVisitNotification(
             vesselVisitDM.Code!,
             _vesselRecordMapper.ToDomain(vesselVisitDM.Vessel),
@@ -50,9 +62,10 @@ public class VesselVisitNotificationMapper
             vesselVisitDM.ETD!,
             cargoManifests,
             Enum.Parse<CargoType>(vesselVisitDM.CargoType!),
-            vesselVisitDM.Volume
-            , crewMembers,
-            vesselVisitDM.NumberOfCrewMembers
+            vesselVisitDM.Volume,
+            crewMembers,
+            vesselVisitDM.NumberOfCrewMembers,
+            dockReassignmentLogs
         );
         vesselVisitDomain.Id = vesselVisitDM.Id;
         vesselVisitDomain.LastModifiedAt = vesselVisitDM.LastModifiedAt;
@@ -155,6 +168,28 @@ public class VesselVisitNotificationMapper
                 }
             }
             dm.CargoManifests.Add(cmDM);
+        }
+        dm.DockReassignmentLogs!.Clear();
+        if (domain.DockReassignmentLogs != null)
+        {
+            foreach (var log in domain.DockReassignmentLogs)
+            {
+                var logDM = new DockReassignmentLogDataModel(log);
+                // resolve dock references from DB so EF tracks them correctly
+                if (log.OriginalDock != null)
+                {
+                    var originalDockDM = await context.Set<DockDataModel>().FindAsync(log.OriginalDock.Id) as DockDataModel;
+                    logDM.OriginalDock = originalDockDM;
+                }
+                if (log.UpdatedDock != null)
+                {
+                    var updatedDockDM = await context.Set<DockDataModel>().FindAsync(log.UpdatedDock.Id) as DockDataModel;
+                    logDM.UpdatedDock = updatedDockDM!;
+                }
+                // set back-reference
+                logDM.VesselVisitNotification = dm;
+                dm.DockReassignmentLogs.Add(logDM);
+            }
         }
     }
 

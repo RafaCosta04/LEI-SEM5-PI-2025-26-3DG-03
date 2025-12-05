@@ -56,11 +56,12 @@ public class VesselVisitNotification
 
     public DateTime LastModifiedAt { get; set; }
 
+    public List<DockReassignmentLog> DockReassignmentLogs { get; private set; } = new List<DockReassignmentLog>();
 
     private VesselVisitNotification() { }
 
 
-    public VesselVisitNotification(string code, VesselRecord vessel, Representative representative, DateTime eta, DateTime etd, List<CargoManifest> cargoManifests, CargoType cargoType, double volume, List<CrewMember> crewMembers, int numberOfCrewMembers)
+    public VesselVisitNotification(string code, VesselRecord vessel, Representative representative, DateTime eta, DateTime etd, List<CargoManifest> cargoManifests, CargoType cargoType, double volume, List<CrewMember> crewMembers, int numberOfCrewMembers, List<DockReassignmentLog>? dockReassignmentLogs)
     {
         CargoType = cargoType;
         ValidateCode(code);
@@ -84,6 +85,17 @@ public class VesselVisitNotification
         LastModifiedAt = DateTime.UtcNow;
         VisitStatus = VisitStatus.InProgress;
         NumberOfCrewMembers = numberOfCrewMembers;
+        DockReassignmentLogs = dockReassignmentLogs ?? new List<DockReassignmentLog>();
+    }
+
+    public void AddDockReassignmentLog(DockReassignmentLog log)
+    {
+        if (log == null)
+        {
+            throw new ArgumentNullException(nameof(log), "DockReassignmentLog cannot be null.");
+        }
+        DockReassignmentLogs.Add(log);
+        LastModifiedAt = DateTime.UtcNow;
     }
 
     public void AssignDock(Dock dock)

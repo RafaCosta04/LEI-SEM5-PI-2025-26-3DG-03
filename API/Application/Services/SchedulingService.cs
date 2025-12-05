@@ -85,8 +85,9 @@ public class SchedulingService
                             && p.Status == ResourceStatus.Available)
                 .ToList();
 
-            int median = GetMedianOperationalCapacity(resourcesForDock);
-            docksDto.Add(new DockRebalancingDTO(dockName, median));
+            double avgCap = GetAverageOperationalCapacity(resourcesForDock);
+            int avgCapInt = avgCap > 0 ? (int)Math.Round(avgCap) : 0;
+            docksDto.Add(new DockRebalancingDTO(dockName, avgCapInt));
         }
 
         var dataRebalancing = new DataRebalancingDTO(notificationDTOs, docksDto);
@@ -121,8 +122,6 @@ public class SchedulingService
             var doc = JsonDocument.Parse(responseJson);
             var rootEl = doc.RootElement;
 
-            // New minimal shape: { status: "ok", assignments: [ { vessel, dock, actualDeparture, actualArrival }, ... ] }
-            // Legacy shapes: { schedule: [...] } or { schedule: { schedule: [...], executionTime: N, totalDelay: M } }
             JsonElement scheduleArrayEl;
             double executionTime = 0.0;
             int totalDelay = 0;
@@ -207,8 +206,21 @@ public class SchedulingService
                     else actualDepartureStr = adEl.ToString();
                 }
 
+                int delayInt = 0;
+                if (item.TryGetProperty("delay", out var delayEl))
+                {
+                    if (delayEl.ValueKind == JsonValueKind.Number)
+                    {
+                        if (TryExtractFirstNumber(delayEl, out double dval)) delayInt = (int)Math.Round(dval);
+                    }
+                    else if (delayEl.ValueKind == JsonValueKind.String)
+                    {
+                        if (int.TryParse(delayEl.GetString(), out var di)) delayInt = di;
+                    }
+                }
+
                 string vesselName = await GetVesselNameByIMO(vesselIMO);
-                var vt = new VesselTimeDTO(vesselName, actualArrivalStr, actualDepartureStr);
+                var vt = new VesselTimeDTO(vesselName, actualArrivalStr, actualDepartureStr, delayInt);
                 if (!rebalancedMap.ContainsKey(dockName)) rebalancedMap[dockName] = new List<VesselTimeDTO>();
                 rebalancedMap[dockName].Add(vt);
             }
@@ -231,22 +243,49 @@ public class SchedulingService
                     .ToList();
                 int numberOfCranes = resourcesForDock.Count;
 
-                // initial entries: from filteredNotifications (domain objects)
                 var initialVesselTimes = new List<VesselTimeDTO>();
                 var assignedNotifications = filteredNotifications
                     .Where(n => n.AssignedDock != null && string.Equals((n.AssignedDock.Name ?? string.Empty).Trim(), dockName.Trim(), System.StringComparison.OrdinalIgnoreCase))
                     .OrderBy(n => n.ETA)
                     .ToList();
+
                 DateTime lastDeparture = DateTime.MinValue;
+                int operationalCapacity = dockDto.MedianOperationalCapacity;
+                double meanOpCap = GetAverageOperationalCapacity(resourcesForDock);
+                double effectiveCap = meanOpCap > 0 ? meanOpCap : (operationalCapacity > 0 ? operationalCapacity : 1.0);
+                if (effectiveCap <= 0) effectiveCap = 1.0; 
+
                 foreach (var n in assignedNotifications)
                 {
                     string vesselImo = n.Vessel?.IMONumber ?? string.Empty;
                     string vesselName = await GetVesselNameByIMO(vesselImo);
 
                     DateTime eta = n.ETA;
-                    DateTime etd = n.ETD;
+                    int totalContainers = 0;
+                    try
+                    {
+                        if (n.CargoManifests != null)
+                        {
+                            foreach (var cm in n.CargoManifests)
+                            {
+                                totalContainers += cm.Entries?.Count ?? 0;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        totalContainers = 0;
+                    }
 
-                    TimeSpan duration = etd > eta ? (etd - eta) : TimeSpan.FromHours(1);
+                        if (totalContainers <= 0)
+                        {
+                            // fallback: estimate containers equal to one hour of capacity
+                            totalContainers = (int)Math.Max(1, Math.Ceiling(effectiveCap));
+                        }
+
+                        // duration in hours using mean operational capacity (containers per hour)
+                        double durationHours = Math.Ceiling(totalContainers / effectiveCap);
+                    if (durationHours < 1) durationHours = 1; // minimum 1 hour
 
                     DateTime adjustedArrival = eta;
                     if (lastDeparture != DateTime.MinValue && adjustedArrival < lastDeparture)
@@ -254,15 +293,29 @@ public class SchedulingService
                         adjustedArrival = lastDeparture;
                     }
 
-                    DateTime adjustedDeparture = adjustedArrival + duration;
-
+                    DateTime adjustedDeparture = adjustedArrival.AddHours(durationHours);
                     lastDeparture = adjustedDeparture;
 
                     string arrival = adjustedArrival.ToString("o");
                     string departure = adjustedDeparture.ToString("o");
-                    initialVesselTimes.Add(new VesselTimeDTO(vesselName, arrival, departure));
+                    // compute initial delay as positive hours difference between simulated departure and declared ETD
+                    int initialDelay = 0;
+                    try
+                    {
+                        var declaredEtd = n.ETD;
+                        var diff = adjustedDeparture - declaredEtd;
+                        if (diff.TotalSeconds > 0)
+                        {
+                            initialDelay = (int)Math.Ceiling(diff.TotalHours);
+                        }
+                    }
+                    catch
+                    {
+                        initialDelay = 0;
+                    }
+
+                    initialVesselTimes.Add(new VesselTimeDTO(vesselName, arrival, departure, initialDelay));
                 }
-                int operationalCapacity = dockDto.MedianOperationalCapacity;
                 initialEntries.Add(new RebalancingEntryDTO(dockName, numberOfCranes, initialVesselTimes, operationalCapacity));
 
                 // rebalanced entries: from rebalancedMap
@@ -271,8 +324,6 @@ public class SchedulingService
                 rebalancedEntries.Add(new RebalancingEntryDTO(dockName, numberOfCranes, rebalancedList, operationalCapacity));
             }
 
-            // If Prolog returned assignments for dock names that are not present in docksDto,
-            // include them so the UI can show unrecognized/mismatched assignments for diagnosis.
             var knownDockNames = new HashSet<string>(docksDto.Select(d => d.Name ?? string.Empty), StringComparer.OrdinalIgnoreCase);
             foreach (var kv in rebalancedMap)
             {
@@ -294,6 +345,83 @@ public class SchedulingService
             errorMessages.Add($"Rebalancing algorithm error: {ex.Message}");
             return null;
         }
+    }
+    public async Task<bool> ApplyRebalancingAsync(RebalancingDTO rebalancingDto, DateTime targetDay, DateTime endDay, long officerId, List<string> errorMessages)
+    {
+        if (rebalancingDto == null)
+        {
+            errorMessages.Add("Rebalancing payload is null.");
+            return false;
+        }
+
+        IEnumerable<VesselVisitNotification> notifications = await _vesselVisitNotificationRepository.GetVisitsByTargetDay_StatusAsync(targetDay, VisitStatus.Approved);
+        var filteredNotifications = notifications
+            .Where(n => n.ETA.Date >= targetDay.Date && n.ETA.Date <= endDay.Date)
+            .ToList();
+
+        if (!filteredNotifications.Any())
+        {
+            errorMessages.Add("No vessel visit notifications found between target day and end day.");
+            return false;
+        }
+
+        var notifByVesselName = filteredNotifications.GroupBy(n => n.Vessel.VesselName ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+
+        int applied = 0;
+        foreach (var entry in rebalancingDto.RebalancedEntries ?? Enumerable.Empty<RebalancingEntryDTO>())
+        {
+            var dockName = entry.DockName ?? string.Empty;
+            var dock = await _dockRepository.GetDockByNameAsync(dockName);
+            if (dock == null)
+            {
+                errorMessages.Add($"Dock not found: {dockName}");
+                continue;
+            }
+
+            foreach (var vt in entry.VesselTimes ?? new List<VesselTimeDTO>())
+            {
+                var vesselName = vt.VesselName ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(vesselName))
+                {
+                    errorMessages.Add($"Empty vessel name in rebalancing entry for dock {dockName}.");
+                    continue;
+                }
+
+                if (!notifByVesselName.TryGetValue(vesselName, out var candidates))
+                {
+                    var byImo = filteredNotifications.FirstOrDefault(n => string.Equals(n.Vessel.IMONumber ?? string.Empty, vesselName, StringComparison.OrdinalIgnoreCase));
+                    if (byImo == null)
+                    {
+                        errorMessages.Add($"Vessel not found for name/imo: {vesselName}");
+                        continue;
+                    }
+                    candidates = new List<VesselVisitNotification> { byImo };
+                }
+
+                // Apply assignment to all matched notifications (usually one)
+                foreach (var notif in candidates)
+                {
+                    try
+                    {
+                        var originalDock = notif.AssignedDock;
+                        var log = new DockReassignmentLog(officerId, originalDock, dock);
+                        notif.AddDockReassignmentLog(log);
+
+                        notif.AssignDock(dock);
+                        var ok = await _vesselVisitNotificationRepository.UpdateVisitAsync(notif, errorMessages);
+                        if (ok) applied++;
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add($"Failed to assign dock {dockName} to vessel {vesselName}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        Console.WriteLine($"ApplyRebalancing: applied assignments for {applied} notifications.");
+        return true;
     }
     public async Task<SchedulingDTO?> GetSchedulingWithGeneticAlgortithm(DateTime targetDay, int populationSize, int numberGenerations, double crossoverRate, double mutationRate, int desiredTime, int stableGenrations, bool enableMultiCrane, List<string> errorMessages)
     {
@@ -464,6 +592,14 @@ public class SchedulingService
         int n = caps.Count;
         if (n % 2 == 1) return caps[n / 2];
         return (caps[(n / 2) - 1] + caps[n / 2]) / 2;
+    }
+
+    private double GetAverageOperationalCapacity(IEnumerable<PhysicalResource> resources)
+    {
+        if (resources == null) return 0.0;
+        var caps = resources.Select(r => (double)r.PhysicalResourceOperationalCapacity).ToList();
+        if (caps.Count == 0) return 0.0;
+        return caps.Average();
     }
 
     public async Task<SchedulingDTO?> GetSchedulingForTargetDay(DateTime targetDay, List<string> errorMessages, string algorithm = "default")

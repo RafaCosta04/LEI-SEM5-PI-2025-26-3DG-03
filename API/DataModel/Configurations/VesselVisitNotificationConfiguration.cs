@@ -46,6 +46,11 @@ public class VesselVisitNotificationConfiguration : IEntityTypeConfiguration<Ves
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
 
+        builder.HasMany(vvn => vvn.DockReassignmentLogs)
+            .WithOne(drl => drl.VesselVisitNotification)
+            .HasForeignKey(drl => drl.VesselVisitNotificationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.ToTable("VesselVisitNotification");
     }
 }

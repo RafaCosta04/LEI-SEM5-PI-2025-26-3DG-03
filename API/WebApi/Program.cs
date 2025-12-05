@@ -120,6 +120,7 @@ builder.Services.AddTransient<IDockRepository, DockRepository>();
 builder.Services.AddTransient<IDockFactory, DockFactory>();
 builder.Services.AddTransient<DockMapper>();
 builder.Services.AddTransient<DockService>();
+builder.Services.AddTransient<DockReassignmentLogMapper>();
 
 builder.Services.AddTransient<IStaffRepository, StaffRepository>();
 builder.Services.AddTransient<IStaffFactory, StaffFactory>();

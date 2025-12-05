@@ -11,11 +11,14 @@ public class VesselTimeDTO
 
     public string Departure { get; set; }
 
-    public VesselTimeDTO(string vesselName, string arrival, string departure)
+    public int Delay { get; set; }
+
+    public VesselTimeDTO(string vesselName, string arrival, string departure, int delay = 0)
     {
         VesselName = vesselName;
         Arrival = arrival;
         Departure = departure;
+        Delay = delay;
     }
 }
 
@@ -28,6 +31,8 @@ public class RebalancingEntryDTO
     public List<VesselTimeDTO> VesselTimes { get; set; }
 
     public int OperationalCapacity { get; set; }
+
+    public int Delay { get; set; }
 
     public RebalancingEntryDTO(string dockName, int numberOfCranes, List<VesselTimeDTO> vesselTimes, int operationalCapacity)
     {

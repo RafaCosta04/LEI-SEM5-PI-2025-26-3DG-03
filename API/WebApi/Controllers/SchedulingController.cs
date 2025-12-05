@@ -16,11 +16,13 @@ public class SchedulingController : ControllerBase
 {
 
     private readonly SchedulingService _schedulingService;
+    private readonly SystemUserService _systemUserService;
     List<string> _errorMessages = new List<string>();
 
-    public SchedulingController(SchedulingService schedulingService)
+    public SchedulingController(SchedulingService schedulingService, SystemUserService systemUserService)
     {
         _schedulingService = schedulingService;
+        _systemUserService = systemUserService;
     }
 
     [HttpGet]
@@ -81,5 +83,39 @@ public class SchedulingController : ControllerBase
             return BadRequest(new { message = msg });
         }
         return Ok(notifications);
+    }
+
+    [HttpPost("Rebalancing/Apply")]
+    public async Task<IActionResult> ApplyRebalancing([FromQuery] DateTime targetDay, [FromQuery] DateTime endDay, [FromBody] RebalancingDTO rebalancing)
+    {
+        var email =
+                User.FindFirst("https://lapr5/email")?.Value ??
+                User.FindFirst("email")?.Value;
+        if (string.IsNullOrEmpty(email))
+        {
+            return Unauthorized("No email claim found in Auth0 token.");
+        }
+        SystemUserDTO? user = await _systemUserService.GetSystemUserByEmail(email);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+        if (rebalancing == null)
+        {
+            return BadRequest(new { message = "Rebalancing payload is required." });
+        }
+        var ok = await _schedulingService.ApplyRebalancingAsync(rebalancing, targetDay, endDay, user.Id, _errorMessages);
+        if (!ok)
+        {
+            var msg = string.Join("; ", _errorMessages);
+            return BadRequest(new { message = msg });
+        }
+        return Ok(new { message = "Rebalancing applied successfully." });
+    }
+
+    [HttpPost("Rebalancing/Reject")]
+    public IActionResult RejectRebalancing()
+    {
+        return Ok(new { message = "Rebalancing rejected. No changes applied." });
     }
 }

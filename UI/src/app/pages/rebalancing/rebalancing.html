@@ -54,14 +54,26 @@
             <div class="results-column initial">
               <h3>Initial Assignments</h3>
               <div *ngIf="rebalancingResult?.initialEntries && rebalancingResult.initialEntries.length > 0; else noInitial2">
-                <div *ngFor="let e of rebalancingResult.initialEntries" class="rebalance-dock" style="margin-bottom:12px;">
-                  <h4>{{ e.dockName }} <small>(Cranes: {{ e.numberOfCranes }}, Capacity: {{ e.operationalCapacity }})</small></h4>
+                <div *ngFor="let e of rebalancingResult.initialEntries" class="timeline-row rebalance-dock" style="margin-bottom:12px;">
+                  <h4>{{ e.dockName }}</h4>
+                  <div class="dock-stats">
+                    <div class="time-detail">
+                      <div class="time-label">Cranes</div>
+                      <div class="time-value">: {{ e.numberOfCranes }}</div>
+                    </div>
+                    <div class="time-detail">
+                      <div class="time-label">Capacity</div>
+                      <div class="time-value">: {{ e.operationalCapacity }}</div>
+                    </div>
+                  </div>
                   <div class="timeline-bar-container">
-                    <div *ngFor="let vt of e.vesselTimes"
-                         class="timeline-bar blue"
-                         [ngStyle]="getDockBarStyle(vt)"
-                         [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure)">
-                      <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                    <div class="timeline-inner">
+                        <div *ngFor="let vt of e.vesselTimes"
+                          class="timeline-bar green"
+                          [ngStyle]="getDockBarStyle(vt)"
+                           [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure) + ((vt.delay !== null && vt.delay !== undefined) ? (' (Delay: ' + vt.delay + 'h)') : '')">
+                        <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -72,14 +84,26 @@
             <div class="results-column rebalanced">
               <h3>Rebalanced Assignments</h3>
               <div *ngIf="rebalancingResult?.rebalancedEntries && rebalancingResult.rebalancedEntries.length > 0; else noRebalanced2">
-                <div *ngFor="let e of rebalancingResult.rebalancedEntries" class="rebalance-dock" style="margin-bottom:12px;">
-                  <h4>{{ e.dockName }} <small>(Cranes: {{ e.numberOfCranes }}, Capacity: {{ e.operationalCapacity }})</small></h4>
+                <div *ngFor="let e of rebalancingResult.rebalancedEntries" class="timeline-row rebalance-dock" style="margin-bottom:12px;">
+                  <h4>{{ e.dockName }}</h4>
+                  <div class="dock-stats">
+                    <div class="time-detail">
+                      <div class="time-label">Cranes</div>
+                      <div class="time-value">: {{ e.numberOfCranes }}</div>
+                    </div>
+                    <div class="time-detail">
+                      <div class="time-label">Capacity</div>
+                      <div class="time-value">: {{ e.operationalCapacity }}</div>
+                    </div>
+                  </div>
                   <div class="timeline-bar-container">
-                    <div *ngFor="let vt of e.vesselTimes"
-                         class="timeline-bar green"
-                         [ngStyle]="getDockBarStyle(vt)"
-                         [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure)">
-                      <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                    <div class="timeline-inner">
+                        <div *ngFor="let vt of e.vesselTimes"
+                          class="timeline-bar green"
+                          [ngStyle]="getDockBarStyle(vt)"
+                           [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure) + ((vt.delay !== null && vt.delay !== undefined) ? (' (Delay: ' + vt.delay + 'h)') : '')">
+                        <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

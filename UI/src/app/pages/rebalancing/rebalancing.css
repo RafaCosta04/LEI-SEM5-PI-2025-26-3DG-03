@@ -48,6 +48,10 @@ page-container{padding:18px;font-family:var(--font-family,Segoe UI,Roboto,Arial)
   max-width: 92vw;
 }
 
+.modal-content .modal-body input[type="datetime-local"].form-input {
+  line-height: 18px;
+}
+
 /* Timeline styles (borrowed from schedule popup) */
 .timeline-bar-container {
   position: relative;
@@ -57,12 +61,14 @@ page-container{padding:18px;font-family:var(--font-family,Segoe UI,Roboto,Arial)
   border-radius: 8px;
   overflow: visible;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-  border: 1px solid #e9ecef;
+  border: none;
 }
 
 .timeline-bar {
   position: absolute;
-  height: 100%;
+  top: 0;
+  bottom: 0;
+  height: auto;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -75,6 +81,15 @@ page-container{padding:18px;font-family:var(--font-family,Segoe UI,Roboto,Arial)
   font-size: 12px;
   overflow: hidden;
 }
+
+.timeline-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 6px 0 6px 6px;
+}
+
 
 .timeline-bar:hover {
   box-shadow: 0 4px 12px rgba(13,110,253,0.5);
@@ -90,11 +105,29 @@ page-container{padding:18px;font-family:var(--font-family,Segoe UI,Roboto,Arial)
 }
 
 /* Color variants to match schedule page */
-.timeline-bar.blue {
+.timeline-bar.blue,
+.timeline-bar.green,
+.timeline-bar {
   background: linear-gradient(135deg, #0d6efd 0%, #4dabf7 100%);
 }
-.timeline-bar.green {
-  background: linear-gradient(135deg, #20c997 0%, #2ecc71 100%);
+
+/* Dark mode overrides to match schedule page */
+:host-context([data-coreui-theme="dark"]) .timeline-row {
+  background: #374151;
+  border-color: #4a5568;
+}
+
+:host-context([data-coreui-theme="dark"]) .timeline-bar-container {
+  background: #2d3748;
+  border-color: #4a5568;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
+}
+
+:host-context([data-coreui-theme="dark"]) .timeline-bar,
+:host-context([data-coreui-theme="dark"]) .timeline-bar.blue,
+:host-context([data-coreui-theme="dark"]) .timeline-bar.green {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  box-shadow: 0 2px 8px rgba(96,165,250,0.25);
 }
 
 /* Results vertical layout: stack initial and rebalanced with divider */
@@ -114,3 +147,105 @@ page-container{padding:18px;font-family:var(--font-family,Segoe UI,Roboto,Arial)
 }
 
 /* Keep results stacked vertically always - no side-by-side */
+
+/* Timeline row (match schedule page visuals) */
+.timeline-row {
+  display: grid;
+  grid-template-columns: 280px 1fr 240px;
+  gap: 16px;
+  align-items: stretch;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.timeline-row:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: #0d6efd;
+}
+
+.timeline-row h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  grid-column: 1 / 2;
+}
+
+.timeline-bar-container {
+  grid-column: 2 / 4;
+}
+
+.timeline-row small {
+  font-weight: 400;
+  color: #6c757d;
+}
+
+/* Dock stats (right column) */
+.dock-stats {
+  grid-column: 1 / 2;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  min-width: 72px;
+}
+
+
+.stat-body { display:flex; flex-direction:column; align-items:flex-start; margin-left: 0 }
+.stat-value { font-weight:700; font-size:13px; color:#212529 }
+.stat-label { font-size:11px; color:#6c757d }
+
+/* Dark mode adjustments for dock-stats */
+:host-context([data-coreui-theme="dark"]) .stat-item {
+  background: transparent;
+  border: none;
+}
+:host-context([data-coreui-theme="dark"]) .stat-value { color: #e2e8f0 }
+:host-context([data-coreui-theme="dark"]) .stat-label { color: #9ca3af }
+
+/* Make dock-stats show inline time-detail style similar to schedule.time-detail */
+.dock-stats .time-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.dock-stats .time-label {
+  font-weight: 700;
+  color: #212529;
+  text-transform: none;
+  font-size: 13px;
+  margin-right: 4px;
+}
+
+.dock-stats .time-value {
+  font-weight: 700;
+  color: #212529;
+  margin-left: 4px;
+}
+
+/* Dark mode for dock-stats time-detail */
+:host-context([data-coreui-theme="dark"]) .dock-stats .time-detail {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+:host-context([data-coreui-theme="dark"]) .dock-stats .time-label { color: #9ca3af }
+:host-context([data-coreui-theme="dark"]) .dock-stats .time-value { color: #e2e8f0 }

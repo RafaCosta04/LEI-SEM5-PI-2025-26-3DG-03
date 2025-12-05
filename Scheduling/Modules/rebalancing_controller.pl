@@ -53,13 +53,14 @@ handle_rebalance_request_inner(Request) :-
     ( catch(rebalance_assignments(Assignments, Mode), E, (with_output_to(user_error, format('Rebalance error: ~w~n',[E])), Assignments = [])) ),
     get_time(T1), _ExecTime is T1 - T0,
 
-    % Build minimal assignments list: assign(Vessel, Dock, ActualDeparture, ActualArrival)
+    % Build minimal assignments list: assign(Vessel, Dock, ActualDeparture, ActualArrival, Delay)
     findall(_{
                 vessel: V,
                 dock: Dock,
                 actualDeparture: ActualDeparture,
-                actualArrival: ActualArrival
-            }, ( member(assign(V,Dock,_Start,_DeclaredDeparture,_Delay,ActualDeparture,ActualArrival), Assignments) ), AssignmentsJson),
+                actualArrival: ActualArrival,
+                delay: Delay
+            }, ( member(assign(V,Dock,_Start,_DeclaredDeparture,Delay,ActualDeparture,ActualArrival), Assignments) ), AssignmentsJson),
 
     % Debug: report how many assignments were produced
     length(AssignmentsJson, _AssignCount),

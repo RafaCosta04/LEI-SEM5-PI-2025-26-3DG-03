@@ -188,7 +188,8 @@ public class VesselVisitNotificationService
                 notificationDTO.CargoType,
                 notificationDTO.Volume,
                 crewMembers,
-                notificationDTO.NumberOfCrewMembers
+                notificationDTO.NumberOfCrewMembers,
+                new List<DockReassignmentLog>()
             );
         }
         catch (Exception ex)

@@ -2,8 +2,6 @@ namespace DataModel.Model;
 
 using Domain.Model;
 
-
-
 public class VesselVisitNotificationDataModel
 {
     public long Id { get; set; }
@@ -37,6 +35,8 @@ public class VesselVisitNotificationDataModel
 
     public int NumberOfCrewMembers { get; set; }
 
+    public List<DockReassignmentLogDataModel> DockReassignmentLogs { get; set; } = new List<DockReassignmentLogDataModel>();
+
     public VesselVisitNotificationDataModel() { }
 
     public VesselVisitNotificationDataModel(VesselVisitNotification vesselVisitNotification)
@@ -54,5 +54,10 @@ public class VesselVisitNotificationDataModel
         AssignedDock = vesselVisitNotification.AssignedDock != null ? new DockDataModel(vesselVisitNotification.AssignedDock) : null;
         VisitStatus = vesselVisitNotification.VisitStatus.ToString();
         NumberOfCrewMembers = vesselVisitNotification.NumberOfCrewMembers;
+        DockReassignmentLogs = vesselVisitNotification.DockReassignmentLogs.ConvertAll(log => new DockReassignmentLogDataModel(log));
+        foreach (var log in DockReassignmentLogs)
+        {
+            log.VesselVisitNotification = this;
+        }
     }
 }

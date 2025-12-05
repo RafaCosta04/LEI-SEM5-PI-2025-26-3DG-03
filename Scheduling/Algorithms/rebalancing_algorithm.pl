@@ -95,7 +95,8 @@ average_opcap(Docks, Avg) :-
 %% score_and_sort_vessels(+Vessels, -Sorted) where Vessels are vessel(Name,A,D,L)
 score_and_sort_vessels(Vessels, AvgCap, Sorted) :-
     maplist(add_score(AvgCap), Vessels, Scored),
-    sort(2, @=<, Scored, ScoredSorted),
+    % Scored is a list of Score-Vessel pairs. Use keysort to sort by Score (the key).
+    keysort(Scored, ScoredSorted),
     pairs_values(ScoredSorted, Sorted).
 
 % add_score(+AvgCap, +Vessel, -Score-Vessel)
@@ -119,8 +120,11 @@ rebalance_vessels([vessel(Name,A,D,L)|VT], DockSchedulesIn, [assign(Name,ChosenD
     % compute duration
     (OpCap =:= 0 -> DurF = 1.0 ; DurF is L / OpCap),
     Duration is ceiling(DurF),
-    % Debug: report assignment decision
-    with_output_to(user_error, format('rebalancing_algorithm: assigning ~w -> ~w start=~w end=~w duration=~w~n',[Name, ChosenDock, ActualStart, ActualEnd, Duration])),
+    % compute delay (actual end vs declared departure)
+    TempDelay is ActualEnd - D,
+    (TempDelay > 0 -> Delay = TempDelay ; Delay = 0),
+    % Debug: report assignment decision including delay
+    with_output_to(user_error, format('rebalancing_algorithm: assigning ~w -> ~w start=~w end=~w duration=~w delay=~w~n',[Name, ChosenDock, ActualStart, ActualEnd, Duration, Delay])),
     % update dock schedules: add task(ActualStart,ActualEnd) to chosen dock
     select(dock(ChosenDock,OpCap,Tasks), DockSchedulesIn, RestSchedules),
     NewTasks = [task(ActualStart,ActualEnd)|Tasks],
