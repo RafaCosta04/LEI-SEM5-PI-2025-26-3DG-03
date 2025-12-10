@@ -32,15 +32,16 @@
     </c-card-header>
     <c-card-body>
       <div class="mb-3">
-        <label cLabel for="policyContent">Policy Content</label>
+        <label cLabel class="mb-2">Policy Content</label>
         <quill-editor
           [(ngModel)]="newPolicyContent"
           [modules]="quillModules"
           [placeholder]="'Enter the new privacy policy content...'"
           [disabled]="loading"
-          [styles]="{height: '300px'}"
+          [styles]="{minHeight: '300px'}"
+          class="w-100"
         ></quill-editor>
-        <small class="form-text text-muted">
+        <small class="form-text text-muted mt-2 d-block">
           Use the toolbar above to format your text. This will replace the current active policy.
         </small>
       </div>

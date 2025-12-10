@@ -18,6 +18,33 @@
   white-space: nowrap;
 }
 
+/* Quill Editor Styles */
+::ng-deep quill-editor {
+  display: block;
+}
+
+::ng-deep quill-editor .ql-container {
+  min-height: 300px;
+  font-size: 14px;
+}
+
+::ng-deep quill-editor .ql-editor {
+  min-height: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+::ng-deep quill-editor .ql-toolbar {
+  background: var(--cui-body-bg, #fff);
+  border: 1px solid var(--cui-border-color, #d8dbe0);
+  border-bottom: none;
+}
+
+::ng-deep quill-editor .ql-container {
+  background: var(--cui-body-bg, #fff);
+  border: 1px solid var(--cui-border-color, #d8dbe0);
+}
+
 textarea {
   font-family: 'Courier New', monospace;
   font-size: 14px;
