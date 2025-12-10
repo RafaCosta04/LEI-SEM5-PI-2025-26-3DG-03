@@ -9,6 +9,6 @@ public interface IPrivacyPolicyRepository : IGenericRepository<PrivacyPolicy>
     Task<PrivacyPolicy> AddPrivacyPolicyAsync(PrivacyPolicy privacyPolicy);
 
     Task<bool> DeactivatePreviousPoliciesAsync();
-        
-        Task<IEnumerable<PrivacyPolicy>> GetAllPrivacyPoliciesAsync();
+
+    Task<IEnumerable<PrivacyPolicy>> GetAllPrivacyPoliciesAsync();
 }

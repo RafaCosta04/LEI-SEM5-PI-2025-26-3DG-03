@@ -6,11 +6,11 @@ public class PrivacyPolicy
 {
     public long Id { get; set; }
 
-    public string? Content { get; private set;}
+    public string? Content { get; private set; }
 
-    public DateTime CreatedAt { get; private set;}
+    public DateTime CreatedAt { get; private set; }
 
-    public bool IsCurrent { get; private set;}
+    public bool IsCurrent { get; private set; }
 
     private PrivacyPolicy() { }
 

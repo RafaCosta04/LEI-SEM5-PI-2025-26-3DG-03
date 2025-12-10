@@ -51,7 +51,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PrivacyPolicyCheckResponse>> CheckPrivacyPolicyUpdate()
         {
             var email = User.FindFirst("https://lapr5/email")?.Value ?? User.FindFirst("email")?.Value;
-            
+
             if (string.IsNullOrEmpty(email))
             {
                 return Unauthorized("No email claim found in token.");
@@ -67,14 +67,14 @@ namespace WebApi.Controllers
         public async Task<ActionResult> AcceptPrivacyPolicy()
         {
             var email = User.FindFirst("https://lapr5/email")?.Value ?? User.FindFirst("email")?.Value;
-            
+
             if (string.IsNullOrEmpty(email))
             {
                 return Unauthorized("No email claim found in token.");
             }
 
             var success = await _privacyPolicyService.AcceptPrivacyPolicyByEmailAsync(email);
-            
+
             if (!success)
             {
                 return NotFound("User not found.");

@@ -37,22 +37,22 @@ public class PrivacyPolicyRepository : GenericRepository<PrivacyPolicy>, IPrivac
             throw;
         }
     }
-        
-        public async Task<IEnumerable<PrivacyPolicy>> GetAllPrivacyPoliciesAsync()
+
+    public async Task<IEnumerable<PrivacyPolicy>> GetAllPrivacyPoliciesAsync()
+    {
+        try
         {
-            try
-            {
-                IEnumerable<PrivacyPolicyDataModel> privacyPolicyDataModels = await _context.Set<PrivacyPolicyDataModel>()
-                    .OrderByDescending(pp => pp.CreatedAt)
-                    .ToListAsync();
-                IEnumerable<PrivacyPolicy> privacyPolicies = _privacyPolicyMapper.ToDomainModel(privacyPolicyDataModels);
-                return privacyPolicies;
-            }
-            catch
-            {
-                throw;
-            }
+            IEnumerable<PrivacyPolicyDataModel> privacyPolicyDataModels = await _context.Set<PrivacyPolicyDataModel>()
+                .OrderByDescending(pp => pp.CreatedAt)
+                .ToListAsync();
+            IEnumerable<PrivacyPolicy> privacyPolicies = _privacyPolicyMapper.ToDomainModel(privacyPolicyDataModels);
+            return privacyPolicies;
         }
+        catch
+        {
+            throw;
+        }
+    }
     public async Task<PrivacyPolicy> AddPrivacyPolicyAsync(PrivacyPolicy privacyPolicy)
     {
         try
@@ -91,5 +91,5 @@ public class PrivacyPolicyRepository : GenericRepository<PrivacyPolicy>, IPrivac
             throw;
         }
     }
-    
+
 }
