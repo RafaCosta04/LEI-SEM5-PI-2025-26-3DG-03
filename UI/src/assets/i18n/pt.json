@@ -26,7 +26,8 @@
 
     "SCHEDULE": "Agenda",
     "SYSTEM_USER": "Utilizadores do Sistema",
-    "PRIVACY_POLICY": "Política de Privacidade"
+    "PRIVACY_POLICY": "Política de Privacidade",
+    "INCIDENT_TYPE": "Tipo de Incidente"
   },
   "SETTINGS": {
     "SETTINGS": "Configurações",
@@ -37,6 +38,71 @@
   }
   ,"LANG_EN": "Inglês",
   "LANG_PT": "Português",
+  "INCIDENT_TYPE": {
+    "TITLE": "Tipos de Incidente",
+
+    "SEARCH_PLACEHOLDER": "Pesquisar por código, nome ou descrição",
+    "NO_RESULTS": "Nenhum tipo de incidente disponível.",
+    "NO_RESULTS_FOR": "Nenhum tipo de incidente encontrado com os filtros aplicados.",
+
+    "BUTTON": {
+      "NEW": "Novo Tipo de Incidente",
+      "EDIT": "Editar",
+      "UNSELECT": "Desselecionar",
+      "SELECT": "Selecionar",
+      "CANCEL": "Cancelar",
+      "CREATE": "Criar",
+      "CREATING": "A criar...",
+      "SAVE": "Guardar",
+      "SAVING": "A guardar..."
+    },
+
+    "TABLE": {
+      "CODE": "Código",
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "CLASSIFICATION": "Classificação",
+      "PARENT_CODE": "Código Pai",
+      "ACTIONS": "Ações"
+    },
+
+    "DETAILS": {
+      "TITLE": "Detalhes do Tipo de Incidente",
+      "CODE": "Código",
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "CLASSIFICATION": "Classificação",
+      "PARENT": "Tipo de Incidente Pai",
+      "NONE": "Nenhum"
+    },
+
+    "FILTER": {
+      "ALL_CLASSIFICATIONS": "Todas as Classificações",
+      "MINOR": "Menor",
+      "MAJOR": "Maior",
+      "CRITICAL": "Crítico",
+      "ALL_TYPES": "Todos os Tipos",
+      "HAS_PARENT": "Tem Pai",
+      "NO_PARENT": "Sem Pai"
+    },
+
+    "FORM": {
+      "TITLE_CREATE": "Criar Novo Tipo de Incidente",
+      "TITLE_EDIT": "Editar Tipo de Incidente",
+      "CODE": "Código",
+      "CODE_HELP": "Máximo 10 caracteres",
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "CLASSIFICATION": "Classificação",
+      "PARENT_CODE": "Código do Tipo de Incidente Pai (opcional)",
+      "PLACEHOLDER": {
+        "CODE": "Inserir código",
+        "NAME": "Inserir nome",
+        "DESCRIPTION": "Inserir descrição",
+        "PARENT_CODE": "Selecionar pai (opcional)"
+      }
+    }
+  },
   "DOCKS": {
     "TITLE": "Docas",
 

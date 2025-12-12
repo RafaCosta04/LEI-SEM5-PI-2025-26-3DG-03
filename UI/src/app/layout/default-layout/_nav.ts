@@ -123,7 +123,13 @@ export const navItems: IExtendedNavData[] = [
   {
     name: 'NAV.PRIVACY_POLICY',
     url: '/privacy-policy/admin',
-    icon: 'nav-img nav-img-qualification',
+    icon: 'nav-img nav-img-privacy-policy',
     roles: ['Admin']
+  },
+  {
+    name: 'NAV.INCIDENT_TYPE',
+    url: '/incident-type',
+    icon: 'nav-img nav-img-incident-type',
+    roles: ['Admin', 'PortAuthorityOfficer']
   }
 ];

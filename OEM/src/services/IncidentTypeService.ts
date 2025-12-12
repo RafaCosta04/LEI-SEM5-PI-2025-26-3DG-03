@@ -160,6 +160,13 @@ export default class IncidentTypeService implements IIncidentTypeService {
             if (exists) {
                 return Result.fail(`IncidentType with code '${dto.code}' already exists.`);
             }
+            
+            const conflictWithName = await this.incidentTypeRepo.findByName(dto.name);
+            if (conflictWithName) {
+                return Result.fail<IncidentTypeDTO>(`Incident Type name '${dto.name}' is already in use.`);
+            }
+
+
             let parentId: string | undefined = undefined;
             if (dto.parentIncidentTypeCode) {
                 const parentIncidentType = await this.incidentTypeRepo.findByCode(dto.parentIncidentTypeCode);
@@ -210,6 +217,10 @@ export default class IncidentTypeService implements IIncidentTypeService {
             const conflictWithName = await this.incidentTypeRepo.findByName(dto.name);
             if (conflictWithName && conflictWithName.id !== existing.id) {
                 return Result.fail<IncidentTypeDTO>(`Incident Type name '${dto.name}' is already in use.`);
+            }
+
+            if(dto.parentIncidentTypeCode === dto.code){
+                return Result.fail<IncidentTypeDTO>("An IncidentType cannot be its own parent.");
             }
 
             let parentId: string | undefined = undefined;

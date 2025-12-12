@@ -26,7 +26,8 @@
 
     "SCHEDULE": "Schedule",
     "SYSTEM_USER": "System User",
-    "PRIVACY_POLICY": "Privacy Policy"
+    "PRIVACY_POLICY": "Privacy Policy",
+    "INCIDENT_TYPE": "Incident Type"
   },
   "SETTINGS": {
     "SETTINGS": "Settings",
@@ -38,6 +39,71 @@
 
   ,"LANG_EN": "English",
   "LANG_PT": "Portuguese",
+  "INCIDENT_TYPE": {
+    "TITLE": "Incident Types",
+
+    "SEARCH_PLACEHOLDER": "Search by code, name, or description",
+    "NO_RESULTS": "No incident types available.",
+    "NO_RESULTS_FOR": "No incident types found matching your filters.",
+
+    "BUTTON": {
+      "NEW": "New Incident Type",
+      "EDIT": "Edit",
+      "UNSELECT": "Unselect",
+      "SELECT": "Select",
+      "CANCEL": "Cancel",
+      "CREATE": "Create",
+      "CREATING": "Creating...",
+      "SAVE": "Save",
+      "SAVING": "Saving..."
+    },
+
+    "TABLE": {
+      "CODE": "Code",
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CLASSIFICATION": "Classification",
+      "PARENT_CODE": "Parent Code",
+      "ACTIONS": "Actions"
+    },
+
+    "DETAILS": {
+      "TITLE": "Incident Type Details",
+      "CODE": "Code",
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CLASSIFICATION": "Classification",
+      "PARENT": "Parent Incident Type",
+      "NONE": "None"
+    },
+
+    "FILTER": {
+      "ALL_CLASSIFICATIONS": "All Classifications",
+      "MINOR": "Minor",
+      "MAJOR": "Major",
+      "CRITICAL": "Critical",
+      "ALL_TYPES": "All Types",
+      "HAS_PARENT": "Has Parent",
+      "NO_PARENT": "No Parent"
+    },
+
+    "FORM": {
+      "TITLE_CREATE": "Create New Incident Type",
+      "TITLE_EDIT": "Edit Incident Type",
+      "CODE": "Code",
+      "CODE_HELP": "Maximum 10 characters",
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CLASSIFICATION": "Classification",
+      "PARENT_CODE": "Parent Incident Type Code (optional)",
+      "PLACEHOLDER": {
+        "CODE": "Enter code",
+        "NAME": "Enter name",
+        "DESCRIPTION": "Enter description",
+        "PARENT_CODE": "Select parent (optional)"
+      }
+    }
+  },
   "DOCKS": {
     "TITLE": "Docks",
 

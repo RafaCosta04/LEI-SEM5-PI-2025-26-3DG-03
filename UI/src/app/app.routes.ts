@@ -86,12 +86,16 @@ export const routes: Routes = [
         path: 'user',
         data: { title: 'System User', breadcrumb: 'System User'},
         loadChildren: () => import('./routing/systemUser.routes').then((m) => m.routes)
-      }
-      ,
+      },
       {
         path: 'privacy-policy',
         data: { title: 'Privacy Policy', breadcrumb: 'Privacy Policy' },
         loadChildren: () => import('./routing/privacyPolicy.routes').then((m) => m.privacyPolicyRoutes)
+      },
+      {
+        path: 'incident-type',
+        data: { title: 'Incident Types', breadcrumb: 'Incident Types' },
+        loadChildren: () => import('./routing/incidentType.routes').then((m) => m.routes)
       }
     ],
   },
