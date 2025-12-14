@@ -84,7 +84,7 @@ namespace Domain.Tests
         {
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, null!, "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("cannot be null or empty", exception.Message);
         }
@@ -94,7 +94,7 @@ namespace Domain.Tests
         {
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "", "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("cannot be null or empty", exception.Message);
         }
@@ -104,7 +104,7 @@ namespace Domain.Tests
         {
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "   ", "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("cannot be null or empty", exception.Message);
         }
@@ -114,7 +114,7 @@ namespace Domain.Tests
         {
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "userexample.com", "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("is not valid", exception.Message);
         }
@@ -152,7 +152,7 @@ namespace Domain.Tests
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "@example.com", "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("is not valid", exception.Message);
         }
@@ -163,7 +163,7 @@ namespace Domain.Tests
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "user@", "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("is not valid", exception.Message);
         }
@@ -174,7 +174,7 @@ namespace Domain.Tests
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "@", "Details"));
-            
+
             Assert.Equal("systemUserEmail", exception.ParamName);
             Assert.Contains("is not valid", exception.Message);
         }
@@ -202,7 +202,7 @@ namespace Domain.Tests
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() =>
                 new DataRequest(DataRequestType.Access, "user@example.com", details));
-            
+
             Assert.Equal("details", exception.ParamName);
             Assert.Contains("cannot exceed 500 characters", exception.Message);
         }

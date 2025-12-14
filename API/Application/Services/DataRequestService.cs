@@ -15,7 +15,7 @@ public class DataRequestService
     private readonly ISystemUserRepository _systemUserRepository;
 
     private readonly IRepresentativeRepository _representativeRepository;
-    
+
     private readonly IDataRequestFactory _dataRequestFactory;
 
     public DataRequestService(IDataRequestRepository dataRequestRepository, IDataRequestFactory dataRequestFactory, ISystemUserRepository systemUserRepository, IRepresentativeRepository representativeRepository)
@@ -63,21 +63,21 @@ public class DataRequestService
 
     public async Task<DataRequestDTO?> CreateDataRequest(DataRequestDTO dataRequestDTO, List<string> errorMessages)
     {
-        if(dataRequestDTO == null)
+        if (dataRequestDTO == null)
         {
             errorMessages.Add($"DataRequestDTO is null.");
             return null;
         }
-        if(string.IsNullOrEmpty(dataRequestDTO.SystemUserEmail))
+        if (string.IsNullOrEmpty(dataRequestDTO.SystemUserEmail))
         {
             errorMessages.Add($"System user email is required.");
             return null;
         }
         var systemUser = await _systemUserRepository.GetSystemUserByEmailAsync(dataRequestDTO.SystemUserEmail);
-        if(systemUser == null)
+        if (systemUser == null)
         {
             var representative = await _representativeRepository.GetRepresentativeByEmailAsync(dataRequestDTO.SystemUserEmail);
-            if(representative == null)
+            if (representative == null)
             {
                 errorMessages.Add($"No system user or representative found with email {dataRequestDTO.SystemUserEmail}.");
                 return null;
@@ -87,7 +87,8 @@ public class DataRequestService
         try
         {
             dataRequest = _dataRequestFactory.NewDataRequest(dataRequestDTO.RequestType, dataRequestDTO.SystemUserEmail, dataRequestDTO.Details);
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             errorMessages.Add($"Error creating DataRequest: {ex.Message}");
             return null;
@@ -96,6 +97,6 @@ public class DataRequestService
         DataRequestDTO drDTO = DataRequestDTO.ToDTO(dataRequestSaved);
         return drDTO;
     }
-    
+
 
 }

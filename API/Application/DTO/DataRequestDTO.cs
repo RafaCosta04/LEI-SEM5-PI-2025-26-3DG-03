@@ -1,4 +1,5 @@
 namespace Application.DTO;
+
 using System.Text.Json.Serialization;
 
 using Domain.Model;

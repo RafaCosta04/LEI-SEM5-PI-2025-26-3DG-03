@@ -48,7 +48,7 @@ namespace WebApi.IntegrationTests.Tests
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
-            
+
             Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "admin.teste@example.com");
             Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "operator.teste@example.com");
             Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "portofficer.teste@example.com");
@@ -61,7 +61,7 @@ namespace WebApi.IntegrationTests.Tests
 
             response.EnsureSuccessStatusCode();
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
-            
+
             Assert.NotNull(dataRequests);
             Assert.Equal(3, dataRequests.Count); // Based on seeded data
         }
@@ -105,7 +105,7 @@ namespace WebApi.IntegrationTests.Tests
             {
                 var response = await _client.GetAsync($"/api/DataRequest/ByID/{dr.Id}");
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                
+
                 var retrieved = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
                 Assert.NotNull(retrieved);
                 Assert.Equal(dr.Id, retrieved.Id);
@@ -122,7 +122,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync("/api/DataRequest/ByEmail/admin.teste@example.com");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
@@ -136,7 +136,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync("/api/DataRequest/ByEmail/nonexistent@example.com");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.Empty(dataRequests);
@@ -151,7 +151,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByEmail/{email}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
@@ -168,10 +168,10 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByType/{requestType}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
-            
+
             if (dataRequests.Any())
             {
                 Assert.All(dataRequests, dr => Assert.Equal(requestType, dr.RequestType));
@@ -184,7 +184,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByType/{DataRequestType.Access}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
@@ -197,7 +197,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByType/{DataRequestType.Deletion}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
@@ -210,7 +210,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByType/{DataRequestType.Rectification}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
@@ -228,10 +228,10 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByStatus/{status}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
-            
+
             if (dataRequests.Any())
             {
                 Assert.All(dataRequests, dr => Assert.Equal(status, dr.Status));
@@ -244,11 +244,11 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByStatus/{DataRequestStatus.Pending}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
-            Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "admin.teste@example.com" 
+            Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "admin.teste@example.com"
                                                 && dr.RequestType == DataRequestType.Access);
         }
 
@@ -258,11 +258,11 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByStatus/{DataRequestStatus.Completed}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
-            Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "operator.teste@example.com" 
+            Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "operator.teste@example.com"
                                                 && dr.RequestType == DataRequestType.Deletion);
         }
 
@@ -272,11 +272,11 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.GetAsync($"/api/DataRequest/ByStatus/{DataRequestStatus.Rejected}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
+
             var dataRequests = await response.Content.ReadFromJsonAsync<List<DataRequestDTO>>(_jsonOptions);
             Assert.NotNull(dataRequests);
             Assert.NotEmpty(dataRequests);
-            Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "portofficer.teste@example.com" 
+            Assert.Contains(dataRequests, dr => dr.SystemUserEmail == "portofficer.teste@example.com"
                                                 && dr.RequestType == DataRequestType.Rectification);
         }
 
@@ -293,7 +293,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.NotEqual(0, created.Id);
@@ -339,7 +339,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.Null(created.Details);
@@ -358,7 +358,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.NotNull(created.Details);
@@ -378,7 +378,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.Equal(500, created.Details!.Length);
@@ -476,7 +476,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.Equal(dto.Details, created.Details);
@@ -495,7 +495,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.Equal(dto.Details, created.Details);
@@ -551,7 +551,7 @@ namespace WebApi.IntegrationTests.Tests
 
             var postResponse = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
             Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
-            
+
             var created = await postResponse.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
 
@@ -584,7 +584,7 @@ namespace WebApi.IntegrationTests.Tests
             var response = await _client.PostAsJsonAsync("/api/DataRequest", dto, _jsonOptions);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            
+
             var created = await response.Content.ReadFromJsonAsync<DataRequestDTO>(_jsonOptions);
             Assert.NotNull(created);
             Assert.Equal(email, created.SystemUserEmail);

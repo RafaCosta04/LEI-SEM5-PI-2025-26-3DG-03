@@ -63,12 +63,12 @@ public class DataRequestController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DataRequestDTO>> PostDataRequest(DataRequestDTO dataRequestDTO)
     {
-        if(dataRequestDTO == null)
+        if (dataRequestDTO == null)
         {
             return BadRequest("DataRequestDTO cannot be null.");
         }
         DataRequestDTO? createdDataRequest = await _dataRequestService.CreateDataRequest(dataRequestDTO, _errorMessages);
-        if(createdDataRequest == null && _errorMessages.Any())
+        if (createdDataRequest == null && _errorMessages.Any())
         {
             return BadRequest(_errorMessages);
         }
