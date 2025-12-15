@@ -1,6 +1,6 @@
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 28px;
   padding: 40px;
   max-width: 1500px;
@@ -14,13 +14,23 @@
   box-shadow: 0 8px 22px rgba(0,0,0,0.25);
   color: white;
   position: relative;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+:host-context([data-coreui-theme="light"]) .card {
+  background: #ffffff;
+  color: #2c3e50;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
 }
 
 .card-preview {
   padding: 0;
   overflow: hidden;
   cursor: pointer;
-  height: 260px;
+  min-height: 320px;
 }
 
 .preview-frame {
@@ -38,60 +48,103 @@
   background: rgba(0,0,0,0.55);
   text-align: center;
   font-weight: 600;
+  color: white;
+}
+
+:host-context([data-coreui-theme="light"]) .preview-overlay {
+  background: rgba(0,0,0,0.7);
 }
 
 .card-calendar {
   display: flex;
   flex-direction: column;
+  height: 320px;
+  overflow: hidden;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .calendar-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
 }
 
 .nav-btn {
   background: rgba(255,255,255,0.08);
   border: none;
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: 6px;
   color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
 }
 
 .nav-btn:hover {
   background: rgba(255,255,255,0.15);
 }
 
+:host-context([data-coreui-theme="light"]) .nav-btn {
+  background: rgba(0,0,0,0.05);
+  color: #2c3e50;
+}
+
+:host-context([data-coreui-theme="light"]) .nav-btn:hover {
+  background: rgba(0,0,0,0.1);
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  grid-template-rows: 24px repeat(6, 1fr);
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
 }
 
 .weekday {
   text-align: center;
-  color: #bbbbbb;
-}
-
-.day {
-  aspect-ratio: 1/1;
-  background: rgba(255,255,255,0.05);
-  border-radius: 8px;
+  color: #999;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-.day:hover {
+.day {
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #e0e0e0;
+}
+
+.day:hover:not(:empty) {
   background: rgba(255,255,255,0.12);
+  transform: scale(1.05);
+}
+
+:host-context([data-coreui-theme="light"]) .day {
+  background: rgba(0,0,0,0.03);
+  color: #2c3e50;
+}
+
+:host-context([data-coreui-theme="light"]) .day:hover:not(:empty) {
+  background: rgba(0,0,0,0.08);
 }
 
 .card h2 {
@@ -102,4 +155,16 @@
 .card p {
   color: #cccccc;
   margin: 0;
+}
+
+:host-context([data-coreui-theme="light"]) .card h2 {
+  color: #2c3e50;
+}
+
+:host-context([data-coreui-theme="light"]) .card p {
+  color: #5a6c7d;
+}
+
+:host-context([data-coreui-theme="light"]) .weekday {
+  color: #666;
 }

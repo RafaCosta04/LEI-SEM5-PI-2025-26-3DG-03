@@ -29,6 +29,34 @@
     "PRIVACY_POLICY": "Privacy Policy",
     "INCIDENT_TYPE": "Incident Type"
   },
+  "DASHBOARD": {
+    "OPEN_3D": "Open 3D",
+    "CALENDAR": {
+      "SUN": "Sun",
+      "MON": "Mon",
+      "TUE": "Tue",
+      "WED": "Wed",
+      "THU": "Thu",
+      "FRI": "Fri",
+      "SAT": "Sat"
+    },
+    "WEATHER": {
+      "TITLE": "Weather in Azores",
+      "LOADING": "Loading weather data..."
+    },
+    "MARITIME": {
+      "TITLE": "Maritime Conditions",
+      "INFO": "Ponta Delgada Port data..."
+    },
+    "SERVICE": {
+      "TITLE": "Service",
+      "COMING_SOON": "Coming soon..."
+    },
+    "WIDGET": {
+      "TITLE": "Additional Widget",
+      "CONTENT": "Additional content here."
+    }
+  },
   "SETTINGS": {
     "SETTINGS": "Settings",
     "LIGHT": "Light",

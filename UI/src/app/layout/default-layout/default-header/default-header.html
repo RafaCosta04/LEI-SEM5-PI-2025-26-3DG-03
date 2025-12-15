@@ -182,7 +182,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                       <div class="flex-grow-1">
                         <div class="d-flex align-items-center gap-2">
-                          <strong class="request-type">{{ 'SETTINGS.REQUEST_TYPE_' + request.requestType?.toUpperCase() | translate }}</strong>
+                          <strong class="request-type">{{ 'SETTINGS.REQUEST_TYPE_' + request.requestType.toUpperCase() | translate }}</strong>
                           <span class="badge" [ngClass]="{
                             'bg-warning': request.status === 'Pending',
                             'bg-success': request.status === 'Completed',

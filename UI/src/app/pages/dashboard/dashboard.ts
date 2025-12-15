@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -28,21 +29,30 @@ export class Dashboard {
   private buildCalendar(year: number, month: number) {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
 
-    const weeks: (number | null)[][] = [];
-    let week: (number | null)[] = new Array(7).fill(null);
-    let dayCounter = 1;
-    for (let i = firstDay; i < 7; i++) {
-      week[i] = dayCounter++;
+    const cells: (number | null)[] = [];
+
+    // Dias do mês anterior (em cinza)
+    for (let i = firstDay - 1; i >= 0; i--) {
+      cells.push(prevMonthDays - i);
     }
-    weeks.push(week);
 
-    while (dayCounter <= daysInMonth) {
-      week = new Array(7).fill(null);
-      for (let i = 0; i < 7 && dayCounter <= daysInMonth; i++) {
-        week[i] = dayCounter++;
-      }
-      weeks.push(week);
+    // Dias do mês atual
+    for (let day = 1; day <= daysInMonth; day++) {
+      cells.push(day);
+    }
+
+    // Preencher até 42 células (6 semanas) com dias do próximo mês
+    const remaining = 42 - cells.length;
+    for (let day = 1; day <= remaining; day++) {
+      cells.push(day);
+    }
+
+    // Dividir em semanas de 7 dias
+    const weeks: (number | null)[][] = [];
+    for (let i = 0; i < 6; i++) {
+      weeks.push(cells.slice(i * 7, (i + 1) * 7));
     }
 
     this.weeks = weeks;

@@ -29,6 +29,34 @@
     "PRIVACY_POLICY": "Política de Privacidade",
     "INCIDENT_TYPE": "Tipo de Incidente"
   },
+  "DASHBOARD": {
+    "OPEN_3D": "Abrir 3D",
+    "CALENDAR": {
+      "SUN": "Dom",
+      "MON": "Seg",
+      "TUE": "Ter",
+      "WED": "Qua",
+      "THU": "Qui",
+      "FRI": "Sex",
+      "SAT": "Sáb"
+    },
+    "WEATHER": {
+      "TITLE": "Clima nos Açores",
+      "LOADING": "A carregar dados meteorológicos..."
+    },
+    "MARITIME": {
+      "TITLE": "Condições Marítimas",
+      "INFO": "Dados do Porto de Ponta Delgada..."
+    },
+    "SERVICE": {
+      "TITLE": "Serviço",
+      "COMING_SOON": "A implementar..."
+    },
+    "WIDGET": {
+      "TITLE": "Outro Widget",
+      "CONTENT": "Conteúdo adicional aqui."
+    }
+  },
   "SETTINGS": {
     "SETTINGS": "Configurações",
     "LIGHT": "Claro",
