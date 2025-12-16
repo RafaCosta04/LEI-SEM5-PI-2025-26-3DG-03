@@ -7,6 +7,8 @@
 :- use_module(library(http/http_parameters)).
 :- use_module('Modules/genetic_controller.pl').
 :- use_module('Modules/rebalancing_controller.pl').
+:- dynamic vessel/6.
+:- dynamic obtain_seq_shortest_delay_improved_multi/4.
 :- consult('Algorithms/vessel_schedule.pl').
 :- consult('Algorithms/improved_vessel_schedule.pl').
 

@@ -312,17 +312,18 @@ safe_log('--- End of global test ---~n', []).
 % ---------------- Base de Conhecimento ----------------
 
 % Fatos `vessel`: vessel(Nome, TIn, TDep, TUnload, TLoad, maxCranes)
+% Test data commented out - vessel facts are now loaded dynamically from API requests
 
-vessel(va, 6, 63, 10, 16,3).
-vessel(vb, 23, 50, 9, 7,3).
-vessel(vc, 8, 40, 5, 12,3).
-vessel(vd, 27, 40, 0, 8,3).
-vessel(ve, 36, 70, 12, 0,3).
-vessel(vf, 40, 60, 8, 6,3).
-vessel(vg, 52, 80, 9, 10,3).
-vessel(vi, 61, 90, 13, 8,3).
-vessel(vj, 74, 100, 7, 7,3).
-vessel(vk, 81, 110, 6, 8,3).
+%vessel(va, 6, 63, 10, 16,3).
+%vessel(vb, 23, 50, 9, 7,3).
+%vessel(vc, 8, 40, 5, 12,3).
+%vessel(vd, 27, 40, 0, 8,3).
+%vessel(ve, 36, 70, 12, 0,3).
+%vessel(vf, 40, 60, 8, 6,3).
+%vessel(vg, 52, 80, 9, 10,3).
+%vessel(vi, 61, 90, 13, 8,3).
+%vessel(vj, 74, 100, 7, 7,3).
+%vessel(vk, 81, 110, 6, 8,3).
 %vessel(vl, 90, 140, 22, 18,5).
 %vessel(vm, 112, 140, 8, 7,5).
 %vessel(vn, 82, 135, 13, 12,5).
