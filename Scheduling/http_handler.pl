@@ -7,10 +7,9 @@
 :- use_module(library(http/http_parameters)).
 :- use_module('Modules/genetic_controller.pl').
 :- use_module('Modules/rebalancing_controller.pl').
+:- use_module('Modules/automatic_controller.pl').
 :- dynamic vessel/6.
 :- dynamic obtain_seq_shortest_delay_improved_multi/4.
-:- consult('Algorithms/vessel_schedule.pl').
-:- consult('Algorithms/improved_vessel_schedule.pl').
 
 
 :- http_handler(root(api/scheduling/compute), handle_scheduling_request, []).
@@ -27,13 +26,23 @@ handle_scheduling_request(Request) :-
 
 handle_scheduling_request_inner(Request) :-
     http_read_json_dict(Request, Dict),
-    http_parameters(Request, [algorithm(AlgParam, [optional(true)])]),
+    http_parameters(Request, [
+        algorithm(AlgParam, [optional(true)]),
+        timeLimit(TimeLimitParam, [optional(true), number])
+    ]),
     (   (get_dict(algorithm, Dict, AlgJson) -> true ; AlgJson = '' ),
         (AlgParam \= '' -> Algorithm = AlgParam ; (AlgJson \= '' -> Algorithm = AlgJson ; Algorithm = default))
     ),
     with_output_to(user_error, format('Selected algorithm: ~w~n', [Algorithm])),
     ( get_dict(maxCranes, Dict, MaxCranes) -> true ; MaxCranes = 1 ),
-    ( process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes)
+    % TimeLimit can come from query parameter OR JSON body (query parameter takes precedence)
+    ( var(TimeLimitParam) -> 
+        ( get_dict(timeLimit, Dict, TimeLimit) -> true ; TimeLimit = 0 )
+    ; 
+        TimeLimit = TimeLimitParam 
+    ),
+    with_output_to(user_error, format('TimeLimit parameter: ~w hours~n', [TimeLimit])),
+    ( process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes, TimeLimit)
     -> (
             with_output_to(user_error, format('Result to reply: ~w~n', [Result])),
             reply_json_dict(_{status: "ok", schedule: Result})
@@ -42,35 +51,105 @@ handle_scheduling_request_inner(Request) :-
     ).
 
 
-% process_data_with_algorithm(+Algorithm, +Dict, -Result)
+% process_data_with_algorithm(+Algorithm, +Dict, -Result, +MaxCranes, +TimeLimit)
 % Dispatches to the selected algorithm implementation.
-process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes) :-
+process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes, TimeLimit) :-
     retractall(vessel(_,_,_,_,_,_)),
+    retractall(automatic_controller:vessel(_,_,_,_,_,_)),
     Notifications = Dict.vesselVisitNotifications,
     Crane = Dict.assignedCrane,
     CraneCapacity = Crane.operationalCapacity,
-    process_vessels(Notifications, CraneCapacity, MaxCranes, _),
-    % First run a single-crane measurement to collect baseline stats for the popup
-    obtain_seq_shortest_delay(_SeqSingle, DelaySingle, ExecTimeSingle),
-    % Now run the requested algorithm to obtain the final sequence (may be multi-crane)
+    
+    % Check if rebalancing mode is requested
     downcase_atom(Algorithm, AlgorithmAtom),
-    (   AlgorithmAtom = 'improved'
-    ->  obtain_seq_shortest_delay_improved_multi(SeqTriplets, ShortestDelay, ExecutionTime, MaxCranes)
-    ;   obtain_seq_shortest_delay_multi(SeqTriplets, ShortestDelay, ExecutionTime, MaxCranes)
-    ),
-    % Build human-friendly messages for the frontend popup
-    % Evaluate formatted messages into strings before assembling the list
-    format_time_msg('Time to generate the shortest delay solution (secs): ~w', ExecTimeSingle, SingleTimeMsg),
-    format_msg('Single-crane total delay: ~w', DelaySingle, SingleDelayMsg),
-    format_time_msg('Time to generate the shortest delay solution (secs): ~w', ExecutionTime, MultiTimeMsg),
-    format_msg('Multi-crane total delay: ~w', ShortestDelay, MultiDelayMsg),
-    ( DelaySingle =:= 0 ->
-        SingleMsg = ['Running single-crane test...', SingleTimeMsg, SingleDelayMsg, 'Single-crane was sufficient, no multi-crane needed.']
+    (   (AlgorithmAtom = 'rebalancing' ; AlgorithmAtom = 'rebalance')
+    ->  % Use rebalancing-based approach: distribute vessels across docks, then apply auto selection per dock
+        with_output_to(user_error, format('Using REBALANCING-BASED algorithm selection...~n', [])),
+        
+        % Get docks information from request
+        Docks = Dict.get(docks, []),
+        
+        % Setup rebalancing facts
+        retractall(rebalancing_algorithm:vessels(_,_,_,_)),
+        retractall(rebalancing_algorithm:vessel(_,_,_,_)),
+        retractall(rebalancing_algorithm:dock(_,_)),
+        
+        % Process docks and vessels for rebalancing
+        maplist(setup_dock_fact, Docks),
+        process_vessels_for_rebalancing(Notifications, CraneCapacity),
+        
+        % Run rebalancing-based scheduling with automatic algorithm selection per dock
+        select_and_run_with_rebalancing(Docks, MaxCranes, TimeLimit, SeqTriplets, ShortestDelay, AlgoInfo),
+        ExecutionTime = AlgoInfo.get(rebalancingTime, 0),
+        SelectedAlgo = 'rebalancing_based',
+        format(atom(SelectionReason), 'Rebalancing-based scheduling with per-dock algorithm selection (~w docks)', [AlgoInfo.numberOfDocks])
     ;
-        SingleMsg = ['Running single-crane test...', SingleTimeMsg, SingleDelayMsg, 'Delays detected with single-crane, applying multi-crane...']
+        % Standard vessel processing (non-rebalancing mode)
+        process_vessels(Notifications, CraneCapacity, MaxCranes, _),
+        
+        % Check if automatic algorithm selection is requested
+        (   (AlgorithmAtom = 'automatic' ; AlgorithmAtom = 'auto')
+        ->  % Use automatic controller to select and run the best algorithm
+            with_output_to(user_error, format('Using AUTOMATIC algorithm selection...~n', [])),
+            select_and_run_algorithm(MaxCranes, TimeLimit, SeqTriplets, ShortestDelay, AlgoInfo),
+            ExecutionTime = AlgoInfo.executionTime,
+            SelectedAlgo = AlgoInfo.selectedAlgorithm,
+            SelectionReason = AlgoInfo.selectionReason
+        ;   % Manual algorithm selection (legacy mode)
+            with_output_to(user_error, format('Using MANUAL algorithm selection: ~w~n', [AlgorithmAtom])),
+            % First run a single-crane measurement to collect baseline stats for the popup
+            automatic_controller:obtain_seq_shortest_delay(_SeqSingle, DelaySingle, ExecTimeSingle),
+            % Now run the requested algorithm to obtain the final sequence (may be multi-crane)
+            (   AlgorithmAtom = 'improved'
+            ->  automatic_controller:obtain_seq_shortest_delay_improved_multi(SeqTriplets, ShortestDelay, ExecutionTime, MaxCranes),
+                SelectedAlgo = heuristic,
+                SelectionReason = 'Manually selected improved/heuristic algorithm'
+            ;   % default or any other value: use optimal algorithm
+                automatic_controller:obtain_seq_shortest_delay_multi(SeqTriplets, ShortestDelay, ExecutionTime, MaxCranes),
+                SelectedAlgo = optimal,
+                SelectionReason = 'Manually selected default/optimal algorithm'
+            )
+        )
     ),
-    MultiMsg = [MultiTimeMsg, MultiDelayMsg],
-    append(SingleMsg, MultiMsg, MessagesRaw),
+    
+    % Build human-friendly messages for the frontend popup
+    % Format algorithm selection message
+    atom_string(SelectedAlgo, SelectedAlgoStr),
+    atom_string(SelectionReason, SelectionReasonStr),
+    format(atom(AlgoSelectionMsg), 'Algorithm: ~w', [SelectedAlgoStr]),
+    
+    % Build messages based on whether it's automatic or manual mode
+    (   (AlgorithmAtom = 'automatic' ; AlgorithmAtom = 'auto')
+    ->  % Automatic mode: include crane mode information
+        % Extract crane mode from AlgoInfo if available
+        ( get_dict(craneMode, AlgoInfo, CraneModeAtom) ->
+            atom_string(CraneModeAtom, CraneModeStr),
+            ( CraneModeAtom = single_crane ->
+                CraneModeDisplay = 'Single-crane mode'
+            ; CraneModeDisplay = 'Multi-crane mode'
+            )
+        ; CraneModeDisplay = ''
+        ),
+        format_time_msg('Execution time: ~w seconds', ExecutionTime, TimeMsg),
+        format_msg('Total delay: ~w', ShortestDelay, DelayMsg),
+        ( CraneModeDisplay \= '' ->
+            MessagesRaw = [AlgoSelectionMsg, SelectionReasonStr, CraneModeDisplay, TimeMsg, DelayMsg]
+        ;   MessagesRaw = [AlgoSelectionMsg, SelectionReasonStr, TimeMsg, DelayMsg]
+        )
+    ;   % Manual mode: conditional display based on single-crane performance
+        ( DelaySingle =:= 0 ->
+            % Single-crane was sufficient - show only single-crane results
+            format_time_msg('Time to generate the shortest delay solution (secs): ~w', ExecTimeSingle, SingleTimeMsg),
+            format_msg('Single-crane total delay: ~w', DelaySingle, SingleDelayMsg),
+            MessagesRaw = ['Running single-crane test...', SingleTimeMsg, SingleDelayMsg]
+        ;
+            % Multi-crane needed - show only multi-crane results
+            format_time_msg('Time to generate the shortest delay solution (secs): ~w', ExecutionTime, MultiTimeMsg),
+            format_msg('Multi-crane total delay: ~w', ShortestDelay, MultiDelayMsg),
+            MessagesRaw = ['Delays detected with single-crane, applying multi-crane...', MultiTimeMsg, MultiDelayMsg]
+        )
+    ),
+    
     % Convert raw items (which may be atoms) to strings
     maplist(atom_string_safe, MessagesRaw, Messages),
     triplets_to_dicts(SeqTriplets, SeqDicts),
@@ -78,7 +157,9 @@ process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes) :-
         schedule: SeqDicts,
         totalDelay: ShortestDelay,
         executionTime: ExecutionTime,
-        messages: Messages
+        messages: Messages,
+        selectedAlgorithm: SelectedAlgoStr,
+        selectionReason: SelectionReasonStr
     }.
 
 % Helpers to format messages safely
@@ -116,8 +197,9 @@ process_vessels([V|Rest], CraneCapacity, MaxCranes, [_|Facts]) :-
     % Calcula tempos (horas ou qualquer unidade que uses)
     compute_loading_unloading(NLoading, NUnloading, CraneCapacity, LoadingTime, UnloadingTime),
 
-    % Cria facto vessel(..., MaxCranes)
+    % Cria facto vessel(..., MaxCranes) in both contexts for compatibility
     assertz(vessel(VesselName, ETAHour, ETDHour, UnloadingTime, LoadingTime, MaxCranes)),
+    assertz(automatic_controller:vessel(VesselName, ETAHour, ETDHour, UnloadingTime, LoadingTime, MaxCranes)),
 
     with_output_to(user_error, format("Fato criado: vessel(~w, ~2f, ~2f, ~2f, ~2f, ~w)~n",
         [VesselName, ETAHour, ETDHour, LoadingTime, UnloadingTime, MaxCranes])),
@@ -220,3 +302,35 @@ sanitize_value(Value, Out) :-
 string_to_number_or_string(Str, Num) :-
     normalize_space(string(S), Str),
     ( catch(number_string(N, S), _, fail) -> Num = N ; Num = S ).
+
+% Helper predicates for rebalancing mode
+setup_dock_fact(DockDict) :-
+    NameRaw = DockDict.get(name, ""),
+    ( string(NameRaw) -> atom_string(Name, NameRaw) ; Name = NameRaw ),
+    OpRaw = DockDict.get(medianOperationalCapacity, 0),
+    ( number(OpRaw) -> OpCap = OpRaw ; ( catch(number_string(OpCap, OpRaw), _, OpCap = 0) ) ),
+    assertz(rebalancing_algorithm:dock(Name, OpCap)).
+
+process_vessels_for_rebalancing([], _).
+process_vessels_for_rebalancing([V|Rest], _CraneCapacity) :-
+    VesselIMO = V.vesselIMO,
+    ETAString = V.eta,
+    ETDString = V.etd,
+    CargoManifests = V.get(cargoManifests, []),
+    
+    datetime_to_hour(ETAString, ETAHour),
+    datetime_to_hour(ETDString, ETDHour),
+    
+    count_cargo(CargoManifests, loading, NLoading),
+    count_cargo(CargoManifests, unloading, NUnloading),
+    TotalContainers is NLoading + NUnloading,
+    
+    ETAInt is ceiling(ETAHour),
+    ETDInt is ceiling(ETDHour),
+    
+    assertz(rebalancing_algorithm:vessels(VesselIMO, ETAInt, ETDInt, TotalContainers)),
+    
+    with_output_to(user_error, format("Rebalancing vessel: ~w (ETA=~w, ETD=~w, Containers=~w)~n",
+        [VesselIMO, ETAInt, ETDInt, TotalContainers])),
+    
+    process_vessels_for_rebalancing(Rest, _).

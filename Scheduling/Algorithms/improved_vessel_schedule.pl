@@ -1,16 +1,16 @@
 :- dynamic vessel/6.
 
 % Vessel facts: (Name, TIn, TDep, TUnload, TLoad, MaxCranes)
-vessel(va, 6, 63, 10, 16,3).
-vessel(vb, 23, 50, 9, 7,3).
-vessel(vc, 8, 40, 5, 12,3).
-vessel(vd, 27, 40, 0, 8,3).
-vessel(ve, 36, 70, 12, 0,3).
-vessel(vf, 40, 60, 8, 6,3).
-vessel(vg, 52, 80, 9, 10,3).
-vessel(vi, 61, 90, 13, 8,3).
-vessel(vj, 74, 100, 7, 7,3).
-vessel(vk, 81, 110, 6, 8,3).
+%vessel(va, 6, 63, 10, 16,3).
+%vessel(vb, 23, 50, 9, 7,3).
+%vessel(vc, 8, 40, 5, 12,3).
+%vessel(vd, 27, 40, 0, 8,3).
+%vessel(ve, 36, 70, 12, 0,3).
+%vessel(vf, 40, 60, 8, 6,3).
+%vessel(vg, 52, 80, 9, 10,3).
+%vessel(vi, 61, 90, 13, 8,3).
+%vessel(vj, 74, 100, 7, 7,3).
+%vessel(vk, 81, 110, 6, 8,3).
 %vessel(vl, 90, 140, 22, 18,5).
 %vessel(vm, 112, 140, 8, 7,5).
 %vessel(vn, 82, 135, 13, 12,5).
@@ -111,8 +111,7 @@ schedule_greedy_improved(LV, FinalSeqTriplets, FinalDelay, TimeSecs) :-
 obtain_seq_shortest_delay_improved(SeqTriplets, DelayHours, ExecutionTime) :-
     findall(V, vessel(V,_,_,_,_,_), LV),
     schedule_greedy_improved(LV, SeqTriplets, DelayHours, TimeSecs),
-    ExecutionTime = TimeSecs,
-    safe_log_improved('Time to generate the improved schedule (secs): ~w~n', [TimeSecs]).
+    ExecutionTime = TimeSecs.
 
 
 % ---------------- Escalonamento (multi-cranes) para improved ----------------
@@ -155,23 +154,30 @@ obtain_seq_shortest_delay_improved_multi(SeqQuad, DelayBest, ExecutionTime, MaxC
     schedule_greedy_improved(LV, SeqSingle, DelaySingle, _),
     
     ( DelaySingle =:= 0 ->
-        % single-crane already optimal, build quad with 1 crane each
+        % Single-crane already optimal - show single-crane results only
+        safe_log_improved('Running single-crane test...~n', []),
+        safe_log_improved('Time to generate the shortest delay solution (secs): ~w~n', [ExecutionTime]),
+        safe_log_improved('Single-crane total delay: ~w~n', [DelaySingle]),
         build_seq_quad_1crane_improved(SeqSingle, SeqQuad, _),
         DelayBest = DelaySingle
     ; MaxCranes =< 1 ->
-        % caller requested testing only up to 1 crane
+        % Caller requested only 1 crane - show single-crane results only
+        safe_log_improved('Running single-crane test...~n', []),
+        safe_log_improved('Time to generate the shortest delay solution (secs): ~w~n', [ExecutionTime]),
+        safe_log_improved('Single-crane total delay: ~w~n', [DelaySingle]),
         build_seq_quad_1crane_improved(SeqSingle, SeqQuad, _),
-        DelayBest = DelaySingle,
-        safe_log_improved('MaxCranes <= 1: skipping multi-crane search and returning single-crane solution.~n', [])
+        DelayBest = DelaySingle
     ;
-        % try N from 1..MaxCranes
+        % Multi-crane needed - show only multi-crane results
+        safe_log_improved('Delays detected with single-crane, applying multi-crane...~n', []),
         loop_try_N_improved_limit(1, MaxCranes, SeqSingle, BestSeq, BestDelay, _),
         SeqQuad = BestSeq,
-        DelayBest = BestDelay
+        DelayBest = BestDelay,
+        safe_log_improved('Time to generate the shortest delay solution (secs): ~w~n', [ExecutionTime]),
+        safe_log_improved('Multi-crane total delay: ~w~n', [DelayBest])
     ),
     get_time(Tf),
-    ExecutionTime is Tf - Ti,
-    safe_log_improved('Improved multi-crane search time (secs): ~w~n', [ExecutionTime]).
+    ExecutionTime is Tf - Ti.
 
 % apply_multi_cranes_improved/4: aplica alocação de cranes e calcula quad + atraso
 apply_multi_cranes_improved(SeqTriplets, SeqQuad, DelayBest, CranesAlloc) :-

@@ -96,11 +96,36 @@ build_seq_quad_1crane([(V, TIn, TEnd, ExecTime)|T], [(V, TIn, TEnd, ExecTime, 1)
 
     % Wrapper de compatibilidade: obtain_seq_shortest_delay_multi/4
     % Older HTTP handler expects a 4-arity predicate (Seq, Delay, ExecTime, MaxCranes).
-    % We provide a thin wrapper that measures execution time and delegates to the
-    % existing obtain_seq_shortest_delay_multi/3 implementation.
     obtain_seq_shortest_delay_multi(SeqQuad, DelayBest, ExecutionTime, MaxCranes) :-
-        % Delegar para a pesquisa multi-crane melhorada que aceita um limite superior.
-        obtain_seq_shortest_delay_improved_multi(SeqQuad, DelayBest, ExecutionTime, MaxCranes).
+        get_time(Ti),
+        % Obter a melhor sequência com 1 crane
+        obtain_seq_shortest_delay(SeqTriplets, DelaySingle),
+        
+        ( DelaySingle =:= 0 ->
+            % Single-crane already optimal - show single-crane results only
+            safe_log('Running single-crane test...~n', []),
+            safe_log('Time to generate the shortest delay solution (secs): ~w~n', [ExecutionTime]),
+            safe_log('Single-crane total delay: ~w~n', [DelaySingle]),
+            build_seq_quad_1crane(SeqTriplets, SeqQuad, _),
+            DelayBest = DelaySingle
+        ; MaxCranes =< 1 ->
+            % Caller requested only 1 crane - show single-crane results only
+            safe_log('Running single-crane test...~n', []),
+            safe_log('Time to generate the shortest delay solution (secs): ~w~n', [ExecutionTime]),
+            safe_log('Single-crane total delay: ~w~n', [DelaySingle]),
+            build_seq_quad_1crane(SeqTriplets, SeqQuad, _),
+            DelayBest = DelaySingle
+        ;
+            % Multi-crane needed - show only multi-crane results
+            safe_log('Delays detected with single-crane, applying multi-crane...~n', []),
+            apply_multi_cranes(SeqTriplets, BestSeq, BestDelay, _),
+            SeqQuad = BestSeq,
+            DelayBest = BestDelay,
+            safe_log('Time to generate the shortest delay solution (secs): ~w~n', [ExecutionTime]),
+            safe_log('Multi-crane total delay: ~w~n', [DelayBest])
+        ),
+        get_time(Tf),
+        ExecutionTime is Tf - Ti.
 
 % apply_multi_cranes/4: aplica alocação de cranes por doca e calcula quad + atraso
 % apply_multi_cranes/4: tenta alocações de 1..MaxCrane (parando cedo se delay = 0)

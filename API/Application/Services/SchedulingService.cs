@@ -604,7 +604,7 @@ public class SchedulingService
         return caps.Average();
     }
 
-    public async Task<SchedulingDTO?> GetSchedulingForTargetDay(DateTime targetDay, List<string> errorMessages, string algorithm = "default")
+    public async Task<SchedulingDTO?> GetSchedulingForTargetDay(DateTime targetDay, List<string> errorMessages, string algorithm = "default", double? timeLimit = null)
     {
         IEnumerable<VesselVisitNotification> notifications = await _vesselVisitNotificationRepository.GetVisitsByTargetDay_StatusAsync(targetDay, VisitStatus.Approved);
         if (!notifications.Any())
@@ -645,14 +645,18 @@ public class SchedulingService
         var algNorm = (algorithm ?? "default").Trim();
         if (string.IsNullOrEmpty(algNorm)) algNorm = "default";
         var algParam = algNorm.ToLowerInvariant();
-        if (algParam != "default" && algParam != "improved")
+        if (algParam != "default" && algParam != "improved" && algParam != "automatic" && algParam != "rebalancing")
         {
-            var msgInvalid = $"Unsupported algorithm '{algParam}'. Supported values: 'default' or 'improved'.";
+            var msgInvalid = $"Unsupported algorithm '{algParam}'. Supported values: 'default', 'improved', 'automatic', or 'rebalancing'.";
             Console.WriteLine(msgInvalid);
             errorMessages.Add(msgInvalid);
             return null;
         }
         string endpoint = baseEndpoint + path + "?algorithm=" + System.Uri.EscapeDataString(algParam);
+        if (timeLimit.HasValue)
+        {
+            endpoint += "&timeLimit=" + timeLimit.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
         Console.WriteLine($"SchedulingService: requested algorithm='{algParam}', calling Prolog endpoint: {endpoint}");
         try
         {
@@ -680,9 +684,9 @@ public class SchedulingService
                 .GetProperty("schedule")
                 .EnumerateArray();
 
-            int totalDelay = scheduleRoot
+            double totalDelay = scheduleRoot
                 .GetProperty("totalDelay")
-                .GetInt32();
+                .GetDouble();
             double executionTime = scheduleRoot
                 .GetProperty("executionTime")
                 .GetDouble();

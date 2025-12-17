@@ -9,10 +9,10 @@
 :- dynamic vessels/1.
 
 % Vessel facts: vessel(Id, ProcessTime, ETA, ETD, MaxCranes)
-vessel(va, 26, 6, 63, 3). 
-vessel(vb, 16, 23, 50, 3). 
-vessel(vc, 17, 8, 40, 3).
-vessel(vd, 8, 27, 40, 3). 
+%vessel(va, 26, 6, 63, 3). 
+%vessel(vb, 16, 23, 50, 3). 
+%vessel(vc, 17, 8, 40, 3).
+%vessel(vd, 8, 27, 40, 3). 
 %vessel(ve, 12, 36, 70, 3). 
 %vessel(vf, 14, 40, 60, 3). 
 %vessel(vg, 19, 52, 80, 3). 

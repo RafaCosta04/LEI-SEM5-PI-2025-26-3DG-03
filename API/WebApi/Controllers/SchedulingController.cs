@@ -26,9 +26,9 @@ public class SchedulingController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<SchedulingDTO>> GetSchedullingForTargetDay(DateTime targetDay, string algorithm = "default")
+    public async Task<ActionResult<SchedulingDTO>> GetSchedullingForTargetDay(DateTime targetDay, string algorithm = "default", double? timeLimit = null)
     {
-        SchedulingDTO? notifications = await _schedulingService.GetSchedulingForTargetDay(targetDay, _errorMessages, algorithm);
+        SchedulingDTO? notifications = await _schedulingService.GetSchedulingForTargetDay(targetDay, _errorMessages, algorithm, timeLimit);
         if (_errorMessages.Count > 0)
         {
             var msg = string.Join("; ", _errorMessages);

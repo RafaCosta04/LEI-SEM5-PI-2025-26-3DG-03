@@ -64,6 +64,24 @@
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
+/* Time info badge */
+.time-info {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.info-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  white-space: nowrap;
+}
+
 /* Dark mode for algorithm dropdown */
 :host-context([data-coreui-theme="dark"]) .alg-label {
   color: #e2e8f0;
