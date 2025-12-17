@@ -435,10 +435,13 @@
 
     "ALGORITHM": {
       "LABEL": "Algoritmo:",
+      "AUTOMATIC": "Automático",
       "DEFAULT": "Padrão",
       "HEURISTIC": "Heurístico",
       "GENETIC": "Genético"
     },
+
+    "TIME_AVAILABLE": "Tempo Disponível",
 
     "GENETIC": {
       "TITLE": "Parâmetros do Algoritmo Genético",

@@ -17,13 +17,14 @@
       <div class="algorithm-select">
         <label class="alg-label">{{ 'SCHEDULE.ALGORITHM.LABEL' | translate }}</label>
         <select [(ngModel)]="selectedAlgorithm" (ngModelChange)="onAlgorithmChange($event)" class="algorithm-dropdown">
+          <option value="automatic">{{ 'SCHEDULE.ALGORITHM.AUTOMATIC' | translate }}</option>
           <option value="default">{{ 'SCHEDULE.ALGORITHM.DEFAULT' | translate }}</option>
           <option value="improved">{{ 'SCHEDULE.ALGORITHM.HEURISTIC' | translate }}</option>
           <option value="genetic">{{ 'SCHEDULE.ALGORITHM.GENETIC' | translate }}</option>
         </select>
       </div>
 
-      <input id="targetDay" type="datetime-local" [(ngModel)]="targetDayLocal" class="form-input" />
+      <input id="targetDay" type="datetime-local" [(ngModel)]="targetDayLocal" (ngModelChange)="onTargetDayChange()" class="form-input" />
 
       <button class="btn btn-primary" (click)="runSchedule()">{{ 'SCHEDULE.BUTTON.RUN' | translate }}</button>
     </div>

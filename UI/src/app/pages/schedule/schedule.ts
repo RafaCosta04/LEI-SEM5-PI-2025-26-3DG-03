@@ -25,9 +25,10 @@ import { ScheduleModel, ScheduleEntryModel } from '../../models/schedule.model';
 })
 export class Schedule implements OnInit, OnDestroy {
   isLoading: boolean = false;
-  selectedAlgorithm: string = 'default';
+  selectedAlgorithm: string = 'automatic';
   showGeneticParams: boolean = false;
   geneticParamsHiding: boolean = false;
+  calculatedTimeLimit: number | null = null;
 
   // Genetic algorithm parameters
   populationSize: number = 10;
@@ -169,8 +170,10 @@ export class Schedule implements OnInit, OnDestroy {
       return;
     }
     let targetIso: string;
+    let targetDate: Date;
     try {
-      targetIso = new Date(this.targetDayLocal).toISOString();
+      targetDate = new Date(this.targetDayLocal);
+      targetIso = targetDate.toISOString();
     } catch (e) {
       this.statusMessageType = 'error';
       this.statusMessage = 'Invalid target day format';
@@ -195,6 +198,14 @@ export class Schedule implements OnInit, OnDestroy {
         this.stableGenerations,
         this.enableMultiCrane
       );
+    } else if (algo === 'automatic') {
+      // Calculate time limit: hours between now and target day
+      const now = new Date();
+      const diffMs = targetDate.getTime() - now.getTime();
+      const timeLimit = Math.max(0, diffMs / (1000 * 60 * 60)); // Convert to hours
+      this.calculatedTimeLimit = Math.round(timeLimit * 100) / 100; // Round to 2 decimals
+
+      scheduleObservable = this.scheduleService.getScheduleByTargetDay(targetIso, algo, timeLimit);
     } else {
       scheduleObservable = this.scheduleService.getScheduleByTargetDay(targetIso, algo);
     }
@@ -216,8 +227,17 @@ export class Schedule implements OnInit, OnDestroy {
           const totalDelay = normalized.totalDelay ?? normalized.TotalDelay ?? normalized.schedule?.totalDelay ?? 0;
           const executionTime = normalized.executionTime ?? normalized.ExecutionTime ?? normalized.schedule?.executionTime ?? 0;
           const messages = normalized.messages ?? normalized.Messages ?? normalized.schedule?.messages ?? [];
-          const algorithmLabel = this.selectedAlgorithm === 'improved' ? 'Heuristic algorithm' :
-                                 this.selectedAlgorithm === 'genetic' ? 'Genetic algorithm' : 'Default algorithm';
+
+          // Determine algorithm label based on selection and response
+          let algorithmLabel = this.selectedAlgorithm === 'improved' ? 'Heuristic algorithm' :
+                               this.selectedAlgorithm === 'genetic' ? 'Genetic algorithm' :
+                               this.selectedAlgorithm === 'automatic' ? 'Automatic Selection' : 'Default algorithm';
+
+          // If automatic mode, try to get the actual algorithm used from response
+          if (this.selectedAlgorithm === 'automatic' && normalized.schedule?.selectedAlgorithm) {
+            const selectedAlgo = normalized.schedule.selectedAlgorithm;
+            algorithmLabel = `Automatic Selection → ${selectedAlgo.charAt(0).toUpperCase() + selectedAlgo.slice(1)}`;
+          }
 
           if (!entries || entries.length === 0) {
             // No vessels for selected day -> show auto-hiding error similar to Qualifications page
@@ -278,7 +298,34 @@ export class Schedule implements OnInit, OnDestroy {
         this.geneticParamsHiding = false;
       }, 300); // Tempo da animação
     }
+
+    // Calculate time limit for automatic mode
+    if (value === 'automatic' && this.targetDayLocal) {
+      this.calculateTimeLimit();
+    } else {
+      this.calculatedTimeLimit = null;
+    }
+
     this.selectedAlgorithm = value;
+  }
+
+  onTargetDayChange() {
+    // Recalculate time limit if in automatic mode
+    if (this.selectedAlgorithm === 'automatic' && this.targetDayLocal) {
+      this.calculateTimeLimit();
+    }
+  }
+
+  private calculateTimeLimit() {
+    try {
+      const targetDate = new Date(this.targetDayLocal);
+      const now = new Date();
+      const diffMs = targetDate.getTime() - now.getTime();
+      const timeLimit = Math.max(0, diffMs / (1000 * 60 * 60));
+      this.calculatedTimeLimit = Math.round(timeLimit * 100) / 100;
+    } catch (e) {
+      this.calculatedTimeLimit = null;
+    }
   }
 
   closeSchedule() {
@@ -286,15 +333,15 @@ export class Schedule implements OnInit, OnDestroy {
     this.scheduleModel = null;
   }
 
-  private getTimelineBounds(): { start: number; end: number } {
-    if (!this.scheduleModel || !this.scheduleModel.scheduleEntries || this.scheduleModel.scheduleEntries.length === 0) {
+  getTimelineBounds(): { start: number; end: number } {
+    if (!this.scheduleModel || !this.scheduleModel.scheduleEntries) {
       const now = Date.now();
       return { start: now, end: now + 3600 * 1000 };
     }
-    let min = Number.POSITIVE_INFINITY;
+    let min = Infinity;
     let max = 0;
-    for (const e of this.scheduleModel.scheduleEntries!) {
-      const s = e.arrivalTime ? new Date(e.arrivalTime).getTime() : Number.POSITIVE_INFINITY;
+    for (const e of this.scheduleModel.scheduleEntries) {
+      const s = e.arrivalTime ? new Date(e.arrivalTime).getTime() : 0;
       const t = e.departureTime ? new Date(e.departureTime).getTime() : 0;
       if (s < min) min = s;
       if (t > max) max = t;

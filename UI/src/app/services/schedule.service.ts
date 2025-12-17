@@ -10,10 +10,16 @@ import { ScheduleModel } from '../models/schedule.model';
 export class ScheduleService {
   constructor(private apiService: ApiService) {}
 
-    getScheduleByTargetDay(targetDay: string, algorithm: string = 'default'): Observable<ScheduleModel> {
+    getScheduleByTargetDay(targetDay: string, algorithm: string = 'default', timeLimit?: number): Observable<ScheduleModel> {
       const encoded = encodeURIComponent(targetDay);
       const alg = encodeURIComponent(algorithm || 'default');
-      return this.apiService.get<ScheduleModel>(`/Scheduling?targetDay=${encoded}&algorithm=${alg}`);
+      
+      let url = `/Scheduling?targetDay=${encoded}&algorithm=${alg}`;
+      if (timeLimit !== undefined && timeLimit !== null) {
+        url += `&timeLimit=${timeLimit}`;
+      }
+      
+      return this.apiService.get<ScheduleModel>(url);
     }
 
     getScheduleWithGeneticAlgorithm(

@@ -3,31 +3,31 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { VesselVisitNotificationDecisionModel } from '../models/vesselVisitNotificationDecision.model';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VesselVisitNotificationDecisionService {
-  private apiUrl = 'https://lapr5-frontend.duckdns.org/api/VesselVisitNotification';
 
-  constructor(private http: HttpClient) { }
+  constructor(private apiService: ApiService) { }
 
   getAllDecisions(): Observable<VesselVisitNotificationDecisionModel[]> {
-    return this.http.get<VesselVisitNotificationDecisionModel[]>(`${this.apiUrl}/Decision`)
+    return this.apiService.get<VesselVisitNotificationDecisionModel[]>('/VesselVisitNotification/Decision')
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getDecisionById(id: number): Observable<VesselVisitNotificationDecisionModel> {
-    return this.http.get<VesselVisitNotificationDecisionModel>(`${this.apiUrl}/DecisionById/${id}`)
+    return this.apiService.get<VesselVisitNotificationDecisionModel>(`/VesselVisitNotification/DecisionById/${id}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   createDecision(decision: VesselVisitNotificationDecisionModel): Observable<VesselVisitNotificationDecisionModel> {
-    return this.http.post<VesselVisitNotificationDecisionModel>(`${this.apiUrl}/Decision`, decision)
+    return this.apiService.post<VesselVisitNotificationDecisionModel>('/VesselVisitNotification/Decision', decision)
       .pipe(
         catchError(this.handleError)
       );
