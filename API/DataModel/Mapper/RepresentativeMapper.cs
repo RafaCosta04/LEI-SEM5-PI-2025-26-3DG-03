@@ -33,20 +33,20 @@ public class RepresentativeMapper
             representativeDM.PhoneNumber!);
         representativeDomain.Id = representativeDM.Id;
         representativeDomain.LastModifiedAt = representativeDM.LastModifiedAt;
-        
+
         // Map Status from string to enum
         if (!string.IsNullOrEmpty(representativeDM.Status))
         {
             var parsedStatus = Enum.Parse<SystemUserStatus>(representativeDM.Status);
             representativeDomain.ChangeUserStatus(parsedStatus);
         }
-        
+
         // Map IsFirstTime: Constructor initializes to true, so call ChangeIsFirstTime() if DB value is false
         if (!representativeDM.IsFirstTime)
         {
             representativeDomain.ChangeIsFirstTime(representativeDM.IsFirstTime);
         }
-        
+
         return representativeDomain;
     }
 
