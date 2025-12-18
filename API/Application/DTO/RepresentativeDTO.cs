@@ -18,7 +18,7 @@ public class RepresentativeDTO
 
     public string? PhoneNumber { get; set; }
 
-    public SystemUserStatus Status { get; set; }
+    public string? Status { get; set; }
 
     public bool IsFirstTime { get; set; }
 
@@ -41,7 +41,7 @@ public class RepresentativeDTO
             RepresentativeDTO representativeDTO = new RepresentativeDTO(representative.Organization!.LegalName!, representative.Name!, representative.CitizenId!, representative.Nationality!, representative.Email!, representative.PhoneNumber!);
             representativeDTO.Id = representative.Id;
             representativeDTO.IsFirstTime = representative.IsFirstTime;
-            representativeDTO.Status = representative.Status;
+            representativeDTO.Status = representative.Status.ToString();
             return representativeDTO;
         }
         catch (ArgumentOutOfRangeException ex)

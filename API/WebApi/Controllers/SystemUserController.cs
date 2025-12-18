@@ -169,7 +169,7 @@ public class SystemUserController : ControllerBase
             {
                 return Forbid();
             }
-            if (representative.Status.Equals(SystemUserStatus.Deactivated))
+            if (representative.Status?.Equals(SystemUserStatus.Deactivated.ToString()) == true)
             {
                 return Forbid("Access denied.");
             }
