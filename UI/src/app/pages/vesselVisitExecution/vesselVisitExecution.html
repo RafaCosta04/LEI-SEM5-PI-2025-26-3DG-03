@@ -1,0 +1,108 @@
+<div class="page-container">
+  <h1 class="page-title">Vessel Visit Execution</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search by code, name or description"
+        class="search-input"
+      >
+      <button *ngIf="searchTerm" (click)="clearSearchAndNotify()" class="clear-button" title="Clear search">✕</button>
+    </div>
+
+    <div class="action-buttons">
+      <button (click)="onCreateNew()" class="btn btn-primary" title="New Execution">New Execution</button>
+      <!-- No Edit button in VVE page by requirement -->
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage" [ngClass]="statusMessageType === 'success' ? 'success-message' : 'error-message'" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+    <button (click)="clearStatusMessage()" class="close-error">✕</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading...</div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Vessel IMO</th>
+          <th>Arrival Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredItems" [class.selected]="selected?.id === item.id" (click)="select(item)">
+          <td><span class="styled-field">{{ item.code }}</span></td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.arrivalDate | date: 'dd/MM/yyyy, HH:mm:ss' }}</td>
+          <td><span [ngClass]="getStatusClass(item.status || item.description)">{{ item.status || item.description }}</span></td>
+          <td>
+            <button (click)="select(item); $event.stopPropagation()" class="btn-select" [class.selected]="selected?.id === item.id">
+              {{ selected?.id === item.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredItems.length === 0 && !isLoading" class="no-results">
+      <ng-container *ngIf="searchTerm; else noneFound"><p>No results for "{{ searchTerm }}"</p></ng-container>
+      <ng-template #noneFound><p>No results.</p></ng-template>
+    </div>
+  </div>
+
+  <div *ngIf="selected" class="selected-info">
+    <h3>Selected Vessel Visit Execution</h3>
+    <div class="info-card">
+      <p *ngIf="selected.code"><strong>Code:</strong> {{ selected.code }}</p>
+      <p *ngIf="selected.name"><strong>Vessel IMO:</strong> {{ selected.name }}</p>
+      <p *ngIf="selected.status || selected.description"><strong>Status:</strong> <span [ngClass]="getStatusClass(selected.status || selected.description)">{{ selected.status || selected.description }}</span></p>
+      <p *ngIf="selected.arrivalDate"><strong>Arrival Date:</strong> {{ selected.arrivalDate | date: 'dd/MM/yyyy, HH:mm:ss' }}</p>
+      <p *ngIf="selected.lastUpdated"><strong>Last Updated:</strong> {{ selected.lastUpdated | date: 'dd/MM/yyyy, HH:mm:ss' }}</p>
+      <p *ngIf="selected.systemUserID"><strong>Created By System User ID:</strong> {{ selected.systemUserID }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Create Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create Execution</h2>
+      <button class="close-button" (click)="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="modalErrorMessage" class="alert alert-danger">{{ modalErrorMessage }}</div>
+
+      <form (ngSubmit)="onSaveNew()" #form="ngForm">
+        <div class="form-group">
+          <label for="vesselVisitNotificationCode">Vessel Visit Notification</label>
+          <select id="vesselVisitNotificationCode" name="vesselVisitNotificationCode" [(ngModel)]="newItem.vesselVisitNotificationCode" required class="form-input" [class.error]="hasFieldError('vesselVisitNotificationCode')">
+            <option [ngValue]="''" disabled>Select Notification</option>
+            <option *ngFor="let n of approvedNotifications" [ngValue]="n.code">{{ n.code }} - {{ n.vesselIMO }}</option>
+          </select>
+          <div *ngIf="hasFieldError('vesselVisitNotificationCode')" class="field-error">{{ getFieldError('vesselVisitNotificationCode') }}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="arrivalDate">Arrival Date</label>
+          <input id="arrivalDate" name="arrivalDate" type="datetime-local" [(ngModel)]="newItem.arrivalDate" required class="form-input" [class.error]="hasFieldError('arrivalDate')">
+          <div *ngIf="hasFieldError('arrivalDate')" class="field-error">{{ getFieldError('arrivalDate') }}</div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeCreateModal()" class="btn btn-secondary" [disabled]="isCreating">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isCreating || !form.form.valid">{{ isCreating ? 'Creating...' : 'Create' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

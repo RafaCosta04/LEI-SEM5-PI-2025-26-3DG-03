@@ -176,7 +176,7 @@ export default class VesselVisitExecutionService implements IVesselVisitExecutio
             return Result.ok(dtoResult);
         } catch (error: any) {
             this.logger.error(error);
-            return Result.fail("Unexpected error creating vessel visit execution: " + error.message);
+            return Result.fail("Error creating vessel visit execution: " + error.message);
         }
     }
 }

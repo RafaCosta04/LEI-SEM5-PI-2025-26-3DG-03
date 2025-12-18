@@ -131,5 +131,10 @@ export const navItems: IExtendedNavData[] = [
     url: '/incident-type',
     icon: 'nav-img nav-img-incident-type',
     roles: ['Admin', 'PortAuthorityOfficer']
+  },
+  {
+    name: 'NAV.VESSEL_VISIT_EXECUTION',
+    url: '/vessel-visit-execution',
+    roles: ['Admin', 'LogisticOperator']
   }
 ];

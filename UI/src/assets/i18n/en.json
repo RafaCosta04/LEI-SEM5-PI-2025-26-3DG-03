@@ -27,7 +27,8 @@
     "SCHEDULE": "Schedule",
     "SYSTEM_USER": "System User",
     "PRIVACY_POLICY": "Privacy Policy",
-    "INCIDENT_TYPE": "Incident Type"
+    "INCIDENT_TYPE": "Incident Type",
+    "VESSEL_VISIT_EXECUTION": "Vessel Visit Execution"
   },
   "DASHBOARD": {
     "OPEN_3D": "Open 3D",
