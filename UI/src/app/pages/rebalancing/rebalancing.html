@@ -72,7 +72,7 @@
                           class="timeline-bar green"
                           [ngStyle]="getDockBarStyle(vt)"
                            [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure) + ((vt.delay !== null && vt.delay !== undefined) ? (' (Delay: ' + vt.delay + 'h)') : '')">
-                        <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                        <span class="bar-label">{{ vt.vesselName }}</span>
                       </div>
                     </div>
                   </div>
@@ -102,7 +102,7 @@
                           class="timeline-bar green"
                           [ngStyle]="getDockBarStyle(vt)"
                            [title]="vt.vesselName + ' ' + formatDateForDisplay(vt.arrival) + ' → ' + formatDateForDisplay(vt.departure) + ((vt.delay !== null && vt.delay !== undefined) ? (' (Delay: ' + vt.delay + 'h)') : '')">
-                        <span class="bar-label">{{ vt.vesselName }} {{ vt.arrival | date:'shortTime' }}</span>
+                        <span class="bar-label">{{ vt.vesselName }}</span>
                       </div>
                     </div>
                   </div>

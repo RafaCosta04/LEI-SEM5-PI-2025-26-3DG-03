@@ -92,11 +92,11 @@ report_rebalance_handlers :-
         forall(member(Path-Handler, Pairs), format('  ~w -> ~w~n', [Path, Handler]))
     )).
 
-% process a dock dict { name: ..., medianOperationalCapacity: N }
+% process a dock dict { name: ..., operationalCapacity: N }
 process_dock_dict(DockDict) :-
     NameRaw = DockDict.get(name, ""),
     ( string(NameRaw) -> atom_string(Name, NameRaw) ; Name = NameRaw ),
-    OpRaw = DockDict.get(medianOperationalCapacity, 0),
+    OpRaw = DockDict.get(operationalCapacity, 0),
     ( number(OpRaw) -> OpCap = OpRaw ; ( catch(number_string(OpCap, OpRaw), _, OpCap = 0) ) ),
     % Assert into the rebalancing_algorithm module so the algorithm can see the facts
     assertz(rebalancing_algorithm:dock(Name, OpCap)).

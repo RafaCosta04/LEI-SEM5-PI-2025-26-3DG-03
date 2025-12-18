@@ -87,9 +87,8 @@ public class SchedulingService
 
             if (resourcesForDock == null || resourcesForDock.Count == 0) continue;
 
-            double avgCap = GetAverageOperationalCapacity(resourcesForDock);
-            int avgCapInt = avgCap > 0 ? (int)Math.Round(avgCap) : 0;
-            docksDto.Add(new DockRebalancingDTO(dockName, avgCapInt));
+            int sumCap = resourcesForDock.Sum(r => r.PhysicalResourceOperationalCapacity);
+            docksDto.Add(new DockRebalancingDTO(dockName, sumCap));
         }
 
         var dataRebalancing = new DataRebalancingDTO(notificationDTOs, docksDto);
@@ -252,7 +251,7 @@ public class SchedulingService
                     .ToList();
 
                 DateTime lastDeparture = DateTime.MinValue;
-                int operationalCapacity = dockDto.MedianOperationalCapacity;
+                int operationalCapacity = dockDto.OperationalCapacity;
                 double meanOpCap = GetAverageOperationalCapacity(resourcesForDock);
                 double effectiveCap = meanOpCap > 0 ? meanOpCap : (operationalCapacity > 0 ? operationalCapacity : 1.0);
                 if (effectiveCap <= 0) effectiveCap = 1.0;
