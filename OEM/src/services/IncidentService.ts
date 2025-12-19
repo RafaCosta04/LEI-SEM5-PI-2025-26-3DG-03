@@ -193,7 +193,8 @@ export default class IncidentService implements IIncidentService {
             return Result.ok(dto);
         } catch (error) {
             this.logger.error(error);
-            return Result.fail("Error creating incident.");
+            const message = error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Error creating incident.');
+            return Result.fail(message);
         }
     }
 
@@ -204,7 +205,7 @@ export default class IncidentService implements IIncidentService {
                 return Result.fail("Incident not found.");
             }
 
-            if (incidentDTO.id !== id) {
+            if (incidentDTO.id && incidentDTO.id !== id) {
                 return Result.fail("Incident ID cannot be changed.");
             }
 
@@ -221,17 +222,15 @@ export default class IncidentService implements IIncidentService {
             }
 
             if (incidentDTO.status) {
-                if (incidentDTO.status === incident.status) {
-                    return Result.fail("Status is unchanged and cannot be updated.");
+                if (incidentDTO.status !== incident.status) {
+                    incident.updateStatus(incidentDTO.status);
                 }
-                incident.updateStatus(incidentDTO.status);
             }
 
             if (incidentDTO.description) {
-                if (incidentDTO.description === incident.description) {
-                    return Result.fail("Description is unchanged and cannot be updated.");
+                if (incidentDTO.description !== incident.description) {
+                    incident.updateDescription(incidentDTO.description);
                 }
-                incident.updateDescription(incidentDTO.description);
             }
 
             const currentCodes = incident.vesselVisitExecutions ? incident.vesselVisitExecutions.map(v => v.code) : [];

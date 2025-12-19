@@ -111,7 +111,7 @@ export default class IncidentController  implements IIncidentController {
 
             const apiBaseUrl = config.env === 'production' 
                 ? (process.env.API_URL || '/api')
-                : (process.env.API_URL || 'http://localhost:3000/api');
+                : (process.env.API_URL || 'http://localhost:5000/api');
 
             const authHeader = req.headers.authorization;
 

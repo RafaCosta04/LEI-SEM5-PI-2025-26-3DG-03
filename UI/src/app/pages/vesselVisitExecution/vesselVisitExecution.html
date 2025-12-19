@@ -162,8 +162,35 @@
 
         <div class="form-group">
           <label for="arrivalDate">Arrival Date</label>
-          <input id="arrivalDate" name="arrivalDate" type="datetime-local" [(ngModel)]="newItem.arrivalDate" required class="form-input" [class.error]="hasFieldError('arrivalDate')">
+          <input id="arrivalDate" name="arrivalDate" type="datetime-local" [(ngModel)]="newItem.arrivalDate" (change)="loadOngoingIncidents()" required class="form-input" [class.error]="hasFieldError('arrivalDate')">
           <div *ngIf="hasFieldError('arrivalDate')" class="field-error">{{ getFieldError('arrivalDate') }}</div>
+        </div>
+
+        <div class="form-group">
+          <label>Ongoing Incidents</label>
+          <div class="incidents-list" *ngIf="ongoingIncidents && ongoingIncidents.length > 0; else noIncidents">
+            <div *ngFor="let incident of ongoingIncidents" class="incident-item">
+              <input 
+                type="checkbox" 
+                [id]="'incident-' + incident.id"
+                [value]="incident.id"
+                [checked]="incident.id ? selectedIncidentIds.includes(incident.id) : false"
+                (change)="onToggleIncidentSelection(incident.id || '', $any($event.target).checked)"
+                [disabled]="!incident.id"
+                class="incident-checkbox"
+              >
+              <label [for]="'incident-' + incident.id" class="incident-label">
+                {{ incident.description || 'No description' }} 
+                <span class="incident-dates">({{ incident.startDate | date: 'dd/MM/yyyy HH:mm' }} - {{ incident.endDate ? (incident.endDate | date: 'dd/MM/yyyy HH:mm') : 'Ongoing' }})</span>
+              </label>
+            </div>
+          </div>
+          <ng-template #noIncidents>
+            <div class="no-incidents-message">
+              <p *ngIf="newItem.arrivalDate">No ongoing incidents for this date range</p>
+              <p *ngIf="!newItem.arrivalDate" class="hint-text">Select an arrival date to view ongoing incidents</p>
+            </div>
+          </ng-template>
         </div>
 
         <div class="modal-footer">

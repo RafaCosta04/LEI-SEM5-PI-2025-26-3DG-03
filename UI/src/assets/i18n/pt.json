@@ -28,6 +28,7 @@
     "SYSTEM_USER": "Utilizadores do Sistema",
     "PRIVACY_POLICY": "Política de Privacidade",
     "INCIDENT_TYPE": "Tipo de Incidente",
+    "INCIDENT": "Incidente",
     "VESSEL_VISIT_EXECUTION": "Execução de Visita"
   },
   "DASHBOARD": {

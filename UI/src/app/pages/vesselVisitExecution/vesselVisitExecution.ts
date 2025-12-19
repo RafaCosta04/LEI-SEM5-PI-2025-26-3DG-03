@@ -7,6 +7,8 @@ import { VesselVisitExecutionService } from '../../services-oem/vesselVisitExecu
 import { VesselVisitExecutionModel } from '../../models/vesselVisitExecution.model';
 import { VesselVisitNotificationService } from '../../services/vesselVisitNotification.service';
 import { VesselVisitNotificationModel, VisitStatus } from '../../models/vesselVisitNotification.model';
+import { IncidentService } from '../../services-oem/incident.service';
+import { IncidentModel } from '../../models/incident.model';
 
 @Component({
   selector: 'app-vessel-visit-execution',
@@ -48,6 +50,10 @@ export class VesselVisitExecution implements OnInit, OnDestroy {
   modalErrorMessage = '';
   fieldErrors: { [key: string]: string } = {};
 
+  // Ongoing incidents for create modal
+  ongoingIncidents: IncidentModel[] = [];
+  selectedIncidentIds: string[] = [];
+
   // Date picker popover
   showDatePicker = false;
 
@@ -56,7 +62,8 @@ export class VesselVisitExecution implements OnInit, OnDestroy {
 
   constructor(
     private vveService: VesselVisitExecutionService,
-    private vvnService: VesselVisitNotificationService
+    private vvnService: VesselVisitNotificationService,
+    private incidentService: IncidentService
   ) {}
 
   ngOnInit(): void {
@@ -279,6 +286,8 @@ export class VesselVisitExecution implements OnInit, OnDestroy {
   onCreateNew() {
     this.showCreateModal = true;
     this.resetNewItem();
+    this.selectedIncidentIds = [];
+    this.ongoingIncidents = [];
     this.loadApprovedNotifications();
   }
 
@@ -349,6 +358,63 @@ export class VesselVisitExecution implements OnInit, OnDestroy {
     this.showCreateModal = false;
     this.resetNewItem();
     this.isCreating = false;
+    this.selectedIncidentIds = [];
+    this.ongoingIncidents = [];
+  }
+
+  /**
+   * Load ongoing incidents that overlap with the arrival date to now
+   */
+  loadOngoingIncidents() {
+    if (!this.newItem.arrivalDate) {
+      this.ongoingIncidents = [];
+      this.selectedIncidentIds = [];
+      return;
+    }
+
+    let arrivalDate: Date;
+    
+    if (typeof this.newItem.arrivalDate === 'string') {
+      // datetime-local format: "2025-12-19T10:30"
+      arrivalDate = new Date(this.newItem.arrivalDate);
+    } else {
+      arrivalDate = new Date(this.newItem.arrivalDate as any);
+    }
+
+    if (isNaN(arrivalDate.getTime())) {
+      this.ongoingIncidents = [];
+      this.selectedIncidentIds = [];
+      return;
+    }
+
+    console.log('Loading incidents for arrival date:', arrivalDate);
+    
+    this.incidentService
+      .getOngoingIncidents(arrivalDate)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (incidents) => {
+          console.log('Loaded incidents:', incidents);
+          this.ongoingIncidents = incidents || [];
+          this.selectedIncidentIds = [];
+        },
+        error: (err) => {
+          console.error('Error loading ongoing incidents:', err);
+          this.ongoingIncidents = [];
+          this.selectedIncidentIds = [];
+        },
+      });
+  }
+
+  onToggleIncidentSelection(incidentId: string, checked: boolean) {
+    if (!incidentId) return;
+    if (checked) {
+      if (!this.selectedIncidentIds.includes(incidentId)) {
+        this.selectedIncidentIds.push(incidentId);
+      }
+    } else {
+      this.selectedIncidentIds = this.selectedIncidentIds.filter(x => x !== incidentId);
+    }
   }
 
   onSaveNew() {
@@ -361,8 +427,15 @@ export class VesselVisitExecution implements OnInit, OnDestroy {
     }
 
     this.isCreating = true;
+    
+    // Add selected incident IDs to the payload
+    const payload: any = {
+      ...this.newItem,
+      incidentIDs: this.selectedIncidentIds.length > 0 ? this.selectedIncidentIds : null
+    };
+
     this.vveService
-      .create(this.newItem)
+      .create(payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (created) => {

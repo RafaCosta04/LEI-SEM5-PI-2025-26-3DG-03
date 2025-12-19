@@ -98,6 +98,11 @@ export const routes: Routes = [
         loadChildren: () => import('./routing/incidentType.routes').then((m) => m.routes)
       },
       {
+        path: 'incident',
+        data: { title: 'Incidents', breadcrumb: 'Incidents' },
+        loadChildren: () => import('./routing/incident.route').then((m) => m.routes)
+      },
+      {
         path: 'vessel-visit-execution',
         data: { title: 'Vessel Visit Executions', breadcrumb: 'Vessel Visit Executions' },
         loadChildren: () => import('./routing/vesselVisitExecution.routes').then((m) => m.routes)

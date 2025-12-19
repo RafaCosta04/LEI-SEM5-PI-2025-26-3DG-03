@@ -28,6 +28,7 @@
     "SYSTEM_USER": "System User",
     "PRIVACY_POLICY": "Privacy Policy",
     "INCIDENT_TYPE": "Incident Type",
+    "INCIDENT": "Incident",
     "VESSEL_VISIT_EXECUTION": "Vessel Visit Execution"
   },
   "DASHBOARD": {

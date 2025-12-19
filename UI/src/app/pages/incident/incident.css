@@ -1,4 +1,4 @@
-/* Reuse basic styling from Qualification page for consistency */
+/* Reuse basic styling from VesselVisitExecution page for consistency */
 
 .error-message {
   background: #f8d7da;
@@ -75,7 +75,7 @@
   border-color: #7a6128;
 }
 
-/* Page layout tweaks for search & filters */
+/* Layout alignment */
 .top-bar {
   display: flex;
   align-items: center;
@@ -84,6 +84,7 @@
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
+
 .search-container {
   display: flex;
   align-items: center;
@@ -91,70 +92,65 @@
   flex: 1 1 420px;
 }
 
-.calendar-wrapper { position: relative; display: inline-block; }
-.search-input {
-  flex: 1 1 auto;
-  min-width: 180px;
-  padding: 10px 12px;
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 auto;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.algorithm-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alg-label {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+:host-context([data-coreui-theme="dark"]) .alg-label {
+  color: #e6eef7;
+}
+
+.algorithm-dropdown {
+  padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #ced4da;
   background: white;
   color: #333;
+  font-size: 0.95rem;
+  cursor: pointer;
 }
 
-:host-context([data-coreui-theme="dark"]) .search-input {
+:host-context([data-coreui-theme="dark"]) .algorithm-dropdown {
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.02);
   color: #e6eef7;
 }
-.clear-button {
-  margin-left: 8px;
-  background: transparent;
-  border: none;
-  padding: 6px;
-  border-radius: 6px;
-  color: #666;
-  cursor: pointer;
-}
 
-:host-context([data-coreui-theme="dark"]) .clear-button {
-  color: #bbb;
-}
-.filter-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.filter-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #333;
-}
-
-:host-context([data-coreui-theme="dark"]) .filter-item {
-  color: #cfd8e3;
-}
-.btn-compact {
-  padding: 6px 10px;
-  font-size: 0.85rem;
-}
 .action-buttons {
-  margin-left: auto;
   display: flex;
+  align-items: center;
   gap: 8px;
+  flex: 0 1 auto;
 }
 
-.table-container .no-results {
-  padding: 36px 0;
-  text-align: center;
-  color: #666;
-  font-size: 1rem;
-}
-
-:host-context([data-coreui-theme="dark"]) .table-container .no-results {
-  color: #cbd5e1;
-}
+.calendar-wrapper { position: relative; display: inline-block; }
 
 /* Datepicker popover styling */
 .calendar-button {
@@ -213,6 +209,39 @@
 
 :host-context([data-coreui-theme="dark"]) .calendar-button .calendar-icon svg {
   color: #bcd3e6;
+}
+
+
+/* Status dropdown styling */
+.status-dropdown {
+  background: white;
+  border: 1px solid #ced4da;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #333;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-left: 8px;
+  min-width: 120px;
+}
+
+.status-dropdown:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+:host-context([data-coreui-theme="dark"]) .status-dropdown {
+  background: #26303a;
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #d7e6f3;
+}
+
+:host-context([data-coreui-theme="dark"]) .status-dropdown:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+:host-context([data-coreui-theme="dark"]) .status-dropdown option {
+  background: #26303a;
+  color: #d7e6f3;
 }
 
 :host-context([data-coreui-theme="dark"]) .calendar-button:hover .calendar-icon svg { color: #d7e6f3; }
@@ -369,143 +398,5 @@ input[type="date"]::-moz-focus-inner { color: transparent; }
 :host-context([data-coreui-theme="dark"]) .datepicker-popover label:after {
   /* ensure the small SVG icon inside the input appears with the correct contrast */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='2' fill='none' stroke='%23e6eef7' stroke-width='1.2'/><path d='M16 2v4M8 2v4' stroke='%23e6eef7' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/><path d='M3 10h18' stroke='%23e6eef7' stroke-width='1.2' stroke-linecap='round'/></svg>");
-}
-
-/* --- schedule-like controls for Status --- */
-.schedule-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.algorithm-select {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 12px;
-  white-space: nowrap;
-}
-
-.alg-label {
-  font-weight: 600;
-  margin-right: 6px;
-  display: inline-block;
-  color: #333;
-}
-
-:host-context([data-coreui-theme="dark"]) .alg-label {
-  color: #cfd8e3;
-}
-
-.algorithm-dropdown {
-  padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 14px;
-  background-color: white;
-  color: #333;
-  cursor: pointer;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  min-width: 140px;
-}
-
-.algorithm-dropdown:hover { border-color: #0d6efd; }
-
-.algorithm-dropdown:focus { outline: none; border-color: #0d6efd; box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25); }
-
-:host-context([data-coreui-theme="dark"]) .alg-label { color: #e2e8f0; }
-
-:host-context([data-coreui-theme="dark"]) .algorithm-dropdown {
-  background-color: #4a5568;
-  border-color: #718096;
-  color: #e2e8f0;
-}
-
-.algorithm-dropdown option { background: #4a5568; color: #e2e8f0; }
-
-/* Ongoing Incidents List Styling */
-.incidents-list {
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  padding: 10px;
-  background: #f8f9fa;
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-:host-context([data-coreui-theme="dark"]) .incidents-list {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #26303a;
-}
-
-.incident-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 4px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-:host-context([data-coreui-theme="dark"]) .incident-item {
-  border-bottom-color: rgba(255, 255, 255, 0.04);
-}
-
-.incident-item:last-child {
-  border-bottom: none;
-}
-
-.incident-checkbox {
-  margin-top: 3px;
-  cursor: pointer;
-  accent-color: #0d6efd;
-}
-
-.incident-label {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #333;
-  flex: 1;
-}
-
-:host-context([data-coreui-theme="dark"]) .incident-label {
-  color: #e2e8f0;
-}
-
-.incident-dates {
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
-:host-context([data-coreui-theme="dark"]) .incident-dates {
-  color: #97a6b6;
-}
-
-.no-incidents-message {
-  padding: 12px 16px;
-  background: #f5f5f5;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-  text-align: center;
-  color: #666;
-}
-
-.no-incidents-message p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.no-incidents-message .hint-text {
-  color: #999;
-  font-style: italic;
-}
-
-:host-context([data-coreui-theme="dark"]) .no-incidents-message {
-  background: #26303a;
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
 }
 

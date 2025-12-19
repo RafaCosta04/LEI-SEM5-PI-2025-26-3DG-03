@@ -19,7 +19,11 @@ export default class IncidentRepo implements IIncidentRepo {
     }
 
     async save(incident: Incident): Promise<Incident> {
-        const existing = await this.incidentSchema.findOne({ _id: incident.id });
+        // Avoid casting empty string to ObjectId; treat as new document
+        let existing: (IIncidentPersistence & Document) | null = null;
+        if (incident.id && incident.id !== "") {
+            existing = await this.incidentSchema.findById(incident.id);
+        }
 
         const raw = IncidentMap.toPersistence(incident);
 
@@ -27,7 +31,8 @@ export default class IncidentRepo implements IIncidentRepo {
             const created = await this.incidentSchema.create(raw);
             return IncidentMap.toDomain(created);
         } else {
-            return null;
+            // If already exists, return the domain representation of existing
+            return IncidentMap.toDomain(existing);
         }
     }
 

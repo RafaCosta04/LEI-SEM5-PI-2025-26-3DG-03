@@ -42,10 +42,11 @@ export class VesselVisitExecutionService {
   }
 
   create(model: VesselVisitExecutionModel): Observable<any> {
-    // Align payload with OEM route expectations (vesselVisitNotificationCode, arrivalDate)
+    // Align payload with OEM route expectations and forward extra fields (e.g., incidentIDs)
     const payload: any = {
       vesselVisitNotificationCode: (model as any).vesselVisitNotificationCode ?? model.code,
-      arrivalDate: (model as any).arrivalDate ?? model.description
+      arrivalDate: (model as any).arrivalDate,
+      incidentIDs: (model as any).incidentIDs ?? null
     };
     return this.oemService.post<any>('/vessel-visit-executions', payload).pipe(
       catchError((err) => this.handleError('create', err))

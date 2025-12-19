@@ -133,6 +133,12 @@ export const navItems: IExtendedNavData[] = [
     roles: ['Admin', 'PortAuthorityOfficer']
   },
   {
+    name: 'NAV.INCIDENT',
+    url: '/incident',
+    icon: 'nav-img nav-img-incident-type',
+    roles: ['Admin', 'LogisticOperator']
+  },
+  {
     name: 'NAV.VESSEL_VISIT_EXECUTION',
     url: '/vessel-visit-execution',
     roles: ['Admin', 'LogisticOperator']
