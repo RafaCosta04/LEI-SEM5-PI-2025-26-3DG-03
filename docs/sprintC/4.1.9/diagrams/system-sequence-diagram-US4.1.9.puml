@@ -1,0 +1,28 @@
+@startuml 4.1.9
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Logistics Operator" as logisticsOperator
+participant "UI" as ui
+participant "System" as system
+
+title System Sequence Diagram - US4.1.9
+
+== Update  Vessel Visit Execution ==
+activate logisticsOperator
+
+logisticsOperator -> ui: Update Vessel Visit Execution\nwith Updated Data
+activate ui
+ui -> system : Submit Updated\nVessel Visit Execution Data
+activate system
+
+system -> system : Validate Updated Data\nand Save to Database
+system --> ui : Confirm Update Success
+deactivate system
+ui -> logisticsOperator : Display Update Confirmation
+deactivate ui 
+
+
+
+@enduml
