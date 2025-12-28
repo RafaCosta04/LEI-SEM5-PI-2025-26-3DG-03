@@ -26,6 +26,17 @@ export function createScene(
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
 
+  let selectionSpotlight: THREE.SpotLight | null = null;
+
+  objectPicker.selectionChanged.subscribe((picked: PickableObject | null) => {
+    if (picked && selectionSpotlight) {
+      selectionSpotlight.target.position.copy(picked.centerPoint);
+      selectionSpotlight.visible = true;
+    } else if (selectionSpotlight) {
+      selectionSpotlight.visible = false;
+    }
+  });
+
   function onMouseClick(event: MouseEvent) {
     if (cameraAnimator.isAnimating()) return;
 
@@ -102,6 +113,21 @@ export function createScene(
     scene.add(directionalLight.target);
     scene.add(ambientLight, directionalLight);
 
+    // Spotlight para seleção
+    const spot = new THREE.SpotLight(0xffffff, 2.5, 800, Math.PI / 10, 0.9, 2);
+    spot.castShadow = true;
+    spot.shadow.mapSize.set(2048, 2048);
+    spot.shadow.camera.near = 0.1;
+    spot.shadow.camera.far = 2000;
+    spot.shadow.bias = -0.0005;
+    // Começa na posição da câmera; o alvo será atualizado na seleção.
+    spot.position.copy(camera.position);
+    spot.target.position.set(0, 0, 0);
+    spot.visible = false;
+    scene.add(spot.target);
+    scene.add(spot);
+    selectionSpotlight = spot;
+
 
     // Céu
     const sky = new Sky();
@@ -170,7 +196,7 @@ export function createScene(
       // Procurar docks e cranes dentro dos grupos
       obj.traverse((child) => {
         console.log('[Traverse Debug]', { childName: child.name, childType: child.userData['type'], userData: child.userData });
-        
+
         if (child.userData['type'] === 'dock' && child !== obj) {
           child.updateMatrixWorld(true);
           const boundingBox = new THREE.Box3().setFromObject(child);
@@ -230,6 +256,13 @@ export function createScene(
       }
     });
     controls.update();
+
+    // Atualiza a posição do spotlight para seguir a câmera
+    if (selectionSpotlight) {
+      selectionSpotlight.position.copy(camera.position);
+      selectionSpotlight.target.updateMatrixWorld();
+    }
+
     renderer.render(scene, camera);
   }
 

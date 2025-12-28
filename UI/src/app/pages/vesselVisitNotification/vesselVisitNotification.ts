@@ -760,12 +760,12 @@ export class VesselVisitNotification implements OnInit, OnDestroy {
   }
 
   // Helper methods for date formatting
-  formatDate(date: Date | undefined): string {
+  formatDate(date: Date | string | undefined | null): string {
     if (!date) return '';
     return new Date(date).toISOString().slice(0, 16); // Format for datetime-local input
   }
 
-  formatDateForDisplay(date: Date | undefined): string {
+  formatDateForDisplay(date: Date | string | undefined | null): string {
     if (!date) return 'N/A';
     return new Date(date).toLocaleString();
   }

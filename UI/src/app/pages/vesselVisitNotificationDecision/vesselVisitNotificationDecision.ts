@@ -272,7 +272,7 @@ export class VesselVisitNotificationDecision implements OnInit, OnDestroy {
   }
 
   // Helper methods for date formatting
-  formatDateForDisplay(date: Date | undefined): string {
+  formatDateForDisplay(date: Date | string | undefined | null): string {
     if (!date) return 'N/A';
     return new Date(date).toLocaleString();
   }

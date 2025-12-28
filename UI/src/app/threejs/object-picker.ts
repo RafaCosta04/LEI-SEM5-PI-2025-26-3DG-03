@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { PermissionService } from '../../app/services/permission.service';
 import { ElementInfoService } from '../../app/services/element-info.service';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 
 
@@ -17,6 +17,7 @@ export interface PickableObject {
   providedIn: 'root'
 })
 export class ObjectPickerService {
+  public selectionChanged: EventEmitter<PickableObject | null> = new EventEmitter<PickableObject | null>();
   private raycaster = new THREE.Raycaster();
   private mouse = new THREE.Vector2();
   private pickableObjects: PickableObject[] = [];
@@ -34,6 +35,12 @@ export class ObjectPickerService {
     obj.mesh.userData['pickable'] = true;
     obj.mesh.userData['type'] = obj.type;
     obj.mesh.userData['name'] = obj.name;
+    obj.mesh.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
   }
 
   clearPickableObjects() {
@@ -126,9 +133,11 @@ export class ObjectPickerService {
       this.selectedObject = obj;
       // Update element info service
       this.elementInfoService.setCurrentElement(obj);
+      this.selectionChanged.emit(obj);
     } else {
       this.selectedObject = null;
       this.elementInfoService.setCurrentElement(null);
+      this.selectionChanged.emit(null);
     }
   }
 
