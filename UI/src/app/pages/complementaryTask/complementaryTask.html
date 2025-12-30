@@ -1,0 +1,216 @@
+<div class="page-container">
+  <h1 class="page-title">Complementary Tasks</h1>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch(searchTerm)"
+        placeholder="Search by team, category, or VVE code"
+        class="search-input"
+      >
+      <button *ngIf="searchTerm" (click)="searchTerm = ''; onSearch('')" class="clear-button" title="Clear search">✕</button>
+    </div>
+
+    <div class="filter-container">
+      <select class="status-dropdown" [(ngModel)]="filterStatus" (change)="applyFilters()">
+        <option value="">All Status</option>
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+
+      <select class="vve-dropdown" [(ngModel)]="filterVVECode" (change)="applyFilters()">
+        <option value="">All Vessel Visits</option>
+        <option *ngFor="let vve of vesselVisitExecutions" [value]="vve.code">{{ vve.code }} - {{ vve.vesselIMO }}</option>
+      </select>
+
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="filterImpactingOnly" (change)="applyFilters()">
+        <span>Impacting Operations Only</span>
+      </label>
+
+      <button (click)="clearFilters()" class="btn btn-secondary">Clear Filters</button>
+    </div>
+
+    <div class="action-buttons">
+      <button (click)="openCreateModal()" class="btn btn-primary" title="New Task">New Task</button>
+      <button (click)="openEditModal(selected!)" class="btn btn-secondary" [disabled]="!selected || selected.status !== 'Ongoing'" title="Edit Task">Edit</button>
+    </div>
+  </div>
+
+  <div *ngIf="statusMessage && statusMessageType === 'success'" class="success-message" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+  </div>
+
+  <div *ngIf="statusMessage && statusMessageType === 'error'" class="error-message" [class.hiding]="statusHiding">
+    {{ statusMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading...</div>
+
+  <div *ngIf="!isLoading" class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Category</th>
+          <th>Responsible Team</th>
+          <th>VVE Code</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredItems"
+            [class.selected]="selected?.id === item.id"
+            [class.impacting]="isImpactingOperations(item)"
+            (click)="selectItem(item)">
+          <td class="icon-cell">
+            <span *ngIf="isImpactingOperations(item)"
+                  class="danger-icon"
+                  [title]="'Operations suspended - ' + getCategoryDisplayName(item.category) + ' in progress'">
+              ⚠️
+            </span>
+          </td>
+          <td>{{ getCategoryDisplayName(item.category) }}</td>
+          <td>{{ item.responsibleTeam }}</td>
+          <td>{{ item.vesselVisitExecutionCode }}</td>
+          <td>{{ formatDate(item.startTime) }}</td>
+          <td>{{ formatDate(item.endTime) }}</td>
+          <td><span [ngClass]="'status-' + item.status">{{ item.status }}</span></td>
+          <td>
+            <button (click)="selectItem(item); $event.stopPropagation()" class="btn-select" [class.selected]="selected?.id === item.id">
+              {{ selected?.id === item.id ? 'Unselect' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredItems.length === 0 && !isLoading" class="no-results">
+      <p>No complementary tasks found.</p>
+    </div>
+  </div>
+
+  <div *ngIf="selected" class="selected-info">
+    <h3>Selected Task</h3>
+    <div class="info-card" [class.impacting-card]="isImpactingOperations(selected)">
+      <p><strong>Category:</strong> {{ getCategoryDisplayName(selected.category) }}</p>
+      <p><strong>Responsible Team:</strong> {{ selected.responsibleTeam }}</p>
+      <p><strong>Vessel Visit:</strong> {{ selected.vesselVisitExecutionCode }}</p>
+      <p><strong>Start Time:</strong> {{ formatDate(selected.startTime) }}</p>
+      <p><strong>End Time:</strong> {{ formatDate(selected.endTime) }}</p>
+      <p><strong>Status:</strong> <span [ngClass]="'status-' + selected.status">{{ selected.status }}</span></p>
+      <p><strong>Suspends Operations:</strong> {{ selected.suspendsOperations ? 'Yes' : 'No' }}</p>
+      <p *ngIf="isImpactingOperations(selected)" class="impact-warning">⚠️ This task is currently impacting cargo operations</p>
+      <p *ngIf="selected.description"><strong>Description:</strong> {{ selected.description }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Create Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create Complementary Task</h2>
+      <button class="close-button" (click)="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="modalErrorMessage" class="alert alert-danger" [class.hiding]="modalErrorHiding">{{ modalErrorMessage }}</div>
+
+      <form (ngSubmit)="createItem()">
+        <div class="form-group">
+          <label for="create-category">Category *</label>
+          <select id="create-category" [(ngModel)]="newItem.category" name="category" class="form-input" required>
+            <option value="">Select a category</option>
+            <option *ngFor="let cat of taskCategories" [value]="cat.code">{{ cat.name }}</option>
+          </select>
+          <span *ngIf="fieldErrors['category']" class="field-error">{{ fieldErrors['category'] }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="create-team">Responsible Team *</label>
+          <input id="create-team" [(ngModel)]="newItem.responsibleTeam" name="team" type="text" class="form-input" required maxlength="200">
+          <span *ngIf="fieldErrors['responsibleTeam']" class="field-error">{{ fieldErrors['responsibleTeam'] }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="create-vve">Vessel Visit Execution *</label>
+          <select id="create-vve" [(ngModel)]="newItem.vesselVisitExecutionCode" name="vve" class="form-input" required>
+            <option value="">Select a vessel visit</option>
+            <option *ngFor="let vve of vesselVisitExecutions" [value]="vve.code">{{ vve.code }} - {{ vve.vesselIMO }}</option>
+          </select>
+          <span *ngIf="fieldErrors['vesselVisitExecutionCode']" class="field-error">{{ fieldErrors['vesselVisitExecutionCode'] }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="create-startTime">Start Time *</label>
+          <input id="create-startTime" [(ngModel)]="newItem.startTime" name="startTime" type="datetime-local" class="form-input" required>
+          <span *ngIf="fieldErrors['startTime']" class="field-error">{{ fieldErrors['startTime'] }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="create-endTime">End Time</label>
+          <input id="create-endTime" [(ngModel)]="newItem.endTime" name="endTime" type="datetime-local" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="newItem.suspendsOperations" name="suspends">
+            <span>Suspends Cargo Operations</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="create-description">Description</label>
+          <textarea id="create-description" [(ngModel)]="newItem.description" name="description" class="form-input" rows="3" maxlength="1000"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeCreateModal()" class="btn btn-secondary" [disabled]="isCreating">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isCreating">
+            {{ isCreating ? 'Creating...' : 'Create Task' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Complementary Task</h2>
+      <button class="close-button" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="editModalErrorMessage" class="alert alert-danger" [class.hiding]="editModalErrorHiding">{{ editModalErrorMessage }}</div>
+
+      <form (ngSubmit)="saveEdit()">
+        <div class="form-group">
+          <label for="edit-endTime">End Time</label>
+          <input id="edit-endTime" [(ngModel)]="editItem.endTime" name="endTime" type="datetime-local" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-status">Status</label>
+          <select id="edit-status" [(ngModel)]="editItem.status" name="status" class="form-input">
+            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeEditModal()" class="btn btn-secondary" [disabled]="isEditing">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isEditing">
+            {{ isEditing ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

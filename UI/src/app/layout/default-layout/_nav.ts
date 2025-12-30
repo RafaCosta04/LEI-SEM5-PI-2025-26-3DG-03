@@ -147,11 +147,19 @@ export const navItems: IExtendedNavData[] = [
   {
     name: 'NAV.COMPLEMENTARY_TASK_CATEGORY',
     url: '/complementary-task-category',
+    icon: 'nav-img nav-img-incident-type',
     roles: ['Admin', 'PortAuthorityOfficer']
+  },
+  {
+    name: 'NAV.COMPLEMENTARY_TASK',
+    url: '/complementary-task',
+    icon: 'nav-img nav-img-incident-type',
+    roles: ['Admin', 'LogisticOperator', 'PortAuthorityOfficer']
   },
   {
     name: 'NAV.VESSEL_VISIT_EXECUTION',
     url: '/vessel-visit-execution',
+    icon: 'nav-img nav-img-incident-type',
     roles: ['Admin', 'LogisticOperator']
   }
 ];

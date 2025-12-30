@@ -116,6 +116,11 @@ export const routes: Routes = [
         path: 'complementary-task-category',
         data: { title: 'Complementary Task Categories', breadcrumb: 'Complementary Task Categories' },
         loadChildren: () => import('./routing/complementaryTaskCategory.routes').then((m) => m.routes)
+      },
+      {
+        path: 'complementary-task',
+        data: { title: 'Complementary Tasks', breadcrumb: 'Complementary Tasks' },
+        loadChildren: () => import('./routing/complementaryTask.routes').then((m) => m.routes)
       }
     ],
   },

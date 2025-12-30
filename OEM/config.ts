@@ -79,6 +79,10 @@ export default {
       name: "ComplementaryTaskCategoryController",
       path: "../controllers/ComplementaryTaskCategoryController"
     },
+    complementaryTask: {
+      name: "ComplementaryTaskController",
+      path: "../controllers/ComplementaryTaskController"
+    },
     operationPlan: {
       name: "OperationPlanController",
       path: "../controllers/OperationPlanController"
@@ -102,6 +106,10 @@ export default {
       name: "complementaryTaskCategoryRepo",
       path: "../repos/ComplementaryTaskCategoryRepo"
     },
+    complementaryTask: {
+      name: "complementaryTaskRepo",
+      path: "../repos/ComplementaryTaskRepo"
+    },
     operationPlan: {
       name: "operationPlanRepo",
       path: "../repos/OperationPlanRepo"
@@ -124,6 +132,10 @@ export default {
     complementaryTaskCategory: {
       name: "complementaryTaskCategoryService",
       path: "../services/ComplementaryTaskCategoryService"
+    },
+    complementaryTask: {
+      name: "complementaryTaskService",
+      path: "../services/ComplementaryTaskService"
     },
     operationPlan: {
       name: "operationPlanService",

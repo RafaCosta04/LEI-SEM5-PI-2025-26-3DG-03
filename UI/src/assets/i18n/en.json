@@ -31,7 +31,8 @@
     "INCIDENT_TYPE": "Incident Type",
     "INCIDENT": "Incident",
     "VESSEL_VISIT_EXECUTION": "Vessel Visit Execution",
-    "COMPLEMENTARY_TASK_CATEGORY": "Complementary Task Category"
+    "COMPLEMENTARY_TASK_CATEGORY": "Complementary Task Category",
+    "COMPLEMENTARY_TASK": "Complementary Tasks"
   },
   "DASHBOARD": {
     "OPEN_3D": "Open 3D",
@@ -502,7 +503,7 @@
       "HEURISTIC": "Heuristic",
       "GENETIC": "Genetic"
     },
-    
+
     "TIME_AVAILABLE": "Time Available",
 
     "GENETIC": {

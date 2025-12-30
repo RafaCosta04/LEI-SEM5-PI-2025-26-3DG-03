@@ -30,7 +30,8 @@
     "INCIDENT_TYPE": "Tipo de Incidente",
     "INCIDENT": "Incidente",
     "VESSEL_VISIT_EXECUTION": "Execução de Visita",
-    "COMPLEMENTARY_TASK_CATEGORY": "Categoria de Tarefa Complementar"
+    "COMPLEMENTARY_TASK_CATEGORY": "Categoria de Tarefa Complementar",
+    "COMPLEMENTARY_TASK": "Tarefas Complementares"
   },
   "DASHBOARD": {
     "OPEN_3D": "Abrir 3D",

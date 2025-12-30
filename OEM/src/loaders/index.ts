@@ -110,6 +110,27 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
     path: config.services.complementaryTaskCategory.path
   }
 
+  
+  const complementaryTaskSchema = {
+    name: 'complementaryTaskSchema',
+    schema: '../persistence/schemas/complementaryTaskSchema',
+  }
+
+  const complementaryTaskController = {
+    name: config.controllers.complementaryTask.name,
+    path: config.controllers.complementaryTask.path
+  }
+
+  const complementaryTaskRepo = {
+    name: config.repos.complementaryTask.name,
+    path: config.repos.complementaryTask.path
+  }
+
+  const complementaryTaskService = {
+    name: config.services.complementaryTask.name,
+    path: config.services.complementaryTask.path
+  }
+
   //const userSchema = {
     // compare with the approach followed in repos and services
     //name: 'userSchema',
@@ -149,6 +170,7 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
       vesselVisitExecutionSchema,
       incidentSchema,
       complementaryTaskCategorySchema,
+      complementaryTaskSchema,
       operationPlanSchema
     ],
     controllers: [
@@ -156,6 +178,7 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
       vesselVisitExecutionController,
       incidentController,
       complementaryTaskCategoryController,
+      complementaryTaskController,
       operationPlanController
     ],
     repos: [
@@ -163,6 +186,7 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
       vesselVisitExecutionRepo,
       incidentRepo,
       complementaryTaskCategoryRepo,
+      complementaryTaskRepo,
       operationPlanRepo
     ],
     services: [
@@ -170,6 +194,7 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
       vesselVisitExecutionService,
       incidentService,
       complementaryTaskCategoryService,
+      complementaryTaskService,
       operationPlanService
     ]
   });
