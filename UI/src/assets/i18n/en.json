@@ -492,7 +492,9 @@
     "BUTTON": {
       "RUN": "Run Schedule",
       "CLOSE": "Close",
-      "CLEAN_SEARCH": "Clean search"
+      "CLEAN_SEARCH": "Clean search",
+      "GENERATE_PLANS": "Generate Operation Plans",
+      "GENERATING_PLANS": "Generating Operation Plans..."
     },
 
     "ALGORITHM": {
