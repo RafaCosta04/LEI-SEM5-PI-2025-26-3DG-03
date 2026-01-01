@@ -25,7 +25,7 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>{{ 'OPERATION_PLANS.TABLE.VESSEL' | translate }}</th>
+          <th>{{ 'OPERATION_PLANS.TABLE.VVN' | translate }}</th>
           <th>{{ 'OPERATION_PLANS.TABLE.TARGET_DAY' | translate }}</th>
           <th>{{ 'OPERATION_PLANS.TABLE.ARRIVAL' | translate }}</th>
           <th>{{ 'OPERATION_PLANS.TABLE.DEPARTURE' | translate }}</th>
@@ -72,7 +72,7 @@
         <div class="plan-info">
           <div class="info-grid">
             <div class="info-item">
-              <label>{{ 'OPERATION_PLANS.DETAILS.VESSEL' | translate }}:</label>
+              <label>{{ 'OPERATION_PLANS.DETAILS.VVN' | translate }}:</label>
               <span>{{ selectedPlan.vvn }}</span>
             </div>
             <div class="info-item">
@@ -120,7 +120,7 @@
                 <tr *ngFor="let operation of selectedPlan.operations">
                   <td>{{ operation.id }}</td>
                   <td>
-                    <span class="operation-type-badge" [class.loading]="operation.operationType === 'LOADING'" [class.unloading]="operation.operationType === 'UNLOADING'">
+                    <span class="operation-type-badge" [class.loading]="operation.operationType === 'LOADING'" [class.unloading]="operation.operationType === 'UNLOADING'" [class.maintenance]="operation.operationType === 'MAINTENANCE'">
                       {{ operation.operationType }}
                     </span>
                   </td>

@@ -7,15 +7,23 @@ import { Result } from "../core/logic/Result";
 import { OperationPlanDTO } from "../dto/OperationPlanDTO";
 import { AuthMechanism } from "mongodb";
 import { OperationPlanMap } from "../mappers/OperationPlanMap";
-import { VesselVisitNotificationDTO } from "./clients/VesselVisitNotificationClient";
+import VesselVisitNotificationClient, { VesselVisitNotificationDTO } from "./clients/VesselVisitNotificationClient";
+import config from "../../config";
 
 
 @Service()
 export default class OperationPlanService implements IOperationPlanService {
+    private vvnClient: VesselVisitNotificationClient;
+
     constructor(
         @Inject("operationPlanRepo") private operationPlanRepo: IOperationPlanRepo,
         @Inject("logger") private logger: any
-    ){}
+    ){
+        const apiBaseUrl = config.env === 'production' 
+            ? (process.env.API_URL || '/api')
+            : (process.env.API_URL || 'http://localhost:5000/api');
+        this.vvnClient = new VesselVisitNotificationClient(apiBaseUrl);
+    }
 
     public async getAllOperationPlans(): Promise<Result<OperationPlanDTO[]>> {
         try {
@@ -296,42 +304,120 @@ export default class OperationPlanService implements IOperationPlanService {
     }
 
 
-    private createOperationEntries(
+    private async createOperationEntries(
         vvn: string,
         assignedCranes: string[],
-        operationTypes: string[],
-        containers: string[],
         arrivalTime: Date,
-        departureTime: Date
-    ): any[] {
+        departureTime: Date,
+        authHeader?: string
+    ): Promise<{ vvnCode: string | null; operations: any[] }> {
         const operations: any[] = [];
         
-        // Criar operações com os dados que já vêm do Prolog
-        for (let i = 0; i < assignedCranes.length; i++) {
-            operations.push({
-                id: `${vvn}-OP${i + 1}`,
-                operationType: operationTypes[i] || 'LOADING',
-                container: containers[i],
-                operationStart: new Date(arrivalTime),
-                operationEnd: new Date(departureTime),
-                craneUsed: assignedCranes[i]
-            });
-        }
+        try {
+            // Buscar todas as VesselVisitNotifications
+            this.logger.info(`Attempting to fetch VVN for vessel: ${vvn}`);
+            this.logger.info(`Using authHeader: ${authHeader ? 'Present' : 'Missing'}`);
+            
+            const allVVNs = await this.vvnClient.getAll(authHeader);
+            
+            this.logger.info(`Fetched ${allVVNs.length} VVNs from API`);
+            
+            // Log dos nomes dos vessels disponíveis
+            if (allVVNs.length > 0) {
+                // Log detalhado do primeiro VVN para debug
+                this.logger.info(`Sample VVN structure: ${JSON.stringify(allVVNs[0], null, 2)}`);
+                
+                const vesselNames = allVVNs.map(v => v.vessel?.vesselName || 'N/A');
+                this.logger.info(`Available vessel names: ${JSON.stringify(vesselNames)}`);
+            }
+            
+            // Filtrar pelo nome do vessel
+            const vvnData = allVVNs.find(v => 
+                v.vessel?.vesselName?.toLowerCase() === vvn.toLowerCase()
+            );
+            
+            if (!vvnData) {
+                this.logger.warn(`VVN for vessel ${vvn} not found, creating empty operation plan`);
+                return { vvnCode: null, operations: [] };
+            }
 
-        return operations;
+            this.logger.info(`VVN ${vvnData.code} found for vessel ${vvn} with ${vvnData.cargoManifests?.length || 0} manifests`);
+            
+            // Log detalhado dos manifests para debug
+            if (vvnData.cargoManifests && vvnData.cargoManifests.length > 0) {
+                vvnData.cargoManifests.forEach((manifest, idx) => {
+                    this.logger.info(`  Manifest ${idx + 1}: ${manifest.manifestType}, ${manifest.entries?.length || 0} entries`);
+                });
+            }
+
+            // Se não há manifests, o vessel está em manutenção
+            if (!vvnData.cargoManifests || vvnData.cargoManifests.length === 0) {
+                this.logger.info(`VVN ${vvn} has no cargo manifests (maintenance visit)`);
+                
+                // Criar uma operation entry de manutenção
+                const maintenanceOperation = {
+                    id: `${vvnData.code}-MAINTENANCE`,
+                    operationType: 'MAINTENANCE',
+                    container: 'N/A',
+                    operationStart: new Date(arrivalTime),
+                    operationEnd: new Date(departureTime),
+                    craneUsed: 'N/A'
+                };
+                
+                return { vvnCode: vvnData.code, operations: [maintenanceOperation] };
+            }
+
+            let operationIndex = 0;
+            let currentStartTime = new Date(arrivalTime);
+            let craneIndex = 0;
+
+            // Iterar por cada cargo manifest
+            for (const manifest of vvnData.cargoManifests) {
+                if (!manifest.entries || manifest.entries.length === 0) {
+                    continue;
+                }
+
+                // Determinar o tipo de operação baseado no manifest type
+                const operationType = manifest.manifestType === 'Loading' ? 'LOADING' : 'UNLOADING';
+
+                // Para cada entry no manifest, criar uma operation entry
+                for (const entry of manifest.entries) {
+                    const operationEnd = new Date(currentStartTime.getTime() + 10 * 60000); // +10 minutos
+
+                    operations.push({
+                        id: `${vvnData.code}-OP${operationIndex + 1}`,
+                        operationType: operationType,
+                        container: entry.containerNumber,
+                        operationStart: new Date(currentStartTime),
+                        operationEnd: operationEnd,
+                        craneUsed: assignedCranes[craneIndex % assignedCranes.length]
+                    });
+
+                    // Próxima operação começa 1 minuto depois do fim da anterior
+                    currentStartTime = new Date(operationEnd.getTime() + 1 * 60000);
+                    operationIndex++;
+                    craneIndex++; // Cycle para a próxima crane
+                }
+            }
+
+            this.logger.info(`Created ${operations.length} operations for VVN ${vvn}`);
+            return { vvnCode: vvnData.code, operations };
+
+        } catch (error) {
+            this.logger.error(`Error creating operation entries for VVN ${vvn}:`, error);
+            return { vvnCode: null, operations: [] };
+        }
     }
 
     public async createBatch(
         vvns: string[],
         assignedCranes: string[][],
-        staffs: string[][],
-        operationTypes: string[][],
-        containers: string[][],
         arrivalTimes: string[],
         departureTimes: string[],
         targetDays: string[],
         author: string,
-        algorithm: string
+        algorithm: string,
+        authHeader?: string
     ): Promise<Result<OperationPlanDTO[]>> {
         try {
             console.log('=== SERVICE - CREATE BATCH DEBUG ===');
@@ -339,9 +425,6 @@ export default class OperationPlanService implements IOperationPlanService {
             console.log('vvns.length:', vvns?.length);
             console.log('assignedCranes:', assignedCranes);
             console.log('assignedCranes.length:', assignedCranes?.length);
-            console.log('staffs.length:', staffs?.length);
-            console.log('operationTypes.length:', operationTypes?.length);
-            console.log('containers.length:', containers?.length);
             console.log('arrivalTimes.length:', arrivalTimes?.length);
             console.log('departureTimes.length:', departureTimes?.length);
             console.log('targetDays.length:', targetDays?.length);
@@ -352,9 +435,6 @@ export default class OperationPlanService implements IOperationPlanService {
 
             // Validar que todos os arrays têm o mesmo tamanho
             if (vvns.length !== assignedCranes.length ||
-                vvns.length !== staffs.length ||
-                vvns.length !== operationTypes.length ||
-                vvns.length !== containers.length ||
                 vvns.length !== arrivalTimes.length ||
                 vvns.length !== departureTimes.length ||
                 vvns.length !== targetDays.length) {
@@ -371,25 +451,25 @@ export default class OperationPlanService implements IOperationPlanService {
 
                 console.log(`=== Processing VVN ${i}: ${vvn} ===`);
                 console.log('assignedCranes[i]:', assignedCranes[i]);
-                console.log('operationTypes[i]:', operationTypes[i]);
-                console.log('containers[i]:', containers[i]);
 
-                // Criar as operation entries para este VVN
-                const operations = this.createOperationEntries(
+                // Criar as operation entries para este VVN baseadas nos cargo manifests
+                const result = await this.createOperationEntries(
                     vvn,
                     assignedCranes[i],
-                    operationTypes[i],
-                    containers[i],
                     arrivalTime,
-                    departureTime
+                    departureTime,
+                    authHeader
                 );
+
+                const vvnCode = result.vvnCode || vvn; // Fallback para vessel name se não encontrar VVN
+                const operations = result.operations;
 
                 console.log('Generated operations:', operations);
 
                 // Criar o operation plan (ID será gerado automaticamente pelo MongoDB)
                 const domain = OperationPlanMap.toDomain({
                     _id: undefined, // MongoDB gerará um ObjectId único automaticamente
-                    vvn: vvn,
+                    vvn: vvnCode, // Usar o código da VVN em vez do vessel name
                     TargetDay: targetDay,
                     arrivalTime: arrivalTime,
                     departureTime: departureTime,

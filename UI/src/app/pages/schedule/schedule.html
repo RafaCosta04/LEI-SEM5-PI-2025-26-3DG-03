@@ -171,7 +171,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="generateOperationPlans()" [disabled]="isGeneratingPlans">
-          {{ isGeneratingPlans ? 'Generating...' : 'Generate Plans' }}
+          {{ isGeneratingPlans ? ('SCHEDULE.BUTTON.GENERATING_PLANS' | translate) : ('SCHEDULE.BUTTON.GENERATE_PLANS' | translate) }}
         </button>
         <button class="btn" (click)="closeSchedule()">{{ 'SCHEDULE.BUTTON.CLOSE' | translate }}</button>
       </div>

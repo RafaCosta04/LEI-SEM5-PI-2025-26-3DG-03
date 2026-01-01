@@ -496,8 +496,6 @@ export class Schedule implements OnInit, OnDestroy {
       algorithm: this.selectedAlgorithm
     };
 
-    console.log('Payload being sent:', payload);
-
     // Chamar o backend para criar operation plans
     this.operationPlanService.createBatch(payload)
       .pipe(takeUntil(this.destroy$))
@@ -506,11 +504,11 @@ export class Schedule implements OnInit, OnDestroy {
           this.isGeneratingPlans = false;
           this.showScheduleModal = false;
 
-          // Extrair IMOs dos vessels
-          const vesselIMOs = vvns.join(', ');
+          // Extrair VVN codes dos operation plans criados
+          const vvnCodes = response.map((plan: any) => plan.vvn).join(', ');
           const targetDay = targetDays[0] || 'Unknown';
           
-          this.generatedPlansMessage = `Operation plans for vessels ${vesselIMOs} on ${targetDay} were generated.`;
+          this.generatedPlansMessage = `Operation plans for VVNs ${vvnCodes} on ${targetDay} were generated.`;
           this.showOperationPlansModal = true;
         },
         error: (err) => {

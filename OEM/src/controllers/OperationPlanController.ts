@@ -142,31 +142,29 @@ export default class OperationPlanController implements IOperationPlanController
             console.log('Keys:', req.body ? Object.keys(req.body) : 'none');
             console.log('==============================================');
             
-            const { vvns, assignedCranes, staffs, operationTypes, containers, arrivalTimes, departureTimes, targetDays, author, algorithm } = req.body;
+            const { vvns, assignedCranes, arrivalTimes, departureTimes, targetDays, author, algorithm } = req.body;
             
             console.log('=== EXTRACTED FIELDS ===');
             console.log('vvns:', vvns);
             console.log('assignedCranes:', assignedCranes);
-            console.log('staffs:', staffs);
-            console.log('operationTypes:', operationTypes);
-            console.log('containers:', containers);
             console.log('arrivalTimes:', arrivalTimes);
             console.log('departureTimes:', departureTimes);
             console.log('targetDays:', targetDays);
             console.log('author:', author);
             console.log('algorithm:', algorithm);
             
+            // Extract Auth header from request
+            const authHeader = req.headers.authorization;
+            
             const result = await this.operationPlanService.createBatch(
                 vvns,
                 assignedCranes,
-                staffs,
-                operationTypes,
-                containers,
                 arrivalTimes,
                 departureTimes,
                 targetDays,
                 author,
-                algorithm
+                algorithm,
+                authHeader
             );
             
             if (result.isSuccess) {

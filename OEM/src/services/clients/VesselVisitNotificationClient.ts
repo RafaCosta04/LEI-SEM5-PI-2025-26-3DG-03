@@ -6,6 +6,21 @@ export interface VesselVisitNotificationDTO {
   code: string;
   vesselIMO?: string;
   visitStatus?: string;
+  vessel?: {
+    vesselName?: string;
+    imoNumber?: string;
+    [key: string]: any;
+  };
+  cargoManifests?: Array<{
+    manifestType: string;
+    entries?: Array<{
+      containerNumber: string;
+      row: number;
+      bay: number;
+      tier: number;
+      storageAreaCode: string;
+    }>;
+  }>;
   [key: string]: any;
 }
 
@@ -20,6 +35,12 @@ export default class VesselVisitNotificationClient {
     const url = `${this.baseUrl}/VesselVisitNotification/ByCode/${encodeURIComponent(code)}`;
     const json = await this.getJson(url, authHeader);
     return json as VesselVisitNotificationDTO | null;
+  }
+
+  public async getAll(authHeader?: string): Promise<VesselVisitNotificationDTO[]> {
+    const url = `${this.baseUrl}/VesselVisitNotification`;
+    const json = await this.getJson(url, authHeader);
+    return (json as VesselVisitNotificationDTO[]) || [];
   }
 
   private async getJson(urlStr: string, authHeader?: string): Promise<any> {
