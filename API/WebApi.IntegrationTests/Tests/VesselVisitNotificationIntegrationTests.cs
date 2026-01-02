@@ -72,10 +72,10 @@ namespace WebApi.IntegrationTests.Tests
         }
 
         [Theory]
-        [InlineData("2025-PA-000001")]
-        [InlineData("2025-PA-000002")]
-        [InlineData("2025-PA-000003")]
-        [InlineData("2025-PA-000004")]
+        [InlineData("2026-PA-000001")]
+        [InlineData("2026-PA-000002")]
+        [InlineData("2026-PA-000003")]
+        [InlineData("2026-PA-000004")]
         public async Task GetVesselVisitNotificationByCode_Found(string code)
         {
             var response = await _client.GetAsync($"/api/VesselVisitNotification/ByCode/{code}");

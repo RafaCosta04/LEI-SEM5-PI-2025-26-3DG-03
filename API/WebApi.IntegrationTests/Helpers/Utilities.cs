@@ -376,7 +376,7 @@ public static class Utilities
         var etd0 = eta0.AddDays(1);
         var n1 = new VesselVisitNotificationDataModel
         {
-            Code = $"{now.Year}-PA-{1.ToString("D6")}",
+            Code = $"2026-PA-{1.ToString("D6")}",
             Vessel = vesselRecords[0],
             VesselId = vesselRecords[0].Id,
             Representative = representatives[0],
