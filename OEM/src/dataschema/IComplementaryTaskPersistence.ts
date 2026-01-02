@@ -1,5 +1,5 @@
-import { ComplementaryTaskStatus, ComplementaryTaskCategory } from "../domain/ComplementaryTaskEnums";
-
+import { ComplementaryTaskStatus } from "../domain/ComplementaryTaskEnums";
+import { ComplementaryTaskCategory } from "../domain/ComplementaryTaskCategory";
 export interface IComplementaryTaskPersistence {
     _id: string;
     category: ComplementaryTaskCategory;
