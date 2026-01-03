@@ -386,11 +386,18 @@
 /* Modal footer */
 .modal-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px;
   border-top: 1px solid #e9ecef;
   background-color: #f8f9fa;
+}
+
+.modal-footer .error-message {
+  flex: 1 1 100%;
+  margin-bottom: 8px;
+  order: -1;
 }
 
 .btn-secondary {

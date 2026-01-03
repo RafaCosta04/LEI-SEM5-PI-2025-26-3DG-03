@@ -377,6 +377,7 @@ export default class OperationPlanService implements IOperationPlanService {
             console.log('algorithm:', algorithm);
             
             const createdPlans: OperationPlanDTO[] = [];
+            const skippedVvns: string[] = [];
 
             // Validar que todos os arrays têm o mesmo tamanho
             if (vvns.length !== assignedCranes.length ||
@@ -411,6 +412,14 @@ export default class OperationPlanService implements IOperationPlanService {
 
                 console.log('Generated operations:', operations);
 
+                // Verificar se já existe um operation plan para esta VVN
+                const existingPlan = await this.operationPlanRepo.findByVvn(vvnCode);
+                if (existingPlan) {
+                    this.logger.info(`Operation plan for VVN ${vvnCode} already exists, skipping...`);
+                    skippedVvns.push(vvnCode);
+                    continue; // Pular para o próximo
+                }
+
                 // Criar o operation plan (ID será gerado automaticamente pelo MongoDB)
                 const domain = OperationPlanMap.toDomain({
                     _id: undefined, // MongoDB gerará um ObjectId único automaticamente
@@ -435,7 +444,15 @@ export default class OperationPlanService implements IOperationPlanService {
             }
 
             if (createdPlans.length === 0) {
+                if (skippedVvns.length > 0) {
+                    return Result.fail(`All operation plans already exist for VVNs: ${skippedVvns.join(', ')}`);
+                }
                 return Result.fail("Failed to create any operation plans.");
+            }
+
+            // Se alguns foram criados e outros foram pulados, registar no log
+            if (skippedVvns.length > 0) {
+                this.logger.info(`Created ${createdPlans.length} new operation plans. Skipped ${skippedVvns.length} existing VVNs: ${skippedVvns.join(', ')}`);
             }
 
             return Result.ok(createdPlans);

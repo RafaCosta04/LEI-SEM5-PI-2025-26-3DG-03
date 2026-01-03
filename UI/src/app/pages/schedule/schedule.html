@@ -170,6 +170,10 @@
         </div>
       </div>
       <div class="modal-footer">
+        <div *ngIf="scheduleErrorMessage" class="error-message" style="margin-bottom: 0;">
+          {{ scheduleErrorMessage }}
+          <button (click)="scheduleErrorMessage = ''" class="close-error">✕</button>
+        </div>
         <button class="btn btn-secondary" (click)="generateOperationPlans()" [disabled]="isGeneratingPlans">
           {{ isGeneratingPlans ? ('SCHEDULE.BUTTON.GENERATING_PLANS' | translate) : ('SCHEDULE.BUTTON.GENERATE_PLANS' | translate) }}
         </button>

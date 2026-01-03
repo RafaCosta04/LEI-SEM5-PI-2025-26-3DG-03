@@ -21,8 +21,22 @@ export class OperationPlanService {
     return this.oemService.post<any>('/operation-plans', payload).pipe(
       catchError((err) => {
         console.error('Error creating operation plans:', err);
+        console.error('Error structure:', JSON.stringify(err, null, 2));
+        
+        // Tentar extrair a mensagem de erro de várias fontes
+        let errorMessage = 'Error creating operation plans';
+        if (err?.error?.error) {
+          errorMessage = err.error.error;
+        } else if (err?.error?.message) {
+          errorMessage = err.error.message;
+        } else if (typeof err?.error === 'string') {
+          errorMessage = err.error;
+        } else if (err?.message) {
+          errorMessage = err.message;
+        }
+        
         return throwError(() => ({
-          message: err?.error?.error || err?.message || 'Error creating operation plans',
+          message: errorMessage,
           originalError: err
         }));
       })

@@ -72,6 +72,7 @@ export class Schedule implements OnInit, OnDestroy {
   showOperationPlansModal: boolean = false;
   generatedPlansMessage: string = '';
   isGeneratingPlans: boolean = false;
+  scheduleErrorMessage: string = '';
 
   constructor(
     private vesselVisitNotificationService: VesselVisitNotificationService,
@@ -341,6 +342,7 @@ export class Schedule implements OnInit, OnDestroy {
   closeSchedule() {
     this.showScheduleModal = false;
     this.scheduleModel = null;
+    this.scheduleErrorMessage = '';
   }
 
   getTimelineBounds(): { start: number; end: number } {
@@ -514,26 +516,39 @@ export class Schedule implements OnInit, OnDestroy {
         error: (err) => {
           this.isGeneratingPlans = false;
           console.error('Error generating operation plans:', err);
-          console.error('Error details:', err?.originalError);
-          console.error('Error response:', err?.originalError?.error);
+          console.error('Error type:', typeof err);
+          console.error('Error.message:', err?.message);
+          console.error('Error.error:', err?.error);
+          console.error('Error.originalError:', err?.originalError);
+          console.error('Error.originalError.error:', err?.originalError?.error);
           
           let msg = 'Error generating operation plans';
           try {
-            if (err && err.error) {
+            // Tentar extrair a mensagem de erro de várias fontes possíveis
+            if (err?.message) {
+              msg = err.message;
+            } else if (err?.originalError?.error?.error) {
+              msg = err.originalError.error.error;
+            } else if (err?.error?.error) {
+              msg = err.error.error;
+            } else if (err?.error) {
               const be = err.error;
               if (typeof be === 'string') msg = be;
-              else if (be.error) msg = be.error;
               else if (be.message) msg = be.message;
             }
+            
+            console.log('Final error message:', msg);
           } catch (e) {
             console.error('Error extracting error message', e);
           }
 
-          this.statusMessageType = 'error';
-          this.statusMessage = msg;
-          this.statusHiding = false;
-          if (this.statusTimeout) { clearTimeout(this.statusTimeout); }
-          this.statusTimeout = setTimeout(() => this.clearStatusMessage(), 3000);
+          // Mostrar erro dentro da modal do schedule
+          this.scheduleErrorMessage = msg;
+          
+          // Auto-hide depois de 5 segundos
+          setTimeout(() => {
+            this.scheduleErrorMessage = '';
+          }, 5000);
         }
       });
   }
