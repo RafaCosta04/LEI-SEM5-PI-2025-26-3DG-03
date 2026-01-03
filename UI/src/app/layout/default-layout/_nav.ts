@@ -106,7 +106,61 @@ export const navItems: IExtendedNavData[] = [
     name: 'NAV.SCHEDULE',
     url: '/schedule',
     icon: 'nav-img nav-img-schedule',
-    roles: ['Admin', 'LogisticOperator']
+    roles: ['Admin', 'PortAuthorityOfficer', 'LogisticOperator'],
+    children: [
+      {
+        name: 'NAV.SCHEDULE',
+        url: '/schedule',
+        icon: 'nav-img nav-img-schedule',
+        roles: ['Admin', 'LogisticOperator']
+      },
+      {
+        name: 'NAV.REBALANCING',
+        url: '/rebalancing',
+        icon: 'nav-img nav-img-rebalancing',
+        roles: ['Admin', 'PortAuthorityOfficer']
+    }
+    ]
+  },
+  {
+    name: 'NAV.INCIDENT',
+    url: '/incident',
+    icon: 'nav-img nav-img-incident-type',
+    roles: ['Admin', 'PortAuthorityOfficer', 'LogisticOperator'],
+    children: [
+      {
+        name: 'NAV.INCIDENT',
+        url: '/incident',
+        icon: 'nav-img nav-img-incident-type',
+        roles: ['Admin', 'LogisticOperator']
+      },
+      {
+        name: 'NAV.INCIDENT_TYPE',
+        url: '/incident-type',
+        icon: 'nav-img nav-img-incident-type',
+        roles: ['Admin', 'PortAuthorityOfficer']
+      }
+    ]
+  },
+  {
+    name: 'NAV.COMPLEMENTARY_TASK',
+    url: '/complementary-task',
+    icon: 'nav-img nav-img-complementary-task',
+    roles: ['Admin', 'PortAuthorityOfficer', 'LogisticOperator'],
+    children: [
+      {
+        name: 'NAV.COMPLEMENTARY_TASK',
+        url: '/complementary-task',
+        icon: 'nav-img nav-img-complementary-task',
+        roles: ['Admin', 'LogisticOperator', 'PortAuthorityOfficer']
+      },
+      {
+        name: 'NAV.COMPLEMENTARY_TASK_CATEGORY',
+        url: '/complementary-task-category',
+        icon: 'nav-img nav-img-complementary-task',
+        roles: ['Admin', 'PortAuthorityOfficer']
+      }
+    ]
   },
   {
     name: 'NAV.OPERATION_PLANS',
@@ -115,10 +169,10 @@ export const navItems: IExtendedNavData[] = [
     roles: ['Admin', 'LogisticOperator']
   },
   {
-    name: 'NAV.REBALANCING',
-    url: '/rebalancing',
-    icon: 'nav-img nav-img-schedule',
-    roles: ['Admin', 'PortAuthorityOfficer']
+    name: 'NAV.VESSEL_VISIT_EXECUTION',
+    url: '/vessel-visit-execution',
+    icon: 'nav-img nav-img-vessel-visit-execution',
+    roles: ['Admin', 'LogisticOperator']
   },
   {
     name: 'NAV.SYSTEM_USER',
@@ -131,35 +185,5 @@ export const navItems: IExtendedNavData[] = [
     url: '/privacy-policy/admin',
     icon: 'nav-img nav-img-privacy-policy',
     roles: ['Admin']
-  },
-  {
-    name: 'NAV.INCIDENT_TYPE',
-    url: '/incident-type',
-    icon: 'nav-img nav-img-incident-type',
-    roles: ['Admin', 'PortAuthorityOfficer']
-  },
-  {
-    name: 'NAV.INCIDENT',
-    url: '/incident',
-    icon: 'nav-img nav-img-incident-type',
-    roles: ['Admin', 'LogisticOperator']
-  },
-  {
-    name: 'NAV.COMPLEMENTARY_TASK_CATEGORY',
-    url: '/complementary-task-category',
-    icon: 'nav-img nav-img-incident-type',
-    roles: ['Admin', 'PortAuthorityOfficer']
-  },
-  {
-    name: 'NAV.COMPLEMENTARY_TASK',
-    url: '/complementary-task',
-    icon: 'nav-img nav-img-incident-type',
-    roles: ['Admin', 'LogisticOperator', 'PortAuthorityOfficer']
-  },
-  {
-    name: 'NAV.VESSEL_VISIT_EXECUTION',
-    url: '/vessel-visit-execution',
-    icon: 'nav-img nav-img-incident-type',
-    roles: ['Admin', 'LogisticOperator']
   }
 ];
