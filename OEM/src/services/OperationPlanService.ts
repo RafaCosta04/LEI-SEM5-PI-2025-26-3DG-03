@@ -129,6 +129,30 @@ export default class OperationPlanService implements IOperationPlanService {
         }
     }
 
+    public async searchOperationPlans(startDate?: Date, endDate?: Date, vvn?: string): Promise<Result<OperationPlanDTO[]>> {
+        try {
+            let operationPlans: OperationPlan[];
+
+            // If date range is provided, use findByDateRange
+            if (startDate && endDate) {
+                operationPlans = await this.operationPlanRepo.findByDateRange(startDate, endDate, vvn);
+            } else if (vvn) {
+                // If only vvn is provided
+                const plan = await this.operationPlanRepo.findByVvn(vvn);
+                operationPlans = plan ? [plan] : [];
+            } else {
+                // If no filters, return all
+                operationPlans = await this.operationPlanRepo.findAll();
+            }
+
+            const operationPlanDTOs = operationPlans.map(op => OperationPlanMap.toDTO(op));
+            return Result.ok(operationPlanDTOs);
+        } catch (error) {
+            this.logger.error(error);
+            return Result.fail("Error searching operation plans.");
+        }
+    }
+
     public async create(dto: OperationPlanDTO): Promise<Result<OperationPlanDTO>> {
         try {
             const exists = await this.operationPlanRepo.findByVvn(dto.vvn);

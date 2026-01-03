@@ -12,6 +12,8 @@ export default interface IOperationPlanService {
 
     getOperationPlansByTargetDay(targetDay: Date): Promise<Result<OperationPlanDTO[]>>;
 
+    searchOperationPlans(startDate?: Date, endDate?: Date, vvn?: string): Promise<Result<OperationPlanDTO[]>>;
+
     getOperationPlansByArrivalTime(arrivalTime: Date): Promise<Result<OperationPlanDTO[]>>;
 
     getOperationPlansByDepartureTime(departureTime: Date): Promise<Result<OperationPlanDTO[]>>;

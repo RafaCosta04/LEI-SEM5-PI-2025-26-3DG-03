@@ -11,6 +11,8 @@ export default interface IOperationPlanRepo extends Repo<OperationPlan> {
 
     findByTargetDay(targetDay: Date): Promise<OperationPlan | null>;
 
+    findByDateRange(startDate: Date, endDate: Date, vvn?: string): Promise<OperationPlan[]>;
+
     findByArrivalTime(arrivalTime: Date): Promise<OperationPlan[]>;
 
     findByDepartureTime(departureTime: Date): Promise<OperationPlan[]>;

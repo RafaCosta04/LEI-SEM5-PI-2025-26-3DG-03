@@ -134,6 +134,39 @@ export default class OperationPlanController implements IOperationPlanController
         }
     }
 
+    public async searchOperationPlans(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            this.logger.silly('Searching operation plans with filters');
+            const { startDate, endDate, vvn } = req.query;
+
+            let startDateObj: Date | undefined;
+            let endDateObj: Date | undefined;
+
+            if (startDate && typeof startDate === 'string') {
+                startDateObj = new Date(startDate);
+            }
+
+            if (endDate && typeof endDate === 'string') {
+                endDateObj = new Date(endDate);
+            }
+
+            const result = await this.operationPlanService.searchOperationPlans(
+                startDateObj,
+                endDateObj,
+                vvn as string | undefined
+            );
+
+            if (result.isSuccess) {
+                res.status(200).json(result.getValue());
+            } else {
+                res.status(500).json({ error: result.error });
+            }
+        } catch (e) {
+            this.logger.error(e);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
+
     public async createOperationPlan(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             console.log('=== CONTROLLER - createOperationPlan START ===');

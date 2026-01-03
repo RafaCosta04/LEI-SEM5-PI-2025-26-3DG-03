@@ -77,8 +77,15 @@ export class OperationPlan implements OnInit, OnDestroy {
     }));
   }
 
-  // Search
+  // Search and Filters
   searchTerm: string = '';
+  startDateFilter: string = '';
+  endDateFilter: string = '';
+  
+  // Sorting
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   private destroy$ = new Subject<void>();
 
   // Selected plan for details modal
@@ -144,7 +151,7 @@ export class OperationPlan implements OnInit, OnDestroy {
       .subscribe({
         next: (plans) => {
           this.operationPlans = plans || [];
-          this.filteredPlans = [...this.operationPlans];
+          this.applyFilters();
           this.isLoading = false;
         },
         error: (error) => {
@@ -152,6 +159,102 @@ export class OperationPlan implements OnInit, OnDestroy {
           this.isLoading = false;
         }
       });
+  }
+
+  applyFilters() {
+    // Start with search filter
+    let filtered = [...this.operationPlans];
+
+    // Apply text search
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(plan =>
+        plan.vvn.toLowerCase().includes(term) ||
+        plan.author.toLowerCase().includes(term) ||
+        plan.algorithm.toLowerCase().includes(term) ||
+        plan.id.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply date range filter
+    if (this.startDateFilter) {
+      const startDate = new Date(this.startDateFilter);
+      startDate.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(plan => {
+        const targetDay = new Date(plan.targetDay);
+        targetDay.setHours(0, 0, 0, 0);
+        return targetDay >= startDate;
+      });
+    }
+
+    if (this.endDateFilter) {
+      const endDate = new Date(this.endDateFilter);
+      endDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(plan => {
+        const targetDay = new Date(plan.targetDay);
+        targetDay.setHours(0, 0, 0, 0);
+        return targetDay <= endDate;
+      });
+    }
+
+    // Apply sorting
+    if (this.sortColumn) {
+      filtered = this.sortPlans(filtered);
+    }
+
+    this.filteredPlans = filtered;
+  }
+
+  sortPlans(plans: OperationPlanModel[]): OperationPlanModel[] {
+    return plans.sort((a, b) => {
+      let compareValue = 0;
+
+      switch (this.sortColumn) {
+        case 'vvn':
+          compareValue = a.vvn.localeCompare(b.vvn);
+          break;
+        case 'targetDay':
+          compareValue = new Date(a.targetDay).getTime() - new Date(b.targetDay).getTime();
+          break;
+        case 'arrivalTime':
+          compareValue = new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime();
+          break;
+        case 'departureTime':
+          compareValue = new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime();
+          break;
+        case 'author':
+          compareValue = a.author.localeCompare(b.author);
+          break;
+        case 'algorithm':
+          compareValue = a.algorithm.localeCompare(b.algorithm);
+          break;
+        case 'operations':
+          compareValue = a.operations.length - b.operations.length;
+          break;
+      }
+
+      return this.sortDirection === 'asc' ? compareValue : -compareValue;
+    });
+  }
+
+  onSortChange(column: string) {
+    if (this.sortColumn === column) {
+      // Toggle direction
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.applyFilters();
+  }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.startDateFilter = '';
+    this.endDateFilter = '';
+    this.sortColumn = '';
+    this.sortDirection = 'asc';
+    this.applyFilters();
   }
 
   loadVvnsWithoutPlans() {
@@ -231,32 +334,11 @@ export class OperationPlan implements OnInit, OnDestroy {
   }
 
   onSearchChange() {
-    const term = this.searchTerm.toLowerCase().trim();
+    this.applyFilters();
+  }
 
-    if (this.activeTab === 'plans') {
-      if (!term) {
-        this.filteredPlans = [...this.operationPlans];
-        return;
-      }
-
-      this.filteredPlans = this.operationPlans.filter(plan =>
-        plan.vvn.toLowerCase().includes(term) ||
-        plan.author.toLowerCase().includes(term) ||
-        plan.algorithm.toLowerCase().includes(term) ||
-        plan.id.toLowerCase().includes(term)
-      );
-    } else {
-      if (!term) {
-        this.filteredMissingVvns = [...this.vvnsWithoutPlans];
-      } else {
-        this.filteredMissingVvns = this.vvnsWithoutPlans.filter(vvn =>
-          vvn.code.toLowerCase().includes(term) ||
-          vvn.vesselIMO?.toLowerCase().includes(term) ||
-          vvn.vessel?.vesselName?.toLowerCase().includes(term)
-        );
-      }
-      this.groupVvnsByDate();
-    }
+  onFilterChange() {
+    this.applyFilters();
   }
 
   viewDetails(plan: OperationPlanModel) {

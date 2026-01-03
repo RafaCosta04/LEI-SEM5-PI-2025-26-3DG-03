@@ -55,6 +55,26 @@ export class OperationPlanService {
     );
   }
 
+  search(startDate?: string, endDate?: string, vvn?: string): Observable<any[]> {
+    let params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    if (vvn) params.append('vvn', vvn);
+
+    const queryString = params.toString();
+    const url = queryString ? `/operation-plans/search?${queryString}` : '/operation-plans/search';
+
+    return this.oemService.get<any[]>(url).pipe(
+      catchError((err) => {
+        console.error('Error searching operation plans:', err);
+        return throwError(() => ({
+          message: err?.error?.error || err?.message || 'Error searching operation plans',
+          originalError: err
+        }));
+      })
+    );
+  }
+
   update(vvn: string, payload: any): Observable<any> {
     return this.oemService.put<any>(`/operation-plans/update/${vvn}`, payload).pipe(
       catchError((err) => {

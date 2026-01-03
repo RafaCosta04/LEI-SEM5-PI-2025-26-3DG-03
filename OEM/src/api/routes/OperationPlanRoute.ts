@@ -183,6 +183,46 @@ export default (app: Router) => {
 
     /**
      * @swagger
+     * /operation-plans/search:
+     *   get:
+     *     tags: [OperationPlans]
+     *     summary: Search operation plans by date range and/or vessel
+     *     parameters:
+     *       - in: query
+     *         name: startDate
+     *         schema:
+     *           type: string
+     *           format: date
+     *         description: Start date for filtering (YYYY-MM-DD)
+     *       - in: query
+     *         name: endDate
+     *         schema:
+     *           type: string
+     *           format: date
+     *         description: End date for filtering (YYYY-MM-DD)
+     *       - in: query
+     *         name: vvn
+     *         schema:
+     *           type: string
+     *         description: Vessel Visit Notification code to filter by
+     *     responses:
+     *       200:
+     *         description: Array of operation plans matching the criteria
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/OperationPlanDTO'
+     *       500:
+     *         description: Internal server error
+     */
+    route.get('/search', (req, res, next) =>
+        ctrl.searchOperationPlans(req, res, next)
+    );
+
+    /**
+     * @swagger
      * /operation-plans:
      *   get:
      *     tags: [OperationPlans]

@@ -975,3 +975,107 @@
 :host-context([data-coreui-theme="dark"]) .changelog-changes {
   color: #a0aec0;
 }
+/* Filters Section */
+.filters-section {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.filter-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.results-info {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+  text-align: right;
+}
+
+/* Sortable columns */
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.sort-icon {
+  margin-left: 4px;
+  font-size: 0.75rem;
+  color: #0d6efd;
+}
+
+/* Dark Mode for Filters */
+:host-context([data-coreui-theme="dark"]) .filters-section {
+  background-color: #1a202c;
+  border-color: #4a5568;
+}
+
+:host-context([data-coreui-theme="dark"]) .filter-group label {
+  color: #cbd5e0;
+}
+
+:host-context([data-coreui-theme="dark"]) .filter-input {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+:host-context([data-coreui-theme="dark"]) .filter-input:focus {
+  border-color: #66b3ff;
+  box-shadow: 0 0 0 3px rgba(102, 179, 255, 0.1);
+}
+
+:host-context([data-coreui-theme="dark"]) .results-info {
+  color: #a0aec0;
+}
+
+:host-context([data-coreui-theme="dark"]) .sortable:hover {
+  background-color: #2d3748;
+}
+
+:host-context([data-coreui-theme="dark"]) .sort-icon {
+  color: #66b3ff;
+}

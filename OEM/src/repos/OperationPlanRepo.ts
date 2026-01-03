@@ -79,6 +79,22 @@ export default class OperationPlanRepo implements IOperationPlanRepo {
     return records.map(r => OperationPlanMap.toDomain(r));
   }
 
+  async findByDateRange(startDate: Date, endDate: Date, vvn?: string): Promise<OperationPlan[]> {
+    const query: any = {
+      targetDay: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    };
+
+    if (vvn) {
+      query.vvn = vvn;
+    }
+
+    const records = await this.operationPlanSchema.find(query);
+    return records.map(r => OperationPlanMap.toDomain(r));
+  }
+
   async update(plan: OperationPlan): Promise<boolean> {
     const raw = OperationPlanMap.toPersistence(plan);
 

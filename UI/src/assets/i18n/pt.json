@@ -1388,6 +1388,7 @@
     "TITLE": "Planos de Operação",
     "SUBTITLE": "Ver e gerir todos os planos de operação gerados a partir dos horários de embarcações",
     "SEARCH_PLACEHOLDER": "Pesquisar por VVN, autor, algoritmo ou ID...",
+    "SEARCH_VVN_PLACEHOLDER": "Pesquisar VVNs...",
     "NO_PLANS": "Nenhum plano de operação encontrado.",
     "NO_MISSING_PLANS": "Todos os VVNs têm planos de operação!",
     "TAB_PLANS": "Planos de Operação",
@@ -1396,6 +1397,14 @@
     "REGENERATE_DAY": "Regenerar Dia",
     "GENERATE_BTN": "Gerar Plano",
     "NO_MISSING_VVNS": "Todos os VVNs têm planos de operação!",
+    "SHOWING": "A mostrar",
+    "FILTERS": {
+      "START_DATE": "Data Inicial",
+      "END_DATE": "Data Final",
+      "VVN": "Embarcação (VVN)",
+      "VVN_PLACEHOLDER": "Filtrar por VVN...",
+      "CLEAR": "Limpar Filtros"
+    },
     "VVN_DETAILS": {
       "VESSEL": "Embarcação",
       "ETA": "Hora Estimada de Chegada",

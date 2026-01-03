@@ -1389,6 +1389,7 @@
     "TITLE": "Operation Plans",
     "SUBTITLE": "View and manage all operation plans generated from vessel schedules",
     "SEARCH_PLACEHOLDER": "Search by VVN, author, algorithm or ID...",
+    "SEARCH_VVN_PLACEHOLDER": "Search VVNs...",
     "NO_PLANS": "No operation plans found.",
     "NO_MISSING_PLANS": "All VVNs have operation plans!",
     "TAB_PLANS": "Operation Plans",
@@ -1397,6 +1398,14 @@
     "REGENERATE_DAY": "Regenerate Day",
     "GENERATE_BTN": "Generate Plan",
     "NO_MISSING_VVNS": "All VVNs have operation plans!",
+    "SHOWING": "Showing",
+    "FILTERS": {
+      "START_DATE": "Start Date",
+      "END_DATE": "End Date",
+      "VVN": "Vessel (VVN)",
+      "VVN_PLACEHOLDER": "Filter by VVN...",
+      "CLEAR": "Clear Filters"
+    },
     "VVN_DETAILS": {
       "VESSEL": "Vessel",
       "ETA": "Estimated Arrival",

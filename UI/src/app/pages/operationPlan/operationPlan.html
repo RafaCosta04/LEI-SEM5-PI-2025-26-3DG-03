@@ -41,6 +41,40 @@
     </div>
   </div>
 
+  <!-- Filters Section for Plans Tab -->
+  <div *ngIf="activeTab === 'plans'" class="filters-section">
+    <div class="filters-container">
+      <div class="filter-group">
+        <label>{{ 'OPERATION_PLANS.FILTERS.START_DATE' | translate }}</label>
+        <input
+          type="date"
+          class="filter-input"
+          [(ngModel)]="startDateFilter"
+          (ngModelChange)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>{{ 'OPERATION_PLANS.FILTERS.END_DATE' | translate }}</label>
+        <input
+          type="date"
+          class="filter-input"
+          [(ngModel)]="endDateFilter"
+          (ngModelChange)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-secondary btn-sm" (click)="clearFilters()">
+          {{ 'OPERATION_PLANS.FILTERS.CLEAR' | translate }}
+        </button>
+      </div>
+    </div>
+    <div class="results-info">
+      {{ 'OPERATION_PLANS.SHOWING' | translate }}: {{ filteredPlans.length }} / {{ operationPlans.length }}
+    </div>
+  </div>
+
   <div *ngIf="isLoading" class="loading">
     {{ 'COMMON.LOADING' | translate }}
   </div>
@@ -103,13 +137,34 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>{{ 'OPERATION_PLANS.TABLE.VVN' | translate }}</th>
-          <th>{{ 'OPERATION_PLANS.TABLE.TARGET_DAY' | translate }}</th>
-          <th>{{ 'OPERATION_PLANS.TABLE.ARRIVAL' | translate }}</th>
-          <th>{{ 'OPERATION_PLANS.TABLE.DEPARTURE' | translate }}</th>
-          <th>{{ 'OPERATION_PLANS.TABLE.OPERATIONS' | translate }}</th>
-          <th>{{ 'OPERATION_PLANS.TABLE.AUTHOR' | translate }}</th>
-          <th>{{ 'OPERATION_PLANS.TABLE.ALGORITHM' | translate }}</th>
+          <th class="sortable" (click)="onSortChange('vvn')">
+            {{ 'OPERATION_PLANS.TABLE.VVN' | translate }}
+            <span *ngIf="sortColumn === 'vvn'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th class="sortable" (click)="onSortChange('targetDay')">
+            {{ 'OPERATION_PLANS.TABLE.TARGET_DAY' | translate }}
+            <span *ngIf="sortColumn === 'targetDay'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th class="sortable" (click)="onSortChange('arrivalTime')">
+            {{ 'OPERATION_PLANS.TABLE.ARRIVAL' | translate }}
+            <span *ngIf="sortColumn === 'arrivalTime'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th class="sortable" (click)="onSortChange('departureTime')">
+            {{ 'OPERATION_PLANS.TABLE.DEPARTURE' | translate }}
+            <span *ngIf="sortColumn === 'departureTime'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th class="sortable" (click)="onSortChange('operations')">
+            {{ 'OPERATION_PLANS.TABLE.OPERATIONS' | translate }}
+            <span *ngIf="sortColumn === 'operations'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th class="sortable" (click)="onSortChange('author')">
+            {{ 'OPERATION_PLANS.TABLE.AUTHOR' | translate }}
+            <span *ngIf="sortColumn === 'author'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th class="sortable" (click)="onSortChange('algorithm')">
+            {{ 'OPERATION_PLANS.TABLE.ALGORITHM' | translate }}
+            <span *ngIf="sortColumn === 'algorithm'" class="sort-icon">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+          </th>
           <th>{{ 'OPERATION_PLANS.TABLE.CREATED' | translate }}</th>
           <th>{{ 'OPERATION_PLANS.TABLE.ACTIONS' | translate }}</th>
         </tr>
