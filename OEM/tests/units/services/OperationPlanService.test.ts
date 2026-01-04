@@ -18,11 +18,13 @@ jest.mock("../../../src/mappers/OperationEntryMap", () => ({
 }));
 
 jest.mock("../../../src/services/clients/VesselVisitNotificationClient");
+jest.mock("../../../src/services/clients/ScheduleClient");
 
 import OperationPlanService from "../../../src/services/OperationPlanService";
 import { OperationPlanMap } from "../../../src/mappers/OperationPlanMap";
 import { OperationEntryMap } from "../../../src/mappers/OperationEntryMap";
 import VesselVisitNotificationClient from "../../../src/services/clients/VesselVisitNotificationClient";
+import ScheduleClient from "../../../src/services/clients/ScheduleClient";
 
 describe("OperationPlanService - Missing Plans Tests (unit tests)", () => {
 
@@ -30,6 +32,7 @@ describe("OperationPlanService - Missing Plans Tests (unit tests)", () => {
     let logger: any;
     let service: OperationPlanService;
     let vvnClientMock: jest.Mocked<VesselVisitNotificationClient>;
+    let scheduleClientMock: jest.Mocked<ScheduleClient>;
 
     beforeEach(() => {
         operationPlanRepo = {
@@ -54,6 +57,10 @@ describe("OperationPlanService - Missing Plans Tests (unit tests)", () => {
         // Mock VesselVisitNotificationClient instance
         vvnClientMock = service['vvnClient'] as jest.Mocked<VesselVisitNotificationClient>;
         vvnClientMock.getAll = jest.fn();
+
+        // Mock ScheduleClient instance
+        scheduleClientMock = service['scheduleClient'] as jest.Mocked<ScheduleClient>;
+        scheduleClientMock.getScheduleByTargetDay = jest.fn();
 
         (OperationEntryMap.toDomain as jest.Mock).mockImplementation((dto) => ({
             ...dto,
@@ -669,6 +676,16 @@ describe("OperationPlanService - Missing Plans Tests (unit tests)", () => {
             operationPlanRepo.findAll.mockResolvedValue(mockExistingPlans);
             operationPlanRepo.delete.mockResolvedValue(true);
 
+            // Mock schedule response
+            scheduleClientMock.getScheduleByTargetDay.mockResolvedValue({
+                schedule: {
+                    schedule: [
+                        { vessel: "Vessel A", craneNames: ["CRANE-1", "CRANE-2"] },
+                        { vessel: "Vessel B", craneNames: ["CRANE-3", "CRANE-4"] }
+                    ]
+                }
+            } as any);
+
             const mockDomainPlan = {
                 id: "new-plan-1",
                 vvn: "2026-PA-000001",
@@ -757,6 +774,15 @@ describe("OperationPlanService - Missing Plans Tests (unit tests)", () => {
             operationPlanRepo.findAll.mockResolvedValue(mockExistingPlans);
             operationPlanRepo.delete.mockResolvedValue(true);
 
+            // Mock schedule response
+            scheduleClientMock.getScheduleByTargetDay.mockResolvedValue({
+                schedule: {
+                    schedule: [
+                        { vessel: "Vessel A", craneNames: ["CRANE-1"] }
+                    ]
+                }
+            } as any);
+
             const mockDomainPlan = {
                 id: "new-plan-1",
                 vvn: "2026-PA-000001",
@@ -837,6 +863,15 @@ describe("OperationPlanService - Missing Plans Tests (unit tests)", () => {
 
             vvnClientMock.getAll.mockResolvedValue(mockVvns as any);
             operationPlanRepo.findAll.mockResolvedValue([]);
+
+            // Mock schedule response
+            scheduleClientMock.getScheduleByTargetDay.mockResolvedValue({
+                schedule: {
+                    schedule: [
+                        { vessel: "Vessel A", craneNames: ["CRANE-1"] }
+                    ]
+                }
+            } as any);
 
             let capturedDomainArg: any;
             (OperationPlanMap.toDomain as jest.Mock).mockImplementation((arg) => {

@@ -208,9 +208,9 @@ export default class VesselVisitExecutionService implements IVesselVisitExecutio
             if (!vesselIMO) {
                 return Result.fail("Vessel IMO is missing in the Vessel Visit Notification.");
             }
-            const vveByVesselIMO = await this.vesselVisitExecutionRepo.findByVesselIMO(vesselIMO);
-            if (vveByVesselIMO) {
-                return Result.fail(`A Vessel Visit Execution already exists for vessel IMO ${vesselIMO}.`);
+            const vveByVvnCode = await this.vesselVisitExecutionRepo.findByVvnCode(dto.vesselVisitNotificationCode);
+            if (vveByVvnCode) {
+                return Result.fail(`A Vessel Visit Execution already exists for VVN code ${dto.vesselVisitNotificationCode}.`);
             }
 
             // Validate that an OperationPlan exists for this VVN

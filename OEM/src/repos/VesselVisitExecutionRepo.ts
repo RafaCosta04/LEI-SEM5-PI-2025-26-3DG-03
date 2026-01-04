@@ -73,6 +73,11 @@ export default class VesselVisitExecutionRepo implements IVesselVisitExecutionRe
 
     }
     
+    async findByVvnCode(vvnCode: string): Promise<VesselVisitExecution | null> {
+        const record = await this.vesselVisitExecutionSchema.findOne({ vvnCode });
+        return record ? VesselVisitExecutionMap.toDomain(record) : null;
+    }
+
     async findByFilters(filters: { from?: Date; to?: Date; vesselIMO?: string; status?: VesselVisitExecutionStatus }): Promise<VesselVisitExecution[]> {
         const query: any = {};
         if (filters.vesselIMO) query.vesselIMO = filters.vesselIMO;

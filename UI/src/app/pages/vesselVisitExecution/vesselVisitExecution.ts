@@ -749,7 +749,31 @@ export class VesselVisitExecution implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (list) => {
-          this.approvedNotifications = (list || []).filter(n => n.visitStatus === VisitStatus.Approved);
+          const approvedList = (list || []).filter(n => n.visitStatus === VisitStatus.Approved);
+          
+          // Get all existing VVEs to filter out VVNs that already have a VVE
+          this.vveService.getAll()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (vves) => {
+                // Extract all vvnCodes from existing VVEs
+                const usedVvnCodes = new Set(
+                  (vves || [])
+                    .map(vve => vve.vesselVisitNotificationCode)
+                    .filter(code => code)
+                );
+                
+                // Filter approved notifications to show only those without an associated VVE
+                this.approvedNotifications = approvedList.filter(
+                  vvn => !usedVvnCodes.has(vvn.code)
+                );
+              },
+              error: (err) => {
+                console.error('Failed loading VVEs for filtering:', err);
+                // If we can't load VVEs, show all approved notifications
+                this.approvedNotifications = approvedList;
+              }
+            });
         },
         error: (err) => {
           console.error('Failed loading notifications:', err);

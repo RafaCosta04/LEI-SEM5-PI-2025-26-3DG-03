@@ -38,6 +38,10 @@ class VesselVisitExecutionRepoFake {
     return this.data.filter(x => x.vesselIMO === vesselIMO);
   }
 
+  async findByVvnCode(vvnCode: string) {
+    return this.data.find(x => x.vvnCode === vvnCode) ?? null;
+  }
+
   async findByFilters(filters: any) {
     let result = [...this.data];
     
@@ -334,7 +338,8 @@ describe("VesselVisitExecutionService – Aggregate Tests", () => {
     expect(result.isSuccess).toBe(true);
     expect(result.getValue().vesselIMO).toBe("IMO1234567");
     expect(result.getValue().systemUserID).toBe("user123");
-    expect(result.getValue().status).toBe(VesselVisitExecutionStatus.InProgress);
+    // Status is inferred as "Loading" based on the first operation's type (LOAD)
+    expect(result.getValue().status).toBe("Loading");
     expect(result.getValue().operations).toBeDefined();
     expect(result.getValue().operations?.length).toBe(1);
   });
@@ -402,8 +407,38 @@ describe("VesselVisitExecutionService – Aggregate Tests", () => {
     expect(result.errorValue()).toContain("status must be 'Approved'");
   });
 
-  it("should fail if execution already exists for vessel IMO", async () => {
-    const existing = new VesselVisitExecution("1", "2025-PA-000001", "IMO1234567", VesselVisitExecutionStatus.InProgress, new Date(), new Date(), "user1");
+  it("should fail if execution already exists for VVN code", async () => {
+    // Create an operation plan first
+    const operations = [
+      new OperationEntry("OP1", "LOAD", "CONT123", new Date("2025-01-15T08:00:00Z"), new Date("2025-01-15T09:00:00Z"), "CRANE-1")
+    ];
+    const operationPlan = new OperationPlan(
+      "1",
+      "VVN001",
+      new Date("2025-01-15"),
+      new Date("2025-01-15T06:00:00Z"),
+      new Date("2025-01-15T18:00:00Z"),
+      operations,
+      "testUser",
+      "Manual",
+      new Date()
+    );
+    operationPlanRepo.addOperationPlan(operationPlan);
+
+    // Create existing VVE with the same vvnCode
+    const existing = new VesselVisitExecution(
+      "1", 
+      "2025-PA-000001", 
+      "IMO1234567", 
+      VesselVisitExecutionStatus.InProgress, 
+      new Date(), 
+      new Date(), 
+      "user1",
+      [],
+      "",
+      undefined,
+      "VVN001"  // same vvnCode
+    );
     await vveRepo.save(existing);
 
     const dto = {
@@ -415,7 +450,7 @@ describe("VesselVisitExecutionService – Aggregate Tests", () => {
     const result = await service.createVesselVisitExecution(dto as any, "Bearer token");
 
     expect(result.isFailure).toBe(true);
-    expect(result.errorValue()).toContain("already exists for vessel IMO");
+    expect(result.errorValue()).toContain("already exists for VVN code");
   });
 
   it("should fail if incident IDs not found", async () => {
@@ -638,10 +673,13 @@ describe("VesselVisitExecutionService – Aggregate Tests", () => {
   });
 
   it("should update arrivalDate and DockAssigned together", async () => {
-    const vve = new VesselVisitExecution("1", "2025-PA-000001", "IMO1234567", VesselVisitExecutionStatus.InProgress, new Date(), new Date(), "user1");
+    const originalDate = new Date();
+    originalDate.setHours(originalDate.getHours() - 12); // Set to 12 hours ago
+    const vve = new VesselVisitExecution("1", "2025-PA-000001", "IMO1234567", VesselVisitExecutionStatus.InProgress, originalDate, new Date(), "user1");
     await vveRepo.save(vve);
 
-    const arrivalDate = new Date("2025-06-10T10:30:00Z");
+    const arrivalDate = new Date();
+    arrivalDate.setHours(arrivalDate.getHours() - 10); // 10 hours ago (within 24h of original)
     const payload = {
       arrivalDate: arrivalDate.toISOString(),
       DockAssigned: "DOCK-B2"
@@ -668,15 +706,20 @@ describe("VesselVisitExecutionService – Aggregate Tests", () => {
   });
 
   it("should update status, arrivalDate and DockAssigned all together", async () => {
-    const vve = new VesselVisitExecution("1", "2025-PA-000001", "IMO1234567", VesselVisitExecutionStatus.InProgress, new Date(), new Date(), "user1");
+    const originalDate = new Date();
+    originalDate.setHours(originalDate.getHours() - 15); // Set to 15 hours ago
+    const vve = new VesselVisitExecution("1", "2025-PA-000001", "IMO1234567", VesselVisitExecutionStatus.InProgress, originalDate, new Date(), "user1");
     await vveRepo.save(vve);
 
-    const arrivalDate = new Date("2025-06-10T10:30:00Z");
+    const arrivalDate = new Date();
+    arrivalDate.setHours(arrivalDate.getHours() - 14); // 14 hours ago (within 24h of original)
+    const departureDate = new Date();
+    departureDate.setHours(departureDate.getHours() - 1); // 1 hour ago (in the past)
     const payload = {
       status: "Completed",
       arrivalDate: arrivalDate.toISOString(),
       DockAssigned: "DOCK-C3",
-      departureDate: new Date("2025-06-15T18:00:00Z").toISOString()
+      departureDate: departureDate.toISOString()
     };
 
     const result = await service.updateVesselVisitExecution("2025-PA-000001", payload);

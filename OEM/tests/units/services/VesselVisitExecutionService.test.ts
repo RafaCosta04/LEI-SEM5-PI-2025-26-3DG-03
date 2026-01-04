@@ -51,6 +51,7 @@ describe("VesselVisitExecutionService (unit tests)", () => {
             findByStatus: jest.fn(),
             findByVesselIMOs: jest.fn(),
             findByVesselIMO: jest.fn(),
+            findByVvnCode: jest.fn(),
             findByFilters: jest.fn(),
             save: jest.fn(),
             update: jest.fn()
@@ -344,7 +345,7 @@ describe("VesselVisitExecutionService (unit tests)", () => {
         mockVvnClient.getByCode.mockResolvedValue(mockVVN);
 
         operationPlanRepo.findByVvn.mockResolvedValue(mockOperationPlan);
-        vesselVisitExecutionRepo.findByVesselIMO.mockResolvedValue(null);
+        vesselVisitExecutionRepo.findByVvnCode.mockResolvedValue(null);
         vesselVisitExecutionRepo.findAll.mockResolvedValue([]);
 
         const domainCreated = new VesselVisitExecution(
@@ -442,7 +443,7 @@ describe("VesselVisitExecutionService (unit tests)", () => {
         expect(result.errorValue()).toContain("must be 'Approved'");
     });
 
-    it("should fail when vessel IMO already has execution", async () => {
+    it("should fail when VVN code already has execution", async () => {
         const dto = {
             vesselVisitNotificationCode: "VVN001",
             arrivalDate: new Date("2024-07-01")
@@ -455,7 +456,7 @@ describe("VesselVisitExecutionService (unit tests)", () => {
         mockSystemUserClient.getByEmail.mockResolvedValue(mockUser);
         mockVvnClient.getByCode.mockResolvedValue(mockVVN);
 
-        vesselVisitExecutionRepo.findByVesselIMO.mockResolvedValue({ id: "existing" });
+        vesselVisitExecutionRepo.findByVvnCode.mockResolvedValue({ id: "existing" });
 
         const result = await service.createVesselVisitExecution(dto as any, "Bearer token");
 

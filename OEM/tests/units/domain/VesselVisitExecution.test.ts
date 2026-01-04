@@ -178,23 +178,7 @@ describe("VesselVisitExecution (unit tests)", () => {
     ).toThrow("Arrival date must be a valid date.");
   });
 
-  it("should throw error if arrival date is in the future", () => {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 10);
-
-    expect(() =>
-      new VesselVisitExecution(
-        validData.id,
-        validData.code,
-        validData.vesselIMO,
-        validData.status,
-        futureDate,
-        validData.lastUpdated,
-        validData.systemUserID,
-        []
-      )
-    ).toThrow("Arrival date cannot be in the future.");
-  });
+  // Removed test: arrival date future validation no longer exists in domain
 
   it("should throw error if departure date is not a valid date", () => {
     expect(() =>
