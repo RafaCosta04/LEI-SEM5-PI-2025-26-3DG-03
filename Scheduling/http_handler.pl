@@ -109,7 +109,14 @@ process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes, TimeLimit) :-
         % Run rebalancing-based scheduling with automatic algorithm selection per dock
         select_and_run_with_rebalancing(Docks, MaxCranes, TimeLimit, SeqTriplets, ShortestDelay, AlgoInfo),
         ExecutionTime = AlgoInfo.get(rebalancingTime, 0),
-        SelectedAlgo = 'automatic_with_rebalancing',
+        
+        % Extract algorithms used from AlgoInfo
+        AlgorithmSummary = AlgoInfo.algorithmSummary,
+        findall(Algo, member(_{algorithm: Algo}, AlgorithmSummary), AlgosList),
+        sort(AlgosList, UniqueAlgos),
+        atomic_list_concat(UniqueAlgos, ', ', AlgosStr),
+        
+        SelectedAlgo = AlgosStr,
         format(atom(SelectionReason), 'Automatic mode: Rebalancing across ~w docks with per-dock algorithm selection', [AlgoInfo.numberOfDocks])
     
     % MANUAL algorithm selection (legacy mode)
@@ -139,7 +146,7 @@ process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes, TimeLimit) :-
     
     % Build messages based on whether it's automatic or manual mode
     (   (AlgorithmAtom = 'automatic' ; AlgorithmAtom = 'auto')
-    ->  % Automatic mode: include crane mode information
+    ->  % Automatic mode: include crane mode information and per-dock algorithm details
         % Extract crane mode from AlgoInfo if available
         ( get_dict(craneMode, AlgoInfo, CraneModeAtom) ->
             atom_string(CraneModeAtom, CraneModeStr),
@@ -151,9 +158,23 @@ process_data_with_algorithm(Algorithm, Dict, Result, MaxCranes, TimeLimit) :-
         ),
         format_time_msg('Execution time: ~w seconds', ExecutionTime, TimeMsg),
         format_msg('Total delay: ~w', ShortestDelay, DelayMsg),
+        
+        % Build per-dock algorithm details
+        ( get_dict(algorithmSummary, AlgoInfo, AlgorithmSummary) ->
+            findall(DockAlgoMsg, 
+                    (member(DockInfo, AlgorithmSummary),
+                     get_dict(dock, DockInfo, Dock),
+                     get_dict(algorithm, DockInfo, Algo),
+                     format(atom(DockAlgoMsg), 'Selected algorithm for ~w: ~w', [Dock, Algo])),
+                    DockAlgoMessages)
+        ; DockAlgoMessages = []
+        ),
+        
         ( CraneModeDisplay \= '' ->
-            MessagesRaw = [AlgoSelectionMsg, SelectionReasonStr, CraneModeDisplay, TimeMsg, DelayMsg]
-        ;   MessagesRaw = [AlgoSelectionMsg, SelectionReasonStr, TimeMsg, DelayMsg]
+            append([SelectionReasonStr, CraneModeDisplay], DockAlgoMessages, Msgs1),
+            append(Msgs1, [TimeMsg, DelayMsg], MessagesRaw)
+        ;   append([SelectionReasonStr], DockAlgoMessages, Msgs2),
+            append(Msgs2, [TimeMsg, DelayMsg], MessagesRaw)
         )
     ;   % Manual mode: conditional display based on single-crane performance
         ( DelaySingle =:= 0 ->
