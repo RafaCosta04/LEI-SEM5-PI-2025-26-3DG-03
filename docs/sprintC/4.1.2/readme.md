@@ -62,3 +62,479 @@ Operation Plan Registration
 
 ## 5. Tests
 
+### System (end-to-end)
+- [OEM/tests/system/OperationPlan.system.test.ts](OEM/tests/system/OperationPlan.system.test.ts) spins up 
+```ts
+describe("POST /operation-plans and fetch by VVN", () => {
+    it("should create plans and fetch them by VVN", async () => {
+      const payload = {
+        vvns: ["2026-PA-000001"],
+        assignedCranes: [["CRANE-1"]],
+        arrivalTimes: ["2026-01-15T10:00:00Z"],
+        departureTimes: ["2026-01-15T18:00:00Z"],
+        targetDays: ["2026-01-15"],
+        author: "system-user",
+        algorithm: "default"
+      };
+
+      const createRes = await request(app)
+        .post("/api/operation-plans")
+        .send(payload)
+        .expect(201);
+
+      expect(createRes.body).toHaveLength(1);
+      expect(createRes.body[0]).toHaveProperty("vvn", "2026-PA-000001");
+
+      const getRes = await request(app)
+        .get("/api/operation-plans/vvn/2026-PA-000001")
+        .expect(200);
+
+      expect(Array.isArray(getRes.body)).toBe(true);
+      expect(getRes.body[0]).toHaveProperty("vvn", "2026-PA-000001");
+      expect(getRes.body[0]).toHaveProperty("operations");
+    });
+  });
+
+```
+
+
+### Application (routes + controller)
+- [OEM/tests/application/OperationPlan.routes.test.ts](OEM/tests/application/OperationPlan.routes.test.ts) 
+
+```ts
+
+describe("PUT /operation-plans/update/:vvn", () => {
+    const payload = {
+      id: "1",
+      vvn: "VVN-1",
+      targetDay: "2026-01-01",
+      arrivalTime: "2026-01-01T08:00:00Z",
+      departureTime: "2026-01-01T10:00:00Z",
+      operations: [
+        {
+          id: "OP1",
+          operationType: "LOAD",
+          container: "C1",
+          operationStart: "2026-01-01T08:00:00Z",
+          operationEnd: "2026-01-01T09:00:00Z",
+          craneUsed: "CR1"
+        }
+      ],
+      author: "alice",
+      algorithm: "genetic",
+      createdAt: "2026-01-01T07:00:00Z",
+      changeReason: "Adjust"
+    };
+
+    it("should update and return 200", async () => {
+      operationPlanServiceMock.update.mockResolvedValue({
+        isSuccess: true,
+        getValue: () => ({ vvn: "VVN-1" })
+      });
+
+      const res = await request(app)
+        .put("/operation-plans/update/VVN-1")
+        .send(payload)
+        .expect(200);
+
+      expect(res.body.vvn).toBe("VVN-1");
+      expect(operationPlanServiceMock.update).toHaveBeenCalledWith("VVN-1", expect.objectContaining({ changeReason: "Adjust" }));
+    });
+
+    it("should return 400 when service fails", async () => {
+      operationPlanServiceMock.update.mockResolvedValue({
+        isSuccess: false,
+        error: "update error"
+      });
+
+      const res = await request(app)
+        .put("/operation-plans/update/VVN-1")
+        .send(payload)
+        .expect(400);
+
+      expect(res.body).toHaveProperty("error", "update error");
+    });
+  });
+
+```
+
+### Aggregate/Service
+- [OEM/tests/aggregate/OperationPlanAggregate.test.ts](OEM/tests/aggregate/OperationPlanAggregate.test.ts) 
+
+```ts
+describe("OperationPlanService – Aggregate Tests", () => {
+	let repo: OperationPlanRepoFake;
+	let service: OperationPlanService;
+
+	beforeEach(() => {
+		repo = new OperationPlanRepoFake();
+		service = new OperationPlanService(repo as any, loggerFake);
+	});
+
+	// ---------------------------------------------
+	// CREATE – robust tests
+	// ---------------------------------------------
+	it("should create a new OperationPlan", async () => {
+		const dto: OperationPlanDTO = {
+			id: "",
+			vvn: "VVN-1",
+			targetDay: new Date("2025-01-10"),
+			arrivalTime: new Date("2025-01-10T06:00:00Z"),
+			departureTime: new Date("2025-01-10T12:00:00Z"),
+			operations: [
+				makeOperationEntryDTO("OP1", "2025-01-10T06:00:00Z", "2025-01-10T07:00:00Z"),
+				makeOperationEntryDTO("OP2", "2025-01-10T07:05:00Z", "2025-01-10T08:00:00Z"),
+			],
+			author: "alice",
+			algorithm: "GEN",
+			createdAt: new Date(),
+		};
+
+		const result = await service.create(dto as any);
+
+		expect(result.isSuccess).toBe(true);
+		const saved = await repo.findByVvn("VVN-1");
+		expect(saved).not.toBeNull();
+		expect(saved?.vvn).toBe("VVN-1");
+	});
+
+	it("should fail to create if VVN already exists", async () => {
+		await repo.save(makeDomainPlan("1", "VVN-1", "2025-01-10"));
+
+		const dto: OperationPlanDTO = {
+			id: "",
+			vvn: "VVN-1",
+			targetDay: new Date("2025-01-11"),
+			arrivalTime: new Date("2025-01-11T06:00:00Z"),
+			departureTime: new Date("2025-01-11T12:00:00Z"),
+			operations: [makeOperationEntryDTO("OP1", "2025-01-11T06:00:00Z", "2025-01-11T07:00:00Z")],
+			author: "alice",
+			algorithm: "GEN",
+			createdAt: new Date(),
+		};
+
+		const result = await service.create(dto as any);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errorValue()).toContain("already exists");
+	});
+
+	it("should fail to create if target day conflicts", async () => {
+		await repo.save(makeDomainPlan("1", "VVN-OLD", "2025-01-10"));
+
+		const dto: OperationPlanDTO = {
+			id: "",
+			vvn: "VVN-NEW",
+			targetDay: new Date("2025-01-10"),
+			arrivalTime: new Date("2025-01-10T06:00:00Z"),
+			departureTime: new Date("2025-01-10T12:00:00Z"),
+			operations: [makeOperationEntryDTO("OP1", "2025-01-10T06:00:00Z", "2025-01-10T07:00:00Z")],
+			author: "alice",
+			algorithm: "GEN",
+			createdAt: new Date(),
+		};
+
+		const result = await service.create(dto as any);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errorValue()).toContain("same target day");
+	});
+
+
+```
+
+### Unit (domain model)
+- [OEM/tests/units/domain/OperationPlan.test.ts](OEM/tests/units/domain/OperationPlan.test.ts)
+
+```ts
+describe("OperationPlan (unit tests)", () => {
+	const baseOperation = new OperationEntry(
+		"op-1",
+		"LOAD",
+		"CONT-1",
+		new Date("2026-01-01T08:00:00Z"),
+		new Date("2026-01-01T09:00:00Z"),
+		"CRANE-1"
+	);
+
+	const validData = {
+		id: "plan-1",
+		vvn: "VVN-001",
+		targetDay: new Date("2026-01-01"),
+		arrivalTime: new Date("2026-01-01T07:00:00Z"),
+		departureTime: new Date("2026-01-01T19:00:00Z"),
+		operations: [baseOperation],
+		author: "tester",
+		algorithm: "genetic",
+		createdAt: new Date("2026-01-01T06:00:00Z"),
+	};
+
+	// ------------------------------------------------------------
+	// Constructor validation
+	// ------------------------------------------------------------
+
+	it("should create an OperationPlan with valid data", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		expect(plan.id).toBe("plan-1");
+		expect(plan.vvn).toBe("VVN-001");
+		expect(plan.TargetDay).toEqual(validData.targetDay);
+		expect(plan.arrivalTime).toEqual(validData.arrivalTime);
+		expect(plan.departureTime).toEqual(validData.departureTime);
+		expect(plan.operations).toHaveLength(1);
+		expect(plan.author).toBe("tester");
+		expect(plan.algorithm).toBe("genetic");
+		expect(plan.createdAt).toEqual(validData.createdAt);
+		expect(plan.changeLog).toEqual([]);
+	});
+
+	it("should throw error if VVN is empty", () => {
+		expect(() =>
+			new OperationPlan(
+				validData.id,
+				"",
+				validData.targetDay,
+				validData.arrivalTime,
+				validData.departureTime,
+				validData.operations,
+				validData.author,
+				validData.algorithm,
+				validData.createdAt
+			)
+		).toThrow("Vessel Visit Notification cannot be null or empty.");
+	});
+
+	it("should throw error if author is empty", () => {
+		expect(() =>
+			new OperationPlan(
+				validData.id,
+				validData.vvn,
+				validData.targetDay,
+				validData.arrivalTime,
+				validData.departureTime,
+				validData.operations,
+				"",
+				validData.algorithm,
+				validData.createdAt
+			)
+		).toThrow("Author cannot be null or empty.");
+	});
+
+	it("should throw error if algorithm is empty", () => {
+		expect(() =>
+			new OperationPlan(
+				validData.id,
+				validData.vvn,
+				validData.targetDay,
+				validData.arrivalTime,
+				validData.departureTime,
+				validData.operations,
+				validData.author,
+				"",
+				validData.createdAt
+			)
+		).toThrow("Algorithm cannot be null or empty.");
+	});
+
+	// ------------------------------------------------------------
+	// Update methods
+	// ------------------------------------------------------------
+
+	it("should update VVN with valid value", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		plan.updateVvn("VVN-002");
+		expect(plan.vvn).toBe("VVN-002");
+	});
+
+	it("should throw error when updating VVN with empty value", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		expect(() => plan.updateVvn("")).toThrow(
+			"Vessel Visit Notification cannot be null or empty."
+		);
+	});
+
+	it("should update author with valid value", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		plan.updateAuthor("new-author");
+		expect(plan.author).toBe("new-author");
+	});
+
+	it("should throw error when updating author with empty value", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		expect(() => plan.updateAuthor("")).toThrow(
+			"Author cannot be null or empty."
+		);
+	});
+
+	it("should update algorithm with valid value", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		plan.updateAlgorithm("improved");
+		expect(plan.algorithm).toBe("improved");
+	});
+
+	it("should throw error when updating algorithm with empty value", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		expect(() => plan.updateAlgorithm("")).toThrow(
+			"Algorithm cannot be null or empty."
+		);
+	});
+
+	it("should update target day, arrival and departure times", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		const newTargetDay = new Date("2026-02-01");
+		const newArrival = new Date("2026-02-01T08:00:00Z");
+		const newDeparture = new Date("2026-02-01T20:00:00Z");
+
+		plan.updateTargetDay(newTargetDay);
+		plan.updateArrivalTime(newArrival);
+		plan.updateDepartureTime(newDeparture);
+
+		expect(plan.TargetDay).toEqual(newTargetDay);
+		expect(plan.arrivalTime).toEqual(newArrival);
+		expect(plan.departureTime).toEqual(newDeparture);
+	});
+
+	it("should update operations list", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		const newOperation = new OperationEntry(
+			"op-2",
+			"UNLOAD",
+			"CONT-2",
+			new Date("2026-02-01T10:00:00Z"),
+			new Date("2026-02-01T11:00:00Z"),
+			"CRANE-2"
+		);
+
+		plan.updateOperations([newOperation]);
+		expect(plan.operations).toHaveLength(1);
+		expect(plan.operations[0].id).toBe("op-2");
+	});
+
+	// ------------------------------------------------------------
+	// Change log
+	// ------------------------------------------------------------
+
+	it("should add change log entry with metadata", () => {
+		const plan = new OperationPlan(
+			validData.id,
+			validData.vvn,
+			validData.targetDay,
+			validData.arrivalTime,
+			validData.departureTime,
+			validData.operations,
+			validData.author,
+			validData.algorithm,
+			validData.createdAt
+		);
+
+		plan.addChangeLogEntry("auditor", "Adjust schedule", "Changed crane order");
+
+		expect(plan.changeLog).toHaveLength(1);
+		expect(plan.changeLog[0]).toMatchObject({
+			author: "auditor",
+			reason: "Adjust schedule",
+			changes: "Changed crane order",
+		});
+		expect(plan.changeLog[0].date).toBeInstanceOf(Date);
+	});
+});
+
+```
