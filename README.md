@@ -20,27 +20,27 @@ Manage vessel visits, optimize cargo operations with AI, and explore the entire 
 
 ---
 
-A full-stack, **polyglot microservices** platform that models the full lifecycle of a vessel visit — from booking and dock assignment to AI-scheduled cargo operations and real-time execution tracking. Built as the capstone project for the 5th semester of Informatics Engineering at **ISEP**.
+A full-stack **microservices platform** — spanning Angular, .NET, Node.js and Prolog — that models the full lifecycle of a vessel visit, from booking and dock assignment to AI-scheduled cargo operations and real-time execution tracking. It is exposed through **RESTful APIs** and a responsive **Single Page Application (SPA)**, and was built as the capstone project for the 5th semester of Informatics Engineering at **ISEP**.
 
 ## ✨ What makes it stand out
 
-- 🧠 **AI scheduling engine (Prolog)** — exact, heuristic and **genetic algorithms** that minimize vessel departure delays, with automatic algorithm selection and dock rebalancing.
-- 🌐 **Live 3D digital twin (Three.js)** — the entire port rendered from real data: docks, cranes, vessels and yards with object picking, dynamic lighting and smooth camera control.
-- 🏛️ **Domain-Driven Design (.NET)** — a cleanly layered core API for the port-facilities domain.
-- 🔐 **Enterprise security** — external IAM (Keycloak / OAuth2) with role- and attribute-based access control across every service.
-- ⚙️ **Production-minded** — CI/CD pipeline, automated backups, GDPR compliance and English / Portuguese i18n.
+- 🧠 **AI optimization engine (Prolog)** — exact, heuristic and **genetic algorithms (metaheuristics)** that solve an NP-hard scheduling problem to minimize vessel departure delays, with automatic algorithm selection and dock rebalancing.
+- 🌐 **Real-time 3D digital twin (Three.js / WebGL)** — the entire port rendered from live data: docks, cranes, vessels and yards with object picking, dynamic lighting and smooth camera control.
+- 🏛️ **Domain-Driven Design (DDD) in .NET** — a cleanly layered, test-covered core API (domain, application, persistence) following SOLID and clean-architecture principles.
+- 🔐 **Authentication & authorization** — external Identity & Access Management via **OAuth2 / OpenID Connect (Keycloak)**, JWT, and **Role-Based & Attribute-Based Access Control (RBAC / ABAC)** enforced on every endpoint.
+- ⚙️ **DevOps & quality** — **CI/CD with GitHub Actions**, automated database backups, **unit & end-to-end testing (Cypress)**, GDPR compliance, internationalization (i18n), and **Agile / Scrum** delivery.
 
 ## 🏛️ Architecture
 
-Five decoupled services, each owning its data and communicating over REST only.
+Five decoupled microservices, each owning its data and communicating exclusively through **RESTful APIs**.
 
-| Service              | Role                               | Stack                           |
-| -------------------- | ---------------------------------- | ------------------------------- |
-| **UI**         | SPA + 3D digital twin              | Angular 20, Three.js, Cypress   |
-| **API**        | Core port domain                   | C# / .NET, Domain-Driven Design |
-| **OEM**        | Operations execution & analytics   | Node.js, Express, MongoDB       |
-| **Scheduling** | Planning & optimization algorithms | Prolog (SWI-Prolog)             |
-| **IAM**        | Authentication                     | Keycloak (OAuth2 / OIDC)        |
+| Service              | Role                               | Stack                                    |
+| -------------------- | ---------------------------------- | ---------------------------------------- |
+| **UI**         | SPA + 3D digital twin              | Angular 20, TypeScript, Three.js, Cypress |
+| **API**        | Core port domain                   | C# / .NET, Domain-Driven Design          |
+| **OEM**        | Operations execution & analytics   | Node.js, Express, MongoDB (NoSQL)        |
+| **Scheduling** | Planning & optimization algorithms | Prolog (SWI-Prolog)                      |
+| **IAM**        | Authentication                     | Keycloak (OAuth2 / OpenID Connect)       |
 
 <div align="center">
 <img src="docs/Global_Artifacts/SprintC/containers_lvl2.png" alt="Container diagram" width="720"/>
